@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+# =Filter Tool=
+# Made to retrieve enhancer and promoter fields from tables
+
+awk -F "\t" '
+{
+	if ($4 ~ /enhancer/ || $4 ~ /promoter/)
+	{
+		print $10,$11;
+		if (!$11)
+		{
+			print "no note",$12;
+		}
+		else
+		{
+			print "yes note",$12;
+		}
+	}
+}
+' "$@"

@@ -1,0 +1,111 @@
+---
+title: Prediction of CRE Promoter-Enhancer Potential via Machine Learning
+format: html
+---
+
+# Introduction
+
+Contrary to classical dictotomy of activating cis-regulatory elements (CREs) such as 
+promoters and enhancers, recent bibliography suggests an architecture shared between 
+both: bidirectional transcription inside the same nucleosome depleted regions (NDRs) 
+with the potential to enhance transcription of nearby located (up to 1Mb) genes.
+
+For this we will gather data from different sources (databases) such as: GeneHancer  
+(mainly), FANTOM5, ENCODE, EPD and RefSeq. 
+
+Description of each database:
+
+* GeneHancer:
+
+	+ Around 251K elements: 251 195
+	+ Assembly: hg38
+	+ Last update: 2018-09 
+	+ Retrieved from: genome.ucsc.edu
+
+* Eukaryotic Promoter Database (EPD):
+
+	+ Around  29K elements:  29 598
+	+ Assembly: hg38
+	+ Last update: 2018-05
+	+ Retrieved from: epd.expasy.org
+
+* ENCODE Candidate Cis-Regulatory Elements (ENCODE cCREs):
+
+	+ Around 926K elements: 926 535
+	+ Assembly: hg38
+	+ Last update: 2020-05 
+	+ Retrieved from: genome.ucsc.edu
+
+No no no, the code is being run in here (at least the python chunks)
+
+```{python}
+def hello():
+  print("Hello world")
+```
+
+```{bash}
+echo "hola"
+```
+
+```{python}
+hello()
+```
+
+```{bash}
+# =Filter Tool=
+# Made to retrieve enhancer and promoter fields from tables
+
+nfield="$1"
+function enha_prom_filter {
+awk -F "\t" '
+{
+	if ($'$nfield' ~ /enhancer/ || $'$nfield' ~ /promoter/)
+	{
+		if (!$11)
+		{
+			print $1,";",$10,";","no-note",";",$12;
+		}
+		else
+		{
+			print $1,";", $10,";","has-note",";",$12;
+		}
+	}
+}
+' "$2"
+}
+# awk -F "\t" '
+# {
+# 	if ($'$nfield' ~ /enhancer/ || $'$nfield' ~ /promoter/)
+# 	{
+# 		if (!$11)
+# 		{
+# 			print $1,";",$10,";","no-note",";",$12;
+# 		}
+# 		else
+# 		{
+# 			print $1,";", $10,";","has-note",";",$12;
+# 		}
+# 	}
+# }
+# ' "$2"
+```
+
+```{bash}
+
+list1=(AB CD FG)
+list2=(12 34 56)
+
+for i in 0 1 2;
+do
+	echo "${list1[i]} ${list2[i]}" 
+done
+
+echo ${list1[*]}
+echo ${list2[*]}
+
+unset list1
+unset list2
+
+```
+
+
