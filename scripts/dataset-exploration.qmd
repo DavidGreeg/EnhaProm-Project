@@ -37,10 +37,12 @@ Description of each database:
 	+ Retrieved from: genome.ucsc.edu
 
 * RefSeq Functional Elements (RefSeq FuncElems):
-	+ Exactly 134 elements (both promoters and enhancers)
+	+ Around   5K elements:   5 756
+	+ Exactly 134 usable elements (both promoters and enhancers)
 	+ Assembly: hg38
-	+ Last update: 
+	+ Last update: 2017-11
 	+ Retrieved from genome.ucsc.edu
+
 
 ```{bash}
 function enha_prom_filter {
