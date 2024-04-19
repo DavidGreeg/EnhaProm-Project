@@ -1,8 +1,12 @@
-#!/bin/bash
+#!/bin/awk
 #
-# =GC Content Measurement Tool=
+# =Phred Quality Sequence Filter Tool=
+# 
+# Example use:
+# (suppose that you are located in:
+#	~/Epigenomica/UBMI-IFC/EnhaProm-Project/scripts)
+# awk -f scripts/quality-seqfilter.awk ~/XX01tiles_DEE1.fastq
 
-awk -F ":" '
 function char_to_val(char){
 	phred_chars="!\"#$%&\x27()*+,-./0123456789:;<=>?@ABCDEFGHIJK"
 	phred_val=index(phred_chars, char)-1
@@ -15,15 +19,9 @@ function char_to_val(char){
 	}
 	if( $1 ~ /^@HS1/ ) #( $1 == "@HS1" )
 	{
-		header = $0;
-		header_line = NR;
+		header=$0;
+		header_line=NR; #-------------------------------
 		getline sequence;
-
-		seq_len = length(sequence);
-		split(sequence, seq_chars, "");
-		for (i=1; i<=seq_len; i++){
-			GC[seq_chars[i]]++;
-		}
 	}
 	else if ( $0 ~ /^\+$/ && header_line == ((NR-2)) ) #( $0 == "+" && header_line == ((NR-2)) )
 	{
@@ -48,4 +46,4 @@ function char_to_val(char){
 	{
 		next;
 	}
-}' "$@"
+}

@@ -1,0 +1,201 @@
+---
+title: Genome Functions to Use Later
+format: html
+---
+
+## Brief description of each function
+
+### Libraries used
+```{r}
+library(stringr)
+library(stringi)
+
+```
+
+### Example sequences:
+```{r}
+seq1 <- "gtatgggaatcagccgggtctcactatgtgcaaaggagattcggtcgtgtggtacttattcag"
+seq2 <- "gtatgggaatcagccgggtctcactatgtgcaaa"
+seq3 <- "gtatgggaat"
+
+sequence1 <- toupper(seq1)
+sequence1
+sequence2 <- toupper(seq2)
+sequence2 
+sequence3 <- toupper(seq3)
+sequence3 
+```
+
+### Counts per Base 
+```{r}
+bases_count <- function(sequence, bases = c("A", "T", "C", "G")) {
+  base_counts <- str_count(sequence, bases)
+  names(base_counts) <- bases
+  return(base_counts)
+}
+
+bases_count(sequence1)
+bases_count(sequence2)
+bases_count(sequence3)
+```
+
+### Percentage per Base
+```{r}
+bases_percentage <- function(sequence, bases = c("A", "T", "C", "G")) {
+  base_percs <- bases_count(sequence, bases) / str_length(sequence)
+  names(base_percs) <- bases
+  return(base_percs)
+}
+
+bases_percentage(sequence1)
+bases_percentage(sequence2)
+bases_percentage(sequence3)
+```
+
+### GC Percentage
+```{r}
+gc_percentage <- function(sequence, bases = c("A", "T", "C", "G")) {
+  base_percs <- bases_percentage(sequence, bases)
+  return(base_percs[3] + base_percs[4])
+}
+
+gc_percentage(sequence1)
+gc_percentage(sequence2)
+gc_percentage(sequence3)
+```
+
+### Base Highlight
+```{r}
+highlight_base <- function(sequence, base) {
+  BASE <- toupper(base)
+  base <- tolower(base)
+  sequence <- tolower(sequence)
+  return(gsub(base, BASE, sequence))
+}
+
+highlight_base(sequence1, "a")
+highlight_base(sequence2, "a")
+highlight_base(sequence3, "a")
+```
+
+### Reverse Complementary
+```{r}
+rev_complement <- function(sequence, bases = "ATCG", replace_bases = "TAGC") {
+  return(stri_reverse(chartr(bases, replace_bases, sequence)))
+}
+
+sequence1 
+rev_complement(sequence1)
+sequence2
+rev_complement(sequence2)
+sequence3 
+rev_complement(sequence3)
+```
+
+### Kmer Combinations
+```{r}
+combi_kmers <- function(bases = c("A", "T", "C", "G"), k = 2) {
+  return(do.call(paste0, expand.grid(rep(list(bases), k))))
+}
+
+combi_kmers()
+combi_kmers(k = 3)
+```
+
+### Counts per Kmer
+```{r}
+count_kmers <- function(sequence, vector_kmers = combi_kmers()) {
+  kmer_counts <- stri_count_fixed(sequence, vector_kmers, overlap = TRUE)
+  names(kmer_counts) <- vector_kmers
+  return(kmer_counts)
+}
+
+count_kmers(sequence3)
+count_kmers(sequence3, combi_kmers(k = 3))
+```
+
+### Kmer Windows
+```{r}
+kmer_windws <- function(sequence, k = 2) {
+  seq_len <- str_length(sequence)
+  return(str_sub(sequence, seq(1, seq_len + 1 - k), seq(k, seq_len)))
+}
+
+sequence3 
+kmer_windws(sequence3)
+kmer_windws(sequence3, k = 3)
+```
+
+### TM Calculation
+```{r}
+tm_calc <- function(sequence, bases = c("A", "T", "C", "G")) {
+  base_counts <- bases_count(sequence, bases)
+  seq_len <- str_length(sequence)
+  countA <- base_counts[1]
+  countT <- base_counts[2]
+  countC <- base_counts[3]
+  countG <- base_counts[4]
+  if (seq_len <= 13) {
+    temp <- ((countA + countT) * 2) + ((countC + countG) * 4)
+  } else {
+    temp <- 64.9 + (41 * (countG + countC - 16.4) / (countA + countT + countC + countG))
+  }
+  names(temp) <- "TM in Celcius"
+  return(temp)
+}
+
+tm_calc(sequence3)
+tm_calc(sequence2)
+```
+
+### TM Calculation (Sequence Length less than 14 bp)
+```{r}
+tm_len_lt14 <- function(sequence, bases = c("A", "T", "C", "G")) {
+  base_counts <- bases_count(sequence, bases)
+  countA <- base_counts[1]
+  countT <- base_counts[2]
+  countC <- base_counts[3]
+  countG <- base_counts[4]
+  temp <- ((countA + countT) * 2) + ((countC + countG) * 4)
+  names(temp) <- "TM in Celcius"
+  return(temp)
+}
+
+tm_len_lt14(sequence3)
+```
+
+### TM Calculation (Sequence Length more than 13 bp)
+```{r}
+tm_len_mt13 <- function(sequence, bases = c("A", "T", "C", "G")) {
+  base_counts <- bases_count(sequence, bases)
+  countA <- base_counts[1]
+  countT <- base_counts[2]
+  countC <- base_counts[3]
+  countG <- base_counts[4]
+  temp <- 64.559 + (41 * (countG + countC - 16.4) / (countA + countT + countC + countG))
+  names(temp) <- "TM in Celcius"
+  return(temp)
+}
+
+tm_len_mt13(sequence2)
+```
+
+
+
+<!-- ```{r} -->
+<!-- rm(bases_count) -->
+<!-- rm(gc_percentage) -->
+<!-- rm(count_kmers) -->
+<!-- rm(kmer_windws) -->
+<!-- source("genome-functions.R") -->
+<!-- bases_count(sequence3) -->
+<!-- gc_percentage(sequence3) -->
+<!-- ``` -->
+<!---->
+<!---->
+<!---->
+<!---->
+<!-- ```{r} -->
+<!-- count_kmers(sequence3) -->
+<!-- kmer_windws(sequence3) -->
+<!-- ``` -->

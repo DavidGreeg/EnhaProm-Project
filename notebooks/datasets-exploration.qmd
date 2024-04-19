@@ -131,15 +131,21 @@ tail -n +2 ../datasets/FEfeats_RS_2023_10_T2T-CHM13v2.0.bed | overlapping_filter
 ```{bash}
 function column_filter {
 
-cols=$1
-file=$2
-
-awk '
+awk -v columns=$1 '
 {
-	for(icol=1;icol<=NF;icol++)
-		printf("%s ",$icol)
+	split(columns,cols,",")
+	i=1
+	for(icol=1;icol<=NF;icol++){
+		if (icol != cols[i]){
+			printf("%s\t",$icol)
+		}
+		else{
+			i++
+		}
+	}
+	printf"\n"
 }
-' "$file"
+' "$2"
 }
 
 column_filter "5,6,7" ../datasets/GeneHancer_RegElems_chr1.tsv

@@ -1,0 +1,97 @@
+---
+title: Genome Functions to Use Later
+format: html
+---
+
+## Brief description of each function
+
+### Libraries used
+```{r}
+# library(stringr)
+# library(stringi)
+source("genome-functions.R")
+```
+
+### Example sequences:
+```{r}
+l_seq <- "gtatgggaatcagccgggtctcactatgtgcaaa"
+s_seq <- "gtatgggaat"
+
+long_sequence <- toupper(l_seq)
+long_sequence 
+short_sequence <- toupper(s_seq)
+short_sequence 
+```
+
+### Counts per Base 
+```{r}
+bases_count(long_sequence)
+bases_count(short_sequence)
+```
+
+### Percentage per Base
+```{r}
+bases_percentage(long_sequence)
+bases_percentage(short_sequence)
+```
+
+### GC Percentage
+```{r}
+gc_percentage(long_sequence)
+gc_percentage(short_sequence)
+```
+
+### Base Highlight
+```{r}
+highlight_base(long_sequence, "a")
+highlight_base(short_sequence, "a")
+```
+
+### Reverse Complementary
+```{r}
+long_sequence
+rev_complement(long_sequence)
+short_sequence 
+rev_complement(short_sequence)
+```
+
+### Kmer Combinations
+```{r}
+combi_kmers()
+combi_kmers(k = 3)
+```
+
+### Counts per Kmer
+```{r}
+count_kmers(short_sequence)
+count_kmers(short_sequence, combi_kmers(k = 3))
+count_kmers(short_sequence, c("CG"))
+
+another_short_sequence <- "GCGCGCGCATTCGC"
+count_kmers(another_short_sequence, c("CG"))
+```
+
+### Kmer Windows
+```{r}
+short_sequence 
+kmer_windws(short_sequence)
+kmer_windws(short_sequence, k = 3)
+```
+
+### TM Calculation
+```{r}
+tm_calc(short_sequence)
+tm_calc(long_sequence)
+```
+
+### TM Calculation (Sequence Length less than 14 bp)
+```{r}
+tm_len_lt14(short_sequence)
+```
+
+### TM Calculation (Sequence Length more than 13 bp)
+```{r}
+tm_len_mt13(long_sequence)
+```
+
+
