@@ -103,36 +103,49 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># library(stringr)</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># library(stringi)</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"genome-functions.R"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># source("genome-functions.R")</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="st">"/home/davidfm/Projects/UBMI-IFC/EnhaProm/"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"scripts/genome-functions.R"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: MASS</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: survival</code></pre>
+</div>
 </div>
 </section>
 <section id="example-sequences" class="level3">
 <h3 class="anchored" data-anchor-id="example-sequences">Example sequences:</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>l_seq <span class="ot">&lt;-</span> <span class="st">"gtatgggaatcagccgggtctcactatgtgcaaa"</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>s_seq <span class="ot">&lt;-</span> <span class="st">"gtatgggaat"</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>long_sequence <span class="ot">&lt;-</span> <span class="fu">toupper</span>(l_seq)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>long_sequence </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>l_seq <span class="ot">&lt;-</span> <span class="st">"gtatgggaatcagccgggtctcactatgtgcaaa"</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>s_seq <span class="ot">&lt;-</span> <span class="st">"gtatgggaat"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>long_sequence <span class="ot">&lt;-</span> <span class="fu">toupper</span>(l_seq)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>long_sequence </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "GTATGGGAATCAGCCGGGTCTCACTATGTGCAAA"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>short_sequence <span class="ot">&lt;-</span> <span class="fu">toupper</span>(s_seq)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>short_sequence </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>short_sequence <span class="ot">&lt;-</span> <span class="fu">toupper</span>(s_seq)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>short_sequence </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "GTATGGGAAT"</code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>testseq1 <span class="ot">&lt;-</span> <span class="st">"TGTCCGCTCCAGTCTCTCTTCCTCATCTTATAAAGCCACGAGTCCCA"</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>testseq2 <span class="ot">&lt;-</span> <span class="st">"CTCCAATCAGGACATGAATTCGGGGATTAAATTGCCAACACATGGCT"</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>testseq3 <span class="ot">&lt;-</span> <span class="st">"GTGCAGTGGCGCTATCTCGGCTCACTGCAAGCTGTTCACGCCATTCT"</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>palindromeseq <span class="ot">&lt;-</span> <span class="st">"CAAGCTTGTGCAGTGTTGCTGTTCTATCTCGGCTCACTGCAAGCTGTTCACGCCATGTTCTGTT"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="counts-per-base" class="level3">
 <h3 class="anchored" data-anchor-id="counts-per-base">Counts per Base</h3>
+<p>Gets counts of each nucleotide in the sequence.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bases_count</span>(long_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bases_count</span>(long_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> A  T  C  G 
  9  8  7 10 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bases_count</span>(short_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bases_count</span>(short_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>A T C G 
 3 3 0 4 </code></pre>
@@ -141,13 +154,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="percentage-per-base" class="level3">
 <h3 class="anchored" data-anchor-id="percentage-per-base">Percentage per Base</h3>
+<p>Gets percentages of each nucleotide in the sequence.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bases_percentage</span>(long_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bases_percentage</span>(long_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>        A         T         C         G 
 0.2647059 0.2352941 0.2058824 0.2941176 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bases_percentage</span>(short_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bases_percentage</span>(short_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  A   T   C   G 
 0.3 0.3 0.0 0.4 </code></pre>
@@ -156,27 +170,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="gc-percentage" class="level3">
 <h3 class="anchored" data-anchor-id="gc-percentage">GC Percentage</h3>
+<p>Sums percentages of cytosine (C) and guanine (G).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gc_percentage</span>(long_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gc_percentage</span>(long_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>GC% 
-0.5 </code></pre>
+<pre><code>[1] 0.5</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gc_percentage</span>(short_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gc_percentage</span>(short_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>GC% 
-0.4 </code></pre>
+<pre><code>[1] 0.4</code></pre>
 </div>
 </div>
 </section>
 <section id="base-highlight" class="level3">
 <h3 class="anchored" data-anchor-id="base-highlight">Base Highlight</h3>
+<p>Converts all nucleotides to lower case, except for the one to highlight.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">highlight_base</span>(long_sequence, <span class="st">"a"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">highlight_base</span>(long_sequence, <span class="st">"a"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "gtAtgggAAtcAgccgggtctcActAtgtgcAAA"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">highlight_base</span>(short_sequence, <span class="st">"a"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">highlight_base</span>(short_sequence, <span class="st">"a"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "gtAtgggAAt"</code></pre>
 </div>
@@ -184,20 +198,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="reverse-complementary" class="level3">
 <h3 class="anchored" data-anchor-id="reverse-complementary">Reverse Complementary</h3>
+<p>Gets the reverse complementary sequence.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>long_sequence</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>long_sequence</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "GTATGGGAATCAGCCGGGTCTCACTATGTGCAAA"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rev_complement</span>(long_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rev_complement</span>(long_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "TTTGCACATAGTGAGACCCGGCTGATTCCCATAC"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>short_sequence </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>short_sequence </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "GTATGGGAAT"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rev_complement</span>(short_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rev_complement</span>(short_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "ATTCCCATAC"</code></pre>
 </div>
@@ -205,107 +220,253 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="kmer-combinations" class="level3">
 <h3 class="anchored" data-anchor-id="kmer-combinations">Kmer Combinations</h3>
+<p>Gets all combinations of kmers of a given size (k).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">combi_kmers</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>all_k2 <span class="ot">&lt;-</span> <span class="fu">combi_kmers</span>()</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>all_k2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> [1] "AA" "TA" "CA" "GA" "AT" "TT" "CT" "GT" "AC" "TC" "CC" "GC" "AG" "TG" "CG"
-[16] "GG"</code></pre>
+<pre><code> [1] "AA" "AC" "AG" "AT" "CA" "CC" "CG" "CT" "GA" "GC" "GG" "GT" "TA" "TC" "TG"
+[16] "TT"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">combi_kmers</span>(<span class="at">k =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>all_k3 <span class="ot">&lt;-</span> <span class="fu">combi_kmers</span>(<span class="at">k =</span> <span class="dv">3</span>)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>all_k3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> [1] "AAA" "TAA" "CAA" "GAA" "ATA" "TTA" "CTA" "GTA" "ACA" "TCA" "CCA" "GCA"
-[13] "AGA" "TGA" "CGA" "GGA" "AAT" "TAT" "CAT" "GAT" "ATT" "TTT" "CTT" "GTT"
-[25] "ACT" "TCT" "CCT" "GCT" "AGT" "TGT" "CGT" "GGT" "AAC" "TAC" "CAC" "GAC"
-[37] "ATC" "TTC" "CTC" "GTC" "ACC" "TCC" "CCC" "GCC" "AGC" "TGC" "CGC" "GGC"
-[49] "AAG" "TAG" "CAG" "GAG" "ATG" "TTG" "CTG" "GTG" "ACG" "TCG" "CCG" "GCG"
-[61] "AGG" "TGG" "CGG" "GGG"</code></pre>
+<pre><code> [1] "AAA" "AAC" "AAG" "AAT" "ACA" "ACC" "ACG" "ACT" "AGA" "AGC" "AGG" "AGT"
+[13] "ATA" "ATC" "ATG" "ATT" "CAA" "CAC" "CAG" "CAT" "CCA" "CCC" "CCG" "CCT"
+[25] "CGA" "CGC" "CGG" "CGT" "CTA" "CTC" "CTG" "CTT" "GAA" "GAC" "GAG" "GAT"
+[37] "GCA" "GCC" "GCG" "GCT" "GGA" "GGC" "GGG" "GGT" "GTA" "GTC" "GTG" "GTT"
+[49] "TAA" "TAC" "TAG" "TAT" "TCA" "TCC" "TCG" "TCT" "TGA" "TGC" "TGG" "TGT"
+[61] "TTA" "TTC" "TTG" "TTT"</code></pre>
 </div>
 </div>
 </section>
 <section id="counts-per-kmer" class="level3">
 <h3 class="anchored" data-anchor-id="counts-per-kmer">Counts per Kmer</h3>
+<p>Counts occurrences of kmers inside sequences, if ‘percentage=TRUE’ provides percentages instead.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count_kmers</span>(short_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count_kmers</span>(short_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>AA TA CA GA AT TT CT GT AC TC CC GC AG TG CG GG 
- 1  1  0  1  2  0  0  1  0  0  0  0  0  1  0  2 </code></pre>
+<pre><code>AA AC AG AT CA CC CG CT GA GC GG GT TA TC TG TT 
+ 1  0  0  2  0  0  0  0  1  0  2  1  1  0  1  0 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count_kmers</span>(short_sequence, <span class="fu">combi_kmers</span>(<span class="at">k =</span> <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count_kmers</span>(short_sequence, all_k3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>AAA TAA CAA GAA ATA TTA CTA GTA ACA TCA CCA GCA AGA TGA CGA GGA AAT TAT CAT GAT 
-  0   0   0   1   0   0   0   1   0   0   0   0   0   0   0   1   1   1   0   0 
-ATT TTT CTT GTT ACT TCT CCT GCT AGT TGT CGT GGT AAC TAC CAC GAC ATC TTC CTC GTC 
-  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0 
-ACC TCC CCC GCC AGC TGC CGC GGC AAG TAG CAG GAG ATG TTG CTG GTG ACG TCG CCG GCG 
+<pre><code>AAA AAC AAG AAT ACA ACC ACG ACT AGA AGC AGG AGT ATA ATC ATG ATT CAA CAC CAG CAT 
+  0   0   0   1   0   0   0   0   0   0   0   0   0   0   1   0   0   0   0   0 
+CCA CCC CCG CCT CGA CGC CGG CGT CTA CTC CTG CTT GAA GAC GAG GAT GCA GCC GCG GCT 
   0   0   0   0   0   0   0   0   0   0   0   0   1   0   0   0   0   0   0   0 
-AGG TGG CGG GGG 
-  0   1   0   1 </code></pre>
+GGA GGC GGG GGT GTA GTC GTG GTT TAA TAC TAG TAT TCA TCC TCG TCT TGA TGC TGG TGT 
+  1   0   1   0   1   0   0   0   0   0   0   1   0   0   0   0   0   0   1   0 
+TTA TTC TTG TTT 
+  0   0   0   0 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count_kmers</span>(short_sequence, <span class="fu">c</span>(<span class="st">"CG"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count_kmers</span>(short_sequence, <span class="at">percentage =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>CG 
- 0 </code></pre>
+<pre><code>       AA        AC        AG        AT        CA        CC        CG        CT 
+0.1111111 0.0000000 0.0000000 0.2222222 0.0000000 0.0000000 0.0000000 0.0000000 
+       GA        GC        GG        GT        TA        TC        TG        TT 
+0.1111111 0.0000000 0.2222222 0.1111111 0.1111111 0.0000000 0.1111111 0.0000000 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>another_short_sequence <span class="ot">&lt;-</span> <span class="st">"GCGCGCGCATTCGC"</span></span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">count_kmers</span>(another_short_sequence, <span class="fu">c</span>(<span class="st">"CG"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>another_short_sequence <span class="ot">&lt;-</span> <span class="st">"GCGCGCGCATTCGC"</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">count_kmers</span>(another_short_sequence, <span class="fu">c</span>(<span class="st">"CG"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>CG 
  4 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count_kmers</span>(another_short_sequence, <span class="fu">c</span>(<span class="st">"CGC"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CGC 
+  4 </code></pre>
 </div>
 </div>
 </section>
 <section id="kmer-windows" class="level3">
 <h3 class="anchored" data-anchor-id="kmer-windows">Kmer Windows</h3>
+<p>Splits sequences into kmers of a specified size (k). By default kmers are separated from each other by 1 nucleotide, however this separation or “stride” (s), can be also specified.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>short_sequence </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>short_sequence </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "GTATGGGAAT"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kmer_windws</span>(short_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kmer_windows</span>(short_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "GT" "TA" "AT" "TG" "GG" "GG" "GA" "AA" "AT"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kmer_windws</span>(short_sequence, <span class="at">k =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kmer_windows</span>(short_sequence, <span class="at">k =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "GTA" "TAT" "ATG" "TGG" "GGG" "GGA" "GAA" "AAT"</code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>testseq1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "TGTCCGCTCCAGTCTCTCTTCCTCATCTTATAAAGCCACGAGTCCCA"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kmer_windows</span>(testseq1, <span class="at">k=</span><span class="dv">8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "TGTCCGCT" "GTCCGCTC" "TCCGCTCC" "CCGCTCCA" "CGCTCCAG" "GCTCCAGT"
+ [7] "CTCCAGTC" "TCCAGTCT" "CCAGTCTC" "CAGTCTCT" "AGTCTCTC" "GTCTCTCT"
+[13] "TCTCTCTT" "CTCTCTTC" "TCTCTTCC" "CTCTTCCT" "TCTTCCTC" "CTTCCTCA"
+[19] "TTCCTCAT" "TCCTCATC" "CCTCATCT" "CTCATCTT" "TCATCTTA" "CATCTTAT"
+[25] "ATCTTATA" "TCTTATAA" "CTTATAAA" "TTATAAAG" "TATAAAGC" "ATAAAGCC"
+[31] "TAAAGCCA" "AAAGCCAC" "AAGCCACG" "AGCCACGA" "GCCACGAG" "CCACGAGT"
+[37] "CACGAGTC" "ACGAGTCC" "CGAGTCCC" "GAGTCCCA"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kmer_windows</span>(testseq1, <span class="at">k=</span><span class="dv">8</span>, <span class="at">s=</span><span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "TGTCCGCT" "CCGCTCCA" "CTCCAGTC" "CAGTCTCT" "TCTCTCTT" "CTCTTCCT"
+ [7] "TTCCTCAT" "CTCATCTT" "ATCTTATA" "TTATAAAG" "TAAAGCCA" "AGCCACGA"
+[13] "CACGAGTC" "GAGTCCCA"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>k3_tseq1 <span class="ot">&lt;-</span> <span class="fu">kmer_windows</span>(testseq1, <span class="at">k =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="tm-calculation" class="level3">
 <h3 class="anchored" data-anchor-id="tm-calculation">TM Calculation</h3>
+<p>Gets Melting Temperature of a sequence, inpendent of its length. I’d call it a fancier GC% metric.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_calc</span>(short_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_calc</span>(short_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>TM in Celcius 
-           28 </code></pre>
+<pre><code>[1] 28</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_calc</span>(long_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_calc</span>(long_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>TM in Celcius 
-     65.62353 </code></pre>
+<pre><code>[1] 65.62353</code></pre>
+</div>
+</div>
+<section id="tm-calculation-sequence-length-less-than-14-bp" class="level4">
+<h4 class="anchored" data-anchor-id="tm-calculation-sequence-length-less-than-14-bp">TM Calculation (Sequence Length less than 14 bp)</h4>
+<p>Gets Melting Temperature of “short” sequences</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_len_lt14</span>(short_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 28</code></pre>
 </div>
 </div>
 </section>
-<section id="tm-calculation-sequence-length-less-than-14-bp" class="level3">
-<h3 class="anchored" data-anchor-id="tm-calculation-sequence-length-less-than-14-bp">TM Calculation (Sequence Length less than 14 bp)</h3>
+<section id="tm-calculation-sequence-length-more-than-13-bp" class="level4">
+<h4 class="anchored" data-anchor-id="tm-calculation-sequence-length-more-than-13-bp">TM Calculation (Sequence Length more than 13 bp)</h4>
+<p>Gets Melting Temperature of “long” sequences</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_len_lt14</span>(short_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_len_mt13</span>(long_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>TM in Celcius 
-           28 </code></pre>
+<pre><code>[1] 65.62353</code></pre>
 </div>
 </div>
 </section>
-<section id="tm-calculation-sequence-length-more-than-13-bp" class="level3">
-<h3 class="anchored" data-anchor-id="tm-calculation-sequence-length-more-than-13-bp">TM Calculation (Sequence Length more than 13 bp)</h3>
+</section>
+<section id="shannon-entropy-calculation" class="level3">
+<h3 class="anchored" data-anchor-id="shannon-entropy-calculation">Shannon Entropy Calculation</h3>
+<p>Gets Shannon Entropy of a sequence. Basically how entropic is a sequence given how many characters it has and what are their proportions relative to the total number of characters.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_len_mt13</span>(long_sequence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: Add longer explanation of Shannon Entropy</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a><span class="fu">shannon_entropy</span>(testseq1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>TM in Celcius 
-     65.62353 </code></pre>
+<pre><code>[1] 1.886488</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">shannon_entropy</span>(testseq2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.981607</code></pre>
 </div>
 </div>
 </section>
+<section id="kmer-barcode" class="level3">
+<h3 class="anchored" data-anchor-id="kmer-barcode">Kmer Barcode</h3>
+<p>While thinking of a way of representing the positions of each kmer inside the whole sequence I first tried to use their positions as a binary code to then get the sum of all.</p>
+<p>However 2^x grows a lot with just a few values. Considering I wanted to characterize more than 100 positions this was unfeasible with 2^x.</p>
+<p>Somehow I thought about using a product of “prime numbers” given their property of having no other factors except for themselves and 1 and the fact that they don’t double each other with each position. And altough the results were manageable, I still thought they were a little too big for my convinience, so I thought of getting the ‘log()’ of the final product.</p>
+<p>That’s when I realized that my first approximation was not that bad after all since I could just change 2 to 1.1 or 1.01 or 1.001 (and so on…) to module the growth rate I desired for them sequence positions.</p>
+<p>After all I implemented all 3 of implementations (named: “primes”, “logprimes” and “expsum”(left as default)).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">which</span>(k3_tseq1 <span class="sc">==</span> <span class="st">"TCT"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 13 15 17 26</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fl">1.001</span><span class="sc">^</span>(<span class="fu">which</span>(k3_tseq1 <span class="sc">==</span> <span class="st">"TCT"</span>) <span class="sc">-</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.012066 1.014091 1.016121 1.025302</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="co"># All indexes are rested 1 so that we can also </span></span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a><span class="co"># use 1.001^0=1 as a first possible position</span></span>
+<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kmer_barcode</span>(<span class="at">kmer =</span> <span class="st">"TCT"</span>, <span class="at">windows =</span> k3_tseq1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4.06758</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="functions-per-windows" class="level1">
+<h1>Functions per Windows</h1>
+<p>At first I called it a fancier ‘lapply()’, however later on, it became to make a more efficient way of feeding sequence data to my own functions (i.e.&nbsp;kmer_barcode())</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>k8_tseq1 <span class="ot">&lt;-</span> <span class="fu">kmer_windows</span>(testseq1, <span class="at">k =</span> <span class="dv">8</span>)</span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a><span class="fu">func_per_windows</span>(<span class="at">windows =</span> k8_tseq1,<span class="at">func =</span> tm_calc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>TGTCCGCT GTCCGCTC TCCGCTCC CCGCTCCA CGCTCCAG GCTCCAGT CTCCAGTC TCCAGTCT 
+      26       28       28       28       28       26       26       24 
+CCAGTCTC CAGTCTCT AGTCTCTC GTCTCTCT TCTCTCTT CTCTCTTC TCTCTTCC CTCTTCCT 
+      26       24       24       24       22       24       24       24 
+TCTTCCTC CTTCCTCA TTCCTCAT TCCTCATC CCTCATCT CTCATCTT TCATCTTA CATCTTAT 
+      24       24       22       24       24       22       20       20 
+ATCTTATA TCTTATAA CTTATAAA TTATAAAG TATAAAGC ATAAAGCC TAAAGCCA AAAGCCAC 
+      18       18       18       18       20       22       22       24 
+AAGCCACG AGCCACGA GCCACGAG CCACGAGT CACGAGTC ACGAGTCC CGAGTCCC GAGTCCCA 
+      26       26       28       26       26       26       28       26 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="fu">func_per_windows</span>(<span class="at">windows =</span> k8_tseq1,<span class="at">func =</span> shannon_entropy) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>TGTCCGCT GTCCGCTC TCCGCTCC CCGCTCCA CGCTCCAG GCTCCAGT CTCCAGTC TCCAGTCT 
+1.561278 1.500000 1.298795 1.548795 1.750000 1.905639 1.750000 1.811278 
+CCAGTCTC CAGTCTCT AGTCTCTC GTCTCTCT TCTCTCTT CTCTCTTC TCTCTTCC CTCTTCCT 
+1.750000 1.811278 1.811278 1.405639 0.954434 1.000000 1.000000 1.000000 
+TCTTCCTC CTTCCTCA TTCCTCAT TCCTCATC CCTCATCT CTCATCTT TCATCTTA CATCTTAT 
+1.000000 1.405639 1.405639 1.405639 1.405639 1.405639 1.500000 1.500000 
+ATCTTATA TCTTATAA CTTATAAA TTATAAAG TATAAAGC ATAAAGCC TAAAGCCA AAAGCCAC 
+1.405639 1.405639 1.405639 1.405639 1.750000 1.750000 1.750000 1.405639 
+AAGCCACG AGCCACGA GCCACGAG CCACGAGT CACGAGTC ACGAGTCC CGAGTCCC GAGTCCCA 
+1.561278 1.561278 1.561278 1.905639 1.905639 1.905639 1.750000 1.905639 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="fu">func_per_windows</span>(<span class="at">kmers =</span> all_k3, <span class="at">windows =</span> k3_tseq1, <span class="at">func =</span> kmer_barcode)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     AAA      AAC      AAG      AAT      ACA      ACC      ACG      ACT 
+1.031470 0.000000 1.032501 0.000000 0.000000 0.000000 1.037674 0.000000 
+     AGA      AGC      AGG      AGT      ATA      ATC      ATG      ATT 
+0.000000 1.033533 0.000000 2.050835 1.029410 1.024278 0.000000 0.000000 
+     CAA      CAC      CAG      CAT      CCA      CCC      CCG      CCT 
+0.000000 1.036637 1.009036 1.023255 3.088589 1.043915 1.003003 1.020191 
+     CGA      CGC      CGG      CGT      CTA      CTC      CTG      CTT 
+1.038712 1.004006 0.000000 0.000000 0.000000 4.055410 0.000000 2.043464 
+     GAA      GAC      GAG      GAT      GCA      GCC      GCG      GCT 
+0.000000 0.000000 1.039750 0.000000 0.000000 1.034567 0.000000 1.005010 
+     GGA      GGC      GGG      GGT      GTA      GTC      GTG      GTT 
+0.000000 0.000000 0.000000 0.000000 0.000000 3.053886 0.000000 0.000000 
+     TAA      TAC      TAG      TAT      TCA      TCC      TCG      TCT 
+1.030439 0.000000 0.000000 1.028381 1.022233 4.071067 0.000000 4.067580 
+     TGA      TGC      TGG      TGT      TTA      TTC      TTG      TTT 
+0.000000 0.000000 0.000000 1.000000 1.027354 1.018154 0.000000 0.000000 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>start_time <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a><span class="fu">func_per_windows</span>(<span class="at">windows =</span> k8_tseq1, <span class="at">func =</span> shannon_entropy) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>TGTCCGCT GTCCGCTC TCCGCTCC CCGCTCCA CGCTCCAG GCTCCAGT CTCCAGTC TCCAGTCT 
+1.561278 1.500000 1.298795 1.548795 1.750000 1.905639 1.750000 1.811278 
+CCAGTCTC CAGTCTCT AGTCTCTC GTCTCTCT TCTCTCTT CTCTCTTC TCTCTTCC CTCTTCCT 
+1.750000 1.811278 1.811278 1.405639 0.954434 1.000000 1.000000 1.000000 
+TCTTCCTC CTTCCTCA TTCCTCAT TCCTCATC CCTCATCT CTCATCTT TCATCTTA CATCTTAT 
+1.000000 1.405639 1.405639 1.405639 1.405639 1.405639 1.500000 1.500000 
+ATCTTATA TCTTATAA CTTATAAA TTATAAAG TATAAAGC ATAAAGCC TAAAGCCA AAAGCCAC 
+1.405639 1.405639 1.405639 1.405639 1.750000 1.750000 1.750000 1.405639 
+AAGCCACG AGCCACGA GCCACGAG CCACGAGT CACGAGTC ACGAGTCC CGAGTCCC GAGTCCCA 
+1.561278 1.561278 1.561278 1.905639 1.905639 1.905639 1.750000 1.905639 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Sys.time</span>() <span class="sc">-</span> start_time, <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Time difference of 0 secs</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(primes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 
 </main>
