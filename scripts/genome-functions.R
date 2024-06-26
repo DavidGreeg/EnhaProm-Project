@@ -207,6 +207,68 @@ palindromes <- function(sequence, k = 2, s = 1, windows, count = FALSE) {
 }
 
 # =============================================================================
+# SHANNON ENTROPY ----------------------------------------------------------- #
+# =============================================================================
+
+shannon_entropy <- function(sequence, base_counts, base_percs) {
+  if (missing(base_percs)) {
+    if (missing(base_counts)) {
+      bpercs <- bases_percentage(sequence)
+    } else {
+      bpercs <- bases_percentage(base_counts = base_counts)
+    }
+  } else {
+    bpercs <- base_percs
+  }
+  return(-sum(bpercs * ifelse(bpercs > 0, log(bpercs, 2), 1)))
+}
+
+# =============================================================================
+# OPTIMIZED PRODUCT: kmer(count percentage in seq * GC percentage * shannon)  #
+# =============================================================================
+
+optim_prod <- function(sequence, bases_counts, base_percs)
+
+# =============================================================================
+# KMER BARCODE: transform kmer positions into numeric vector to get sum/prod  #
+# =============================================================================
+
+kmer_barcode <- function(sequence, k, windows, kmer, option = "expsum") {
+  if (missing(windows)) {
+    windows <- kmer_windows(sequence, k = k)
+  }
+  barcode_profile <- switch(option,
+    "expsum" = expsum_profile(windows, kmer),
+    "primes" = primes_profile(windows, kmer),
+    "logprimes" = logprimes_profile(windows, kmer),
+    {
+      stop("No valid option selected")
+    }
+  )
+  return(barcode_profile)
+}
+expsum_profile <- function(windows, kmer) {
+  # : return(sum(1.001^(which(rev(windows == kmer)) - 1)))
+  return(sum(1.001^(which(windows == kmer) - 1)))
+}
+primes_profile <- function(windows, kmer) {
+  n_kmers <- length(windows)
+  return(prod(generate_n_primes(n_kmers)[windows == kmer]))
+}
+logprimes_profile <- function(windows, kmer) {
+  n_kmers <- length(windows)
+  return(prod(log(generate_n_primes(n_kmers), 8)[windows == kmer]))
+}
+
+intvectodec <- function(intvec) {
+  return(sum(intvec * 10^((length(intvec) - 1):0)))
+}
+
+bintodec <- function(x) {
+  return(sum(2^(which(rev(unlist(strsplit(as.character(x), "")) == 1)) - 1)))
+}
+
+# =============================================================================
 # PARTIAL PALINDROMES: seq - rev(seq) pairs given an interspace length limit  #
 # =============================================================================
 
@@ -316,61 +378,141 @@ pp_chunk_onlySeqs <- function(vector_len, kmer_size,
 }
 
 # =============================================================================
-# SHANNON ENTROPY ----------------------------------------------------------- #
+# TABLE MAKERS: Table production (data extraction), given a set of sequences  #
 # =============================================================================
 
-shannon_entropy <- function(sequence, base_counts, base_percs) {
-  if (missing(base_percs)) {
-    if (missing(base_counts)) {
-      bpercs <- bases_percentage(sequence)
-    } else {
-      bpercs <- bases_percentage(base_counts = base_counts)
-    }
+sequence_characterizer <- function(sequence, k_max = 4, no_names = FALSE,
+                                   optim = FALSE, as_vector = TRUE) {
+  basepercs <- bases_percentage(sequence)
+  seq_tms <- tm_len_mt13(sequence)
+  seq_sha <- shannon_entropy(sequence)
+  ## Add pairwise alignment data per sequence
+  ## Local and Global alignment of sequence against its mirror (reverse)
+  ## and reverse complementary
+
+  kmers_characs <- list()
+  if (!as_vector) {
+    kmers_characs[[1]] <- list(perc = basepercs, temp = seq_tms, shan = seq_sha)
+    names(kmers_characs)[1] <- "WS"
   } else {
-    bpercs <- base_percs
+    kiv_characs <- c(basepercs, temp = seq_tms, shan = seq_sha)
   }
-  return(-sum(bpercs * ifelse(bpercs > 0, log(bpercs, 2), 1)))
-}
-
-# =============================================================================
-# KMER BARCODE: transform kmer positions into numeric vector to get sum/prod  #
-# =============================================================================
-
-kmer_barcode <- function(sequence, k, windows, kmer, option = "expsum") {
-  if (missing(windows)) {
-    windows <- kmer_windows(sequence, k = k)
-  }
-  barcode_profile <- switch(option,
-    "expsum" = expsum_profile(windows, kmer),
-    "primes" = primes_profile(windows, kmer),
-    "logprimes" = logprimes_profile(windows, kmer),
-    {
-      stop("No valid option selected")
+  for (i in 2:k_max) {
+    all_ki <- combi_kmers(k = i)
+    ki_seq <- kmer_windows(sequence, k = i)
+    ki_percs <- count_kmers(sequence, k = i,
+                            percentage = TRUE)
+    # ^This can be optimized to use only loaded kmers not sequence
+    if (!optim)
+      ki_tms <- func_per_windows(windows = all_ki,
+                                 func = tm_len_lt14)
+    ki_sha <- func_per_windows(windows = all_ki,
+                               func = shannon_entropy)
+    ki_brc <- func_per_windows(kmers = all_ki,
+                               windows = ki_seq,
+                               func = kmer_barcode)
+    ki_pals <- func_per_windows(windows = all_ki,
+                                func = isPalindrome)
+        # ^Add 'isPalindrome' to 'optim' conditional in the form of
+        # 'if(isPalindrome)' then "value = 2*value"
+    ki_revc <- func_per_windows(windows = all_ki,
+                                func = isRevComPalindrome)
+        # ^Add 'isRevComPalindrome' to 'optim' conditional in the form of
+        # 'if(isRevComPalindrome)' then "value = 2*value",
+        #  but also add option
+        # 'if((seq_length % 2) != 0)' then
+        # "replace nucleotide in the middle with N" then
+        # 'if(isRevComPalindrome)' then "value = 2*value"
+        # Maybe later on, make more options like this for partial palindromes.
+    # ^Another optimization is to only compute data from non-zero count kmers
+    # and later on, organize it in the corresponding 'all_ki' order
+    # Maybe I can just add an "isTrue" parameter/conditional to all functions
+    ki_name <- paste("k", i, sep = "")
+    if (optim) {
+      ki_gcp <- func_per_windows(windows = all_ki,
+                                 func = gc_percentage)
+      ki_gcp <- 2^ki_gcp
+      ki_sha <- 1.1^ki_sha
+      ki_prod <- ki_percs * ki_gcp * ki_sha
+      ki_characs <- list(prod = ki_prod, barc = ki_brc,
+                         pals = ki_pals, revc = ki_revc)
+    } else {
+      ki_characs <- list(perc = ki_percs, temp = ki_tms, shan = ki_sha,
+                         barc = ki_brc, pals = ki_pals, revc = ki_revc)
     }
-  )
-  return(barcode_profile)
-}
-expsum_profile <- function(windows, kmer) {
-  # : return(sum(1.001^(which(rev(windows == kmer)) - 1)))
-  return(sum(1.001^(which(windows == kmer) - 1)))
-}
-primes_profile <- function(windows, kmer) {
-  n_kmers <- length(windows)
-  return(prod(generate_n_primes(n_kmers)[windows == kmer]))
-}
-logprimes_profile <- function(windows, kmer) {
-  n_kmers <- length(windows)
-  return(prod(log(generate_n_primes(n_kmers), 8)[windows == kmer]))
+    # ^This 'optim' option can be further exploited if instead of doing
+    # 4 different 'func_per_windows()' and then operating over their values,
+    # make a new function that multiplies all perc*gcp*sha per sequence in
+    # just one go.
+    if (as_vector) {
+      for (kmer_i in 1:4^i) {
+        # ikmer_seq <- c(all_ki[kmer_i])
+        # names(ikmer_seq) <- paste("k", i, "-", kmer_i, "_", "seq", sep = "")
+        ikmer_characs <- c(unlist(lapply(ki_characs, `[[`, kmer_i)))
+        if (!no_names)
+          names(ikmer_characs) <- paste("k", i, "-", kmer_i,
+                                        "_", names(ikmer_characs), sep = "")
+        # kiv_characs <- c(kiv_characs, ikmer_seq, ikmer_characs)
+        kiv_characs <- c(kiv_characs, ikmer_characs)
+      }
+      # kmers_characs[[i]] <- kiv_characs
+    } else {
+      kmers_characs[[i]] <- ki_characs
+      names(kmers_characs)[i] <- ki_name
+    }
+  }
+  # return(ifelse(as_vector, kiv_characs, kmers_characs))
+  if (as_vector) {
+    return(kiv_characs)
+  } else {
+    return(kmers_characs)
+  }
 }
 
-intvectodec <- function(intvec) {
-  return(sum(intvec * 10^((length(intvec) - 1):0)))
+sequences_characterizer <- function(sequences, k_max, optim = FALSE, as_df = TRUE) {
+  # seqs_data <- list(A_perc = c(), T_perc = c(), C_perc = c(), G_perc = c(),
+  #                   seq_TM = c(), seq_SE = c())
+  sc_len <- ifelse(optim,
+                   cols_numb(k = k_max, n_params = 4),
+                   cols_numb(k = k_max, n_params = 6))
+  sc_len <- sc_len + 6
+  seqs_data <- vector(mode = "list", length = sc_len)
+  i <- 0
+  for (sequence_i in sequences) {
+    if (!i) {
+      seq_i <- sequence_characterizer(sequence_i, k = k_max,
+                                      optim = optim, as_vector = TRUE)
+      names(seqs_data) <- names(seq_i)
+      names(seq_i) <- NULL
+      i <- i + 1
+    } else {
+      seq_i <- sequence_characterizer(sequence_i, k = k_max, no_names = TRUE,
+                                      optim = optim, as_vector = TRUE)
+      names(seq_i) <- NULL
+    }
+    for (j in 1:sc_len) {
+      seqs_data[[j]] <- append(seqs_data[[j]], seq_i[j])
+    }
+  }
+  if (as_df) {
+    return(as.data.frame(seqs_data))
+  } else {
+    return(seqs_data)
+  }
+}
+cols_numb <- function(k_max, n_params) {
+  number <- 0
+  for (i in 2:k_max) {
+    number <- sum(number, 4^i)
+  }
+  return(number * n_params)
 }
 
-bintodec <- function(x) {
-  return(sum(2^(which(rev(unlist(strsplit(as.character(x), "")) == 1)) - 1)))
-}
+# =============================================================================
+# REGRESSIONS: Polynomial, Fourier-like and Bin-like modelling for kmer data  #
+# =============================================================================
 
+# To-do: modelling in a bin-like (histogram) way
 kmer_spc_polynome <- function(sequence, k, windows, kmer,
                               plot = FALSE, option = "norm") {
   if(missing(windows)) {
@@ -565,114 +707,6 @@ polynome_cases <- function(lens, poss, case) {
     lm(lens ~ poss + I(poss^2) + I(0 * poss^3) + I(poss^4) + I(poss^5)),
     lm(lens ~ poss + I(poss^2) + I(poss^3) + I(poss^4) + I(poss^5))
   ))
-}
-
-sequence_characterizer <- function(sequence, k_max = 4, no_names = FALSE,
-                                   optim = FALSE, as_vector = TRUE) {
-  basepercs <- bases_percentage(sequence)
-  seq_tms <- tm_len_mt13(sequence)
-  seq_sha <- shannon_entropy(sequence)
-
-  kmers_characs <- list()
-  if (!as_vector) {
-    kmers_characs[[1]] <- list(perc = basepercs, temp = seq_tms, shan = seq_sha)
-    names(kmers_characs)[1] <- "WS"
-  } else {
-    kiv_characs <- c(basepercs, temp = seq_tms, shan = seq_sha)
-  }
-  for (i in 2:k_max) {
-    all_ki <- combi_kmers(k = i)
-    ki_seq <- kmer_windows(sequence, k = i)
-    ki_percs <- count_kmers(sequence, k = i,
-                            percentage = TRUE)
-    if (!optim)
-      ki_tms <- func_per_windows(windows = all_ki,
-                                 func = tm_len_lt14)
-    ki_sha <- func_per_windows(windows = all_ki,
-                               func = shannon_entropy)
-    ki_brc <- func_per_windows(kmers = all_ki,
-                               windows = ki_seq,
-                               func = kmer_barcode)
-    ki_pals <- func_per_windows(windows = all_ki,
-                                func = isPalindrome)
-    ki_revc <- func_per_windows(windows = all_ki,
-                                func = isRevComPalindrome)
-    ki_name <- paste("k", i, sep = "")
-    if (optim) {
-      ki_gcp <- func_per_windows(windows = all_ki,
-                                 func = gc_percentage)
-      ki_gcp <- 2^ki_gcp
-      ki_sha <- 1.1^ki_sha
-      ki_prod <- ki_percs * ki_gcp * ki_sha
-      ki_characs <- list(prod = ki_prod, barc = ki_brc,
-                         pals = ki_pals, revc = ki_revc)
-    } else {
-      ki_characs <- list(perc = ki_percs, temp = ki_tms, shan = ki_sha,
-                         barc = ki_brc, pals = ki_pals, revc = ki_revc)
-    }
-    if (as_vector) {
-      for (kmer_i in 1:4^i) {
-        # ikmer_seq <- c(all_ki[kmer_i])
-        # names(ikmer_seq) <- paste("k", i, "-", kmer_i, "_", "seq", sep = "")
-        ikmer_characs <- c(unlist(lapply(ki_characs, `[[`, kmer_i)))
-        if (!no_names)
-          names(ikmer_characs) <- paste("k", i, "-", kmer_i,
-                                        "_", names(ikmer_characs), sep = "")
-        # kiv_characs <- c(kiv_characs, ikmer_seq, ikmer_characs)
-        kiv_characs <- c(kiv_characs, ikmer_characs)
-      }
-      # kmers_characs[[i]] <- kiv_characs
-    } else {
-      kmers_characs[[i]] <- ki_characs
-      names(kmers_characs)[i] <- ki_name
-    }
-  }
-  # return(ifelse(as_vector, kiv_characs, kmers_characs))
-  if (as_vector) {
-    return(kiv_characs)
-  } else {
-    return(kmers_characs)
-  }
-}
-
-sequences_characterizer <- function(sequences, k_max, optim = FALSE, as_df = TRUE) {
-  # seqs_data <- list(A_perc = c(), T_perc = c(), C_perc = c(), G_perc = c(),
-  #                   seq_TM = c(), seq_SE = c())
-  sc_len <- ifelse(optim,
-                   cols_numb(k = k_max, n_params = 4),
-                   cols_numb(k = k_max, n_params = 6))
-  sc_len <- sc_len + 6
-  seqs_data <- vector(mode = "list", length = sc_len)
-  i <- 0
-  for (sequence_i in sequences) {
-    if (!i) {
-      seq_i <- sequence_characterizer(sequence_i, k = k_max,
-                                      optim = optim, as_vector = TRUE)
-      names(seqs_data) <- names(seq_i)
-      names(seq_i) <- NULL
-      i <- i + 1
-    } else {
-      seq_i <- sequence_characterizer(sequence_i, k = k_max, no_names = TRUE,
-                                      optim = optim, as_vector = TRUE)
-      names(seq_i) <- NULL
-    }
-    for (j in 1:sc_len) {
-      seqs_data[[j]] <- append(seqs_data[[j]], seq_i[j])
-    }
-  }
-  if (as_df) {
-    return(as.data.frame(seqs_data))
-  } else {
-    return(seqs_data)
-  }
-}
-
-cols_numb <- function(k_max, n_params) {
-  number <- 0
-  for (i in 2:k_max) {
-    number <- sum(number, 4^i)
-  }
-  return(number * n_params)
 }
 
 trigon_cases <- function(lens, poss, peaks, case, subcase,
