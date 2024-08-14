@@ -30,6 +30,11 @@ testseq3 <- "GTGCAGTGGCGCTATCTCGGCTCACTGCAAGCTGTTCACGCCATTCT"
 palindromeseq <- "CAAGCTTGTGCAGTGTTGCTGTTCTATCTCGGCTCACTGCAAGCTGTTCACGCCATGTTCTGTT"
 ```
 
+### Sequence Import
+```{r}
+
+```
+
 ### Counts per Base 
 Gets counts of each nucleotide in the sequence.
 ```{r}

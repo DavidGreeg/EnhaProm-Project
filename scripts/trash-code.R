@@ -828,3 +828,162 @@ generate_combinations <- function(set, k) {
   return(combinations)
 }
 rm(generate_combinations)
+
+# ============================================================================ #
+#						  PRODUCT OPTIMIZATION DRAFT                           #
+# ============================================================================ #
+
+# =============================================================================
+# GC PERCENTAGE * SHANNON ENTROPY: Optimized function to use later ---------- #
+# =============================================================================
+
+gc_sha_prod <- function(sequence, #base_counts, base_percs,
+                        mod_sh = 1.1, mod_gc = 2) {
+  #: if (missing(base_percs)) {
+  #:   if (missing(base_counts)) {
+  #:     bpercs <- bases_percentage(sequence)
+  #:   } else {
+  #:     bpercs <- bases_percentage(base_counts = base_counts)
+  #:   }
+  #: } else {
+  #:   bpercs <- base_percs
+  #: }
+
+  bpercs <- bases_percentage(sequence)
+  names(bpercs) <- NULL
+  shannon <- mod_sh^(-sum(bpercs * ifelse(bpercs > 0, log(bpercs, 2), 1)))
+  gc_perc <- mod_gc^(bpercs[3] + bpercs[4])
+  return(shannon * gc_perc)
+}
+
+# =============================================================================
+# OPTIMIZED PRODUCT: kmer(count percentage in seq * GC percentage * shannon)  #
+# =============================================================================
+
+# optimized_product <- function(sequence, k, kmer, windows) {
+optimized_product <- function(kmers, windows) {
+  # if (missing(windows)) {
+  #   windows <- kmer_windows(sequence, k = k)
+  # }
+  k_perc <- counts_per_window(seq_kmers = windows,
+                              all_kmers = kmers)
+  names(k_perc) <- NULL
+  # print(k_perc)
+  # k_perc <- (stri_count_fixed(kmer, windows, overlap = TRUE) / length(windows))
+  gc_sha <- gc_sha_prod(kmers)
+  # print(gc_sha)
+  # gc_sha <- sapply(kmer, gc_sha_prod, simplify = TRUE)
+  #: gc_sha <- sapply(kmers,
+  #:            function(x) {
+  #:              gc_percentage(sequence = x) * shannon_entropy(sequence = x)
+  #:              },
+  #:              simplify = TRUE)
+  return(k_perc * gc_sha)
+}
+
+present_kmers <- function(kmer_counts, sequence, all_kmers) {
+  if (missing(kmer_counts)) {
+    kmer_counts <- count_kmers(sequence, all_kmers)
+  }
+  return(names(kmer_counts[kmer_counts > 0]))
+}
+
+
+# =============================================================================
+# TABLE MAKERS: Table production (data extraction), given a set of sequences  #
+# =============================================================================
+
+sequence_characterizer <- function(sequence, k_max = 4, no_names = FALSE,
+                                   optim = FALSE, as_vector = TRUE) {
+  basepercs <- bases_percentage(sequence)
+  seq_tms <- tm_len_mt13(sequence)
+  seq_sha <- shannon_entropy(sequence)
+  ## Add pairwise alignment data per sequence
+  ## Local and Global alignment of sequence against its mirror (reverse)
+  ## and reverse complementary
+
+  kmers_characs <- list()
+  if (!as_vector) {
+    kmers_characs[[1]] <- list(perc = basepercs, temp = seq_tms, shan = seq_sha)
+    names(kmers_characs)[1] <- "WS"
+  } else {
+    kiv_characs <- c(basepercs, temp = seq_tms, shan = seq_sha)
+  }
+  for (i in 2:k_max) {
+    all_ki <- combi_kmers(k = i)
+    ki_seq <- kmer_windows(sequence, k = i)
+    if (!optim) {
+      ki_percs <- count_kmers(sequence, k = i,
+                              percentage = TRUE)
+      # ^This can be optimized to use only loaded kmers not sequence
+      ki_tms <- func_per_windows(windows = all_ki,
+                                 func = tm_len_lt14)
+      ki_sha <- func_per_windows(windows = all_ki,
+                                 func = shannon_entropy)
+    }
+    ki_brc <- func_per_windows(kmers = all_ki,
+                               windows = ki_seq,
+                               func = kmer_barcode)
+    ki_pals <- func_per_windows(windows = all_ki,
+                                func = isPalindrome)
+        # ^Add 'isPalindrome' to 'optim' conditional in the form of
+        # 'if(isPalindrome)' then "value = 2*value"
+    if (!(i %% 2)) {
+      ki_revc <- func_per_windows(windows = all_ki,
+                                  func = isRevComPalindrome)
+    }
+        # ^Add 'isRevComPalindrome' to 'optim' conditional in the form of
+        # 'if(isRevComPalindrome)' then "value = 2*value",
+        #  but also add option
+        # 'if((seq_length % 2) != 0)' then
+        # "replace nucleotide in the middle with N" then
+        # 'if(isRevComPalindrome)' then "value = 2*value"
+        # Maybe later on, make more options like this for partial palindromes.
+    # ^Another optimization is to only compute data from non-zero count kmers
+    # and later on, organize it in the corresponding 'all_ki' order
+    # Maybe I can just add an "isTrue" parameter/conditional to all functions
+    ki_name <- paste("k", i, sep = "")
+    if (optim) {
+      # ki_gcp <- func_per_windows(windows = all_ki,
+                                 # func = gc_percentage)
+      # ki_gcp <- 2^ki_gcp
+      # ki_sha <- 1.1^ki_sha
+      # ki_prod <- ki_percs * ki_gcp * ki_sha
+      ki_prod <- func_per_windows(kmers = all_ki,
+                                  windows = ki_seq,
+                                  func = ksg_product)
+      ki_characs <- list(prod = ki_prod, barc = ki_brc,
+                         pals = ki_pals, revc = ki_revc)
+    } else {
+      ki_characs <- list(perc = ki_percs, temp = ki_tms, shan = ki_sha,
+                         barc = ki_brc, pals = ki_pals, revc = ki_revc)
+    }
+    # ^This 'optim' option can be further exploited if instead of doing
+    # 4 different 'func_per_windows()' and then operating over their values,
+    # make a new function that multiplies all perc*gcp*sha per sequence in
+    # just one go.
+    if (as_vector) {
+      for (kmer_i in 1:4^i) {
+        # ikmer_seq <- c(all_ki[kmer_i])
+        # names(ikmer_seq) <- paste("k", i, "-", kmer_i, "_", "seq", sep = "")
+        ikmer_characs <- c(unlist(lapply(ki_characs, `[[`, kmer_i)))
+        if (!no_names)
+          names(ikmer_characs) <- paste("k", i, "-", kmer_i,
+                                        "_", names(ikmer_characs), sep = "")
+        # kiv_characs <- c(kiv_characs, ikmer_seq, ikmer_characs)
+        kiv_characs <- c(kiv_characs, ikmer_characs)
+      }
+      # kmers_characs[[i]] <- kiv_characs
+    } else {
+      kmers_characs[[i]] <- ki_characs
+      names(kmers_characs)[i] <- ki_name
+    }
+  }
+  # return(ifelse(as_vector, kiv_characs, kmers_characs))
+  if (as_vector) {
+    return(kiv_characs)
+  } else {
+    return(kmers_characs)
+  }
+}
+
