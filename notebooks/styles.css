@@ -1,0 +1,55 @@
+/* Add language headers above code cells */
+/* .cell.python::before { */
+/*     content: "Python Code"; */
+/*     display: block; */
+/*     font-weight: bold; */
+/*     color: #333; */
+/*     margin-bottom: 5px; */
+/* } */
+/**/
+/* .cell.r::before { */
+/*     content: "R Code"; */
+/*     display: block; */
+/*     font-weight: bold; */
+/*     color: #333; */
+/*     margin-bottom: 5px; */
+/* } */
+.cell.python::before {
+    content: "Python Code";
+    display: block;
+    font-weight: bold;
+    color: white;
+    /* background-color: #306998; /* Python blue color */
+	background-color: rgba(48,105,152,0.7);
+    padding: 6px 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+	text-align: right;
+}
+
+/* R code cell header */
+.cell.r::before {
+    content: "R Code";
+    display: block;
+    font-weight: bold;
+    color: white;
+    /* background-color: #1f77b4; R blue color */
+	background-color: rgba(31,119,180,0.7);
+    padding: 6px 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+	text-align: right;
+}
+/* Bash code cell header */
+.cell.bash::before {
+    content: "Bash Code";
+    display: block;
+    font-weight: bold;
+    color: white;
+    /* background-color: #333333; /* Dark gray for Bash */
+	background-color: rgba(53,67,100,0.7);
+    padding: 6px 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+	text-align: right;
+}

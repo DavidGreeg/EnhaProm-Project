@@ -53,6 +53,10 @@ rev_complement <- function(sequence, bases = "ATCG", replace_bases = "TAGC") {
   return(stri_reverse(chartr(bases, replace_bases, sequence)))
 }
 
+n_ki <- function(size) {
+  return(4^size)
+}
+
 # =============================================================================
 # KMERS / WINDOWS: kmer creation, identification & utilities for them ------- #
 # =============================================================================
@@ -114,16 +118,23 @@ kmer_windows <- function(sequence, k = 2, s = 1) {
   return(str_sub(sequence, seq(1, seq_len + 1 - k, s), seq(k, seq_len, s)))
 }
 
-func_per_windows <- function(sequence, k = 2, s = 1, windows, kmers, func) {
+func_per_windows <- function(sequence, k, s, windows, kmers,
+                             option = character(0), func) {
   if (missing(windows)) {
     windows <- kmer_windows(sequence, k = k, s = s)
   }
   if (missing(kmers)) {
     return(sapply(windows, func, simplify = TRUE))
   } else {
-    return(sapply(kmers,
-                  function(x) func(kmer = x, windows = windows),
-                  simplify = TRUE))
+    if (missing(option)) {
+      return(sapply(kmers,
+                    function(x) func(kmer = x, windows = windows),
+                    simplify = TRUE))
+    } else {
+      return(sapply(kmers,
+            function(x) func(kmer = x, windows = windows, option = option),
+            simplify = TRUE))
+    }
   }
 }
 
@@ -480,15 +491,13 @@ sequence_characterizer <- function(sequence, k_max = 4, no_names = FALSE,
     }
     ki_brc <- func_per_windows(kmers = all_ki,
                                windows = ki_seq,
-                               func = kmer_barcode)
-    ki_pals <- func_per_windows(windows = all_ki,
-                                func = isPalindrome)
-        # ^Add 'isPalindrome' to 'optim' conditional in the form of
-        # 'if(isPalindrome)' then "value = 2*value"
-    if (!(i %% 2)) {
-      ki_revc <- func_per_windows(windows = all_ki,
-                                  func = isRevComPalindrome)
-    }
+                               func = kmer_barcode, opt = "expsum")
+    ki_pals <- func_per_windows(kmers = all_ki,
+                                windows = ki_seq,
+                                func = comps_barcode, opt = "partpal")
+    ki_revc <- func_per_windows(kmers = all_ki,
+                                windows = ki_seq,
+                                func = comps_barcode, opt = "revcomp")
         # ^Add 'isRevComPalindrome' to 'optim' conditional in the form of
         # 'if(isRevComPalindrome)' then "value = 2*value",
         #  but also add option
@@ -501,42 +510,28 @@ sequence_characterizer <- function(sequence, k_max = 4, no_names = FALSE,
     # Maybe I can just add an "isTrue" parameter/conditional to all functions
     ki_name <- paste("k", i, sep = "")
     if (optim) {
-      # ki_gcp <- func_per_windows(windows = all_ki,
-                                 # func = gc_percentage)
-      # ki_gcp <- 2^ki_gcp
-      # ki_sha <- 1.1^ki_sha
-      # ki_prod <- ki_percs * ki_gcp * ki_sha
       ki_prod <- func_per_windows(kmers = all_ki,
                                   windows = ki_seq,
                                   func = ksg_product)
       ki_characs <- list(prod = ki_prod, barc = ki_brc,
-                         psco = ki_psco)
+                         pals = ki_pals, revc = ki_revc)
     } else {
       ki_characs <- list(perc = ki_percs, temp = ki_tms, shan = ki_sha,
                          barc = ki_brc, pals = ki_pals, revc = ki_revc)
     }
-    # ^This 'optim' option can be further exploited if instead of doing
-    # 4 different 'func_per_windows()' and then operating over their values,
-    # make a new function that multiplies all perc*gcp*sha per sequence in
-    # just one go.
     if (as_vector) {
       for (kmer_i in 1:4^i) {
-        # ikmer_seq <- c(all_ki[kmer_i])
-        # names(ikmer_seq) <- paste("k", i, "-", kmer_i, "_", "seq", sep = "")
         ikmer_characs <- c(unlist(lapply(ki_characs, `[[`, kmer_i)))
         if (!no_names)
           names(ikmer_characs) <- paste("k", i, "-", kmer_i,
                                         "_", names(ikmer_characs), sep = "")
-        # kiv_characs <- c(kiv_characs, ikmer_seq, ikmer_characs)
         kiv_characs <- c(kiv_characs, ikmer_characs)
       }
-      # kmers_characs[[i]] <- kiv_characs
     } else {
       kmers_characs[[i]] <- ki_characs
       names(kmers_characs)[i] <- ki_name
     }
   }
-  # return(ifelse(as_vector, kiv_characs, kmers_characs))
   if (as_vector) {
     return(kiv_characs)
   } else {
@@ -544,9 +539,12 @@ sequence_characterizer <- function(sequence, k_max = 4, no_names = FALSE,
   }
 }
 
-sequences_characterizer <- function(sequences, k_max, optim = FALSE, as_df = TRUE) {
+sequences_characterizer <- function(sequences, k_max, optim = FALSE, as_df = TRUE,
+                                    progressbar = TRUE) {
   # seqs_data <- list(A_perc = c(), T_perc = c(), C_perc = c(), G_perc = c(),
   #                   seq_TM = c(), seq_SE = c())
+  if (progressbar)
+    pb = txtProgressBar(min = 0, max = length(sequences), initial = 0)
   sc_len <- ifelse(optim,
                    cols_numb(k = k_max, n_params = 4),
                    cols_numb(k = k_max, n_params = 6))
@@ -559,7 +557,6 @@ sequences_characterizer <- function(sequences, k_max, optim = FALSE, as_df = TRU
                                       optim = optim, as_vector = TRUE)
       names(seqs_data) <- names(seq_i)
       names(seq_i) <- NULL
-      i <- i + 1
     } else {
       seq_i <- sequence_characterizer(sequence_i, k = k_max, no_names = TRUE,
                                       optim = optim, as_vector = TRUE)
@@ -568,6 +565,9 @@ sequences_characterizer <- function(sequences, k_max, optim = FALSE, as_df = TRU
     for (j in 1:sc_len) {
       seqs_data[[j]] <- append(seqs_data[[j]], seq_i[j])
     }
+    i <- i + 1
+    if (progressbar)
+      setTxtProgressBar(pb, i)
   }
   if (as_df) {
     return(as.data.frame(seqs_data))
