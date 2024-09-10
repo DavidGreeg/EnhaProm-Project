@@ -1,0 +1,577 @@
+---
+title: Genomic-Benchmarks Test
+pdf-engine: xelatex
+format: 
+  pdf: 
+    toc: true
+    number-sections: true
+    colorlinks: true
+    papersize: letter
+    fig-format: png
+    fig-width: 7
+    fig-height: 5
+    cell-language: true
+    keep-tex: true
+    header-includes:
+      - \usepackage{array}
+      - \usepackage{float}
+      - \usepackage{booktabs}
+      - \usepackage{arydshln}
+      - \usepackage{multirow}
+      - \usepackage{xcolor}
+      - \usepackage{tcolorbox}
+      - \usepackage{geometry}
+      - \geometry{left=0.75in, right=0.75in, top=1in, bottom=1in}
+      - \definecolor{pythoncol}{rgb}{0.188,0.412,0.596}
+      - \definecolor{rcol}{rgb}{0.121,0.466,0.705}
+      - \definecolor{bashcol}{rgb}{0.207,0.262,0.392}
+      - \newtcolorbox{pythonheader}{colback=pythoncol!70, colframe=pythoncol, fontupper=\bfseries\color{white}, boxrule=0.1mm, arc=4mm, left=2mm, right=2mm, top=1mm, bottom=1mm, halign=right, sharp corners=south}
+      - \newtcolorbox{rheader}{colback=rcol!70, colframe=rcol, fontupper=\bfseries\color{white}, boxrule=0.1mm, arc=4mm, left=2mm, right=2mm, top=1mm, bottom=1mm, halign=right, sharp corners=south}
+      - \newtcolorbox{bashheader}{colback=bashcol!70, colframe=bashcol, fontupper=\bfseries\color{white}, boxrule=0.1mm, arc=4mm, left=2mm, right=2mm, top=1mm, bottom=1mm, halign=right, sharp corners=south}
+mainfont: Liberation Serif
+execute:
+  cache: true
+---
+
+# Downloading data
+\begin{pythonheader}
+Python Code
+\end{pythonheader}
+```{python}
+#| label: data-download
+#| eval: false
+
+# Listing available datasets
+from genomic_benchmarks.data_check import list_datasets
+list_datasets()
+# Inspecting each dataset to select two
+from genomic_benchmarks.data_check import info as info_gb
+info_gb("human_nontata_promoters") # <- This one will be used
+info_gb("human_ensembl_regulatory")
+info_gb("human_enhancers_cohn")    # <- This one will also be used
+info_gb("human_enhancers_ensembl")
+# Downloading datasets
+from genomic_benchmarks.loc2seq import download_dataset
+import os
+os.chdir("/home/davidfm/Projects/UBMI-IFC/EnhaProm/datasets/GenomicBenchmarks")
+download_dataset("human_nontata_promoters", version=0) 
+download_dataset("human_enhancers_cohn", version=0) 
+```
+
+# Formatting data
+
+The downloaded data came in the form of two directories with many *.txt* files inside, and seeing that at least '*getShape()*' 
+function from '*DNAshapeR*' library required FASTA files to work and it felt right to collect all sequences in a single file, 
+I transfered all sequences of each cis-regulatory element to their single respective FASTA file and gave them a simple header.
+
+\begin{bashheader}
+Bash Code
+\end{bashheader}
+```{bash}
+#| label: data-to-fasta
+#| eval: false
+
+cd /home/davidfm/Projects/UBMI-IFC/EnhaProm/datasets/GenomicBenchmarks/
+awk 'BEGIN{counter=0}{print ">promoter_"counter"|train|positive";
+     print $0; counter+=1}' human_nontata_promoters/train/positive/*.txt \
+     > promoters_train_positive.fasta
+awk 'BEGIN{counter=0}{print ">enhancer_"counter"|train|positive"; 
+     print $0; counter+=1}' human_enhancers_cohn/train/positive/*.txt \
+     > enhancers_train_positive.fasta
+```
+
+# Libraries used
+
+Here is a list of the R libraries used for the following analysis, as well as
+a reference to my own functions to be used in the characterization step.
+
+\begin{rheader}
+R Code
+\end{rheader}
+```{r}
+#| label: requirements
+#| output: false
+
+# For genome-functions.R
+library(stringr)
+library(stringi)
+library(primes)
+# For parallel computing
+library(doParallel)
+library(foreach)
+# For biological functions: 
+#   - Local/Global alignments 
+#   - DNA Shape computing
+library(Biostrings)
+library(DNAshapeR)
+# For plotting
+library(cowplot)
+library(ggplot2)
+library(dplyr)
+library(plyr)
+# For pretty tables
+library(knitr)
+library(kableExtra)
+# For my own functions
+source("/home/davidfm/Projects/UBMI-IFC/EnhaProm/scripts/genome-functions.R")
+```
+
+# Characterizing sequences
+
+Here, we characterize a subset from each of our datasets: 1638 sequences per 
+regulatory element; 3276 in total. However, there's a circumstance about the 
+sequences that has to be noted:
+
+* Both datasets have considerably different elements lengthwise:
+	1. All promoters have a length of 251 nucleotides.
+	2. All enhancers have a length of 500 nucleotides.
+
+```{r}
+#| label: csv-scanning
+#| eval: false
+
+# Scanning sequences
+prom_fasta <- "datasets/GenomicBenchmarks/promoters_train_positive.fasta"
+enha_fasta <- "datasets/GenomicBenchmarks/enhancers_train_positive.fasta"
+prom_seqs <- scan(prom_fasta, character(), quote = "")[seq(2, 29484, 2)]
+enha_seqs <- scan(enha_fasta, character(), quote = "")[seq(2, 20842, 2)]
+```
+
+Given some previous tests done to 'sequences_characterizer()' I came to the
+conclusion that parallel computing might provide a higher and more complex
+set of data in a feasible time span.
+
+```{r}
+#| label: csv-construction
+#| eval: false
+
+# Prepairing clusters for parallel computing
+corescluster <- makeCluster(6)
+registerDoParallel(corescluster)
+# Characterizing sequences and exporting to CSV
+list_seqs <- list(promoters = prom_seqs, enhancers = enha_seqs)
+reg_elems <- c("promoters", "enhancers")
+for (reg_elem in reg_elems) {
+  foreach(i = 1:6) %dopar% {
+    library(stringr) # for some reason we have to specify for
+    library(stringi) # all the libraries that the sequence
+    library(primes)  # characterizer needs
+    i_start <- ((i - 1) * 273) + 1
+    i_final <- i * 273
+    if (i > 1) {     # Conditional so that only the first CSV has headers
+      write.table(sequences_characterizer(list_seqs[[reg_elem]][i_start:i_final],
+                                          k_max = 6, optim = TRUE),
+                  paste("datasets/GB-Testing/test", reg_elem, "-minitraining_",
+                        i, ".csv", sep = ""), sep = ",",
+                  row.names = FALSE, col.names = FALSE)
+    } else {
+	  write.csv(sequences_characterizer(list_seqs[[reg_elem]][i_start:i_final],
+                                        k_max = 6, optim = TRUE),
+                paste("datasets/GB-Testing/", reg_elem, "-minitraining_",
+                      i, ".csv", sep = ""), row.names = FALSE)
+    }
+  }
+}
+```
+
+# Concatenating CSV's
+
+It was decided to produce many files instead of appending over the same CSV table in order to 
+apply a sort of quality control checkup after the parallel computing was done. This, because when forcing the process 
+RAM overload was possible and the function could die mid-process. Since our data was separated in six tables per 
+cis-regulatory element, here we only join each set together in a single CSV.
+
+\begin{bashheader}
+Bash Code
+\end{bashheader}
+```{bash}
+#| label: csv-concatenation
+#| eval: false
+
+cat datasets/GB-Testing/testpromoters-minitraining_*.csv \
+    > datasets/GB-Testing/test-1638-promoters-6mers.csv
+cat datasets/GB-Testing/testenhancers-minitraining_*.csv \
+    > datasets/GB-Testing/test-1638-enhancers-6mers.csv
+```
+
+# Data description
+
+```{=latex}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+
+\begin{table}[H]
+\caption{Overview of each column generated by '\textit{sequences-characterizer()}'}
+\centering
+% Using the new column types L, C, and R for custom width and orientation
+\begin{tabular}{|L{2.5cm}|C{4cm}|C{5cm}|} 
+\hline
+\centering \textbf{Column} & \textbf{Description} & \textbf{Section Processed} \\
+\hline
+A & \parbox[c][1.2cm]{4cm}{\centering Percentage of Alanines} & \multirow{6}{*}{\underline{per Sequence}} \\
+\cdashline{1-2}
+T & \parbox[c][1.2cm]{4cm}{\setlength\parindent{4pt}Percentage of Thymines} & \\
+\cdashline{1-2}
+C & \parbox[c][1.2cm]{4cm}{\centering Percentage of Cytosines} & \\
+\cdashline{1-2}
+G & \parbox[c][1.2cm]{4cm}{\centering Percentage of Guanines} & \\
+\cdashline{1-2}
+temp & \parbox[c][1.2cm]{4cm}{\centering Melting Temperature} & \\
+\cdashline{1-2}
+shan & \parbox[c][1.2cm]{4cm}{\centering Shannon Coefficient} & \\
+\hline
+kN.M\_prod & \parbox[c][1.25cm]{4cm}{\centering KSG Product} & \multirow{4}{*}{\parbox[t]{8cm}{
+\setlength\parindent{45pt}\underline{per Kmer:}\\\\
+each possible kmer of size N\\
+is identified on a scale of 1 to\\
+$4^N$ denoted by M.\\\\
+\texttt{
+i.e. k3.1 (or the first\\
+kmer of size 3) would be\\
+AAA; k4.2 would be AAAC\\
+}
+}} \\
+\cdashline{1-2}
+kN.M\_barc & \parbox[c][1.2cm]{4cm}{\centering Barcode Profile} & \\
+\cdashline{1-2}
+kN.M\_pals & \parbox[c][1.2cm]{4cm}{\centering Palindrome Profile} & \\
+\cdashline{1-2}
+kN.M\_revc & \parbox[c][1.7cm]{4cm}{\centering Reverse Complement Profile} & \\
+\hline
+\end{tabular}
+\end{table}
+```
+
+Prior to our primary analysis, it feels reasonable to explain the columns per sequence produced by our
+tabulator '*sequences_characterizer()*'. From here we'll first describe the ones computed sequence-wise, 
+the ones computed kmer-wise, then the ones computed over each kmer distribution, and finally the ones 
+corresponding to DNA-Shape; this feature comes at last considering '*getShape()*' function makes its' own 
+dataframe. The ones in **black** are already integrated in the table, the ones in \color{red} **red** 
+\color{black} are yet to be adjoined:
+
+\underline{Per sequence}
+
+* From *'genome-functions.R'*:
+	* **A, T, C, G** - *Nucleotide Percentages* per sequence.
+
+	* **temp** - \textit{Melting \underline{Temp}erature}: Temperature at which DNA's double helix dissociates 
+into single strands. *It's dependent on GC percentage and sequence length.*
+
+	* **shan** - \textit{\underline{Shan}non Entropy Coefficient}: Statistical quantifier of information in a 
+system. Measures the uncertainty a set of data has. In this case is a nucleotide-diversity metric. 
+*It's dependent on nucleotide percentages.*
+
+* From *'Biostrings'*:
+	* \color{red}**la_sc** \color{black} - \textit{\underline{L}ocal \underline{A}lignment \underline{Sc}ore}
+
+	* \color{red}**la_id** \color{black} - \textit{\underline{L}ocal \underline{A}lignment \underline{Id}entity}
+
+	* \color{red}**ga_sc** \color{black} - \textit{\underline{G}lobal \underline{A}lignment \underline{Sc}ore}
+
+	* \color{red}**ga_id** \color{black} - \textit{\underline{G}lobal \underline{A}lignment \underline{Id}entity}
+	
+\underline{Per kmer}
+\newfontfamily\mynimbus{Nimbus Sans Narrow}
+
+* From *'genome-functions.R'*:
+
+	* **kN.M_prod** - \textit{KSG \underline{Prod}uct}: Its obtained by multiplying \mynimbus\textbf{
+\underline{K}mer-Percentage * \underline{S}hannon Entropy * \underline{G}C-Percentage} \fontspec{Liberation Serif} (in concept).
+However, this is a little tricky since you don't want the product to be zero if a sequence is solely composed of A/T nucleotides. 
+
+	* **kN.M_barc** - \textit{\underline{Barc}ode Profile}:
+
+	* **kN.M_pals** - \textit{\underline{Pal}indrome\underline{s}' Profile}:
+
+	* **kN.M_revc** - \textit{\underline{Rev}erse \underline{C}omplement Profile}:
+
+\underline{Per kmer distribution}
+
+\underline{Per non-defined kmer}
+
+* From *'DNAshapeR'*: \newline Its produced a row per sequence and a set vectors (EP, MGW, HelT, Roll & ProT as default) obtained when
+dividing each sequence in kmers (length non-defined by me) of whose length depends on sequence-length, so I would classify it as per
+
+	* \color{red}**sh_ep** \color{black} - Shape EP
+
+	* \color{red}**sh_mgw** \color{black} - Shape MGW
+
+	* \color{red}**sh_helt** \color{black} - Shape HelT
+
+	* \color{red}**sh_roll** \color{black} - Shape Roll
+
+	* \color{red}**sh_prot** \color{black} - Shape ProT
+
+
+
+# Primary analysis
+Firstly we read our CSV tables into our conviniently named dataframes.
+
+We could have concatenated both tables together, however I prefer to keep them in different files.
+\begin{rheader}
+R Code
+\end{rheader}
+```{r}
+#| label: data-load
+setwd("/home/davidfm/Projects/UBMI-IFC/EnhaProm")
+testpromoters <- read.csv("datasets/GB-Testing/test-1638-promoters-6mers.csv", 
+                          check.names = F)
+testenhancers <- read.csv("datasets/GB-Testing/test-1638-enhancers-6mers.csv", 
+                          check.names = F)
+```
+First we get an overviwew of the dimensions of our data:
+```{r}
+#| label: data-dimensions
+#| layout-ncol: 2
+deparse(substitute(testpromoters))
+deparse(substitute(testenhancers))
+dim(testpromoters)
+dim(testenhancers)
+```
+
+
+It's noticeable the fact that we have way more columns than rows in this test table.
+Let's get a glimpse of the records corresponding to the first three promoters.
+```{r}
+#| label: false-code-prom
+#| eval: false
+kable(testpromoters[1:3,1:18])
+```
+```{r}
+#| label: data-head-workaround-prom
+#| echo: false
+kable(testpromoters[1:3,1:6]) #|>
+  # kableExtra::add_header_above(header=c("Test Promoters"=6))
+kable(testpromoters[1:3,7:12])
+kable(testpromoters[1:3,13:18])
+```
+
+Let's get a glimpse of the records corresponding to the first three enhancers.
+```{r}
+#| label: false-code-enha
+#| eval: false
+kable(testenhancers[1:3,1:18])
+```
+```{r}
+#| label: data-head-workaround-enha
+#| echo: false
+kable(testenhancers[1:3,1:6]) #|>
+  # kableExtra::add_header_above(header=c("Test Enhancers"=6))
+kable(testenhancers[1:3,7:12])
+kable(testenhancers[1:3,13:18])
+```
+
+```{r}
+meanpromoters <- colMeans(testpromoters)
+meanenhancers <- colMeans(testenhancers)
+sdpromoters <- apply(testpromoters, 2, sd)
+sdenhancers <- apply(testenhancers, 2, sd)
+# names_test <- rep(names(testpromoters),2)
+cre_summary <- data.frame(Type = factor(rep(c("Promoter","Enhancer"), 
+                                        each = length(testpromoters))),
+                          Field = rep(names(testpromoters),2),
+                          Means = c(meanpromoters, meanenhancers),
+                          StDevs = c(sdpromoters, sdenhancers))
+# head(cre_summary)
+kable(cre_summary[c(1:10,21831:21840),])
+```
+
+```{r}
+#| code-overflow: wrap
+# Get only 'prod' columns of each kmer
+k2 <- n_ki(2); k3 <- n_ki(3); k4 <- n_ki(4); k5 <- n_ki(5); k6 <- n_ki(6) 
+kmer_sections_indexes <- c(1, 
+                           k2, 
+                           k2 + 1, 
+                           k2 + k3, 
+                           k2 + k3 + 1,
+                           k2 + k3 + k4, 
+                           k2 + k3 + k4 + 1,
+                           k2 + k3 + k4 + k5, 
+                           k2 + k3 + k4 + k5 + 1, 
+                           k2 + k3 + k4 + k5 + k6)
+prod_indexes <- seq(7,21827,4)
+barc_indexes <- seq(8,21828,4)
+pals_indexes <- seq(9,21829,4)
+revc_indexes <- seq(10,21830,4)
+all_prod_indexes <- c(prod_indexes, 21830 + prod_indexes)
+all_barc_indexes <- c(barc_indexes, 21830 + barc_indexes)
+all_pals_indexes <- c(pals_indexes, 21830 + pals_indexes)
+all_revc_indexes <- c(revc_indexes, 21830 + revc_indexes)
+kable(head(testenhancers[, barc_indexes])[,c(1:8,length(barc_indexes))])
+```
+
+```{r}
+#| label: kmer-sections-false
+#| eval: false
+kable(head(testenhancers[496:500, barc_indexes], 5)[kmer_sections_indexes])
+```
+```{r}
+#| label: kmer-sections
+#| echo: false
+subset1 <- testenhancers[496:500, barc_indexes]
+row.names(subset1) <- NULL
+kable(subset1[kmer_sections_indexes[1:5]]) |>
+  column_spec(column = 2:5, width = "1in") 
+kable(subset1[kmer_sections_indexes[6:10]]) |>
+  column_spec(column = 2:5, width = "1in") 
+```
+
+```{r}
+kable(cre_summary[c(prod_indexes[1:5],(21830+prod_indexes)[1:5]),])
+```
+
+```{r}
+subset_cre_nucl <- cre_summary[c(1:4,21830+(1:4)),]
+subset_cre_temp <- cre_summary[c(5,21830+5),]
+subset_cre_shan <- cre_summary[c(6,21830+6),]
+subset_cre_prod <- cre_summary[c(prod_indexes[17:64],(21830+prod_indexes)[17:64]),]
+subset_cre_barc <- cre_summary[c(barc_indexes[17:64],(21830+barc_indexes)[17:64]),]
+subset_cre_pals <- cre_summary[c(pals_indexes[17:64],(21830+pals_indexes)[17:64]),]
+subset_cre_revc <- cre_summary[c(revc_indexes[17:64],(21830+revc_indexes)[17:64]),]
+kable(cbind(subset_cre_prod[subset_cre_prod$Type=="Promoter",],
+      subset_cre_prod[subset_cre_prod$Type=="Enhancer",])[,c(2,1,3,4,5,7,8)][1:10,])
+field_order_nucl <- subset_cre_nucl$Field[1:4]
+field_order_prod <- subset_cre_prod$Field[1:48]
+field_order_barc <- subset_cre_barc$Field[1:48]
+```
+```{r}
+subset_cre_temp$Means
+subset_cre_temp$StDevs
+```
+```{r}
+subset_cre_shan$Means
+subset_cre_shan$StDevs
+```
+<!---->
+<!-- ```{r} -->
+<!-- subset_cre_prod$Means -->
+<!-- subset_cre_prod$StDevs -->
+<!-- ``` -->
+<!---->
+<!-- ```{r} -->
+<!-- subset_cre_barc$Means -->
+<!-- subset_cre_barc$StDevs -->
+<!-- ``` -->
+
+```{r}
+#| row: screen
+#| out-height: 100%
+#| fig-align: center
+
+ggplot(subset_cre_nucl) +
+  geom_bar(aes(x = factor(Field, levels = field_order_nucl), 
+               y = ifelse(Type == "Enhancer", -Means, Means), 
+               fill = paste(Type, "Means")),
+           stat = "identity", position = "identity", 
+           alpha = 0.6, width = 0.7) +
+  geom_errorbar(aes(x = factor(Field, levels = field_order_nucl),
+	                ymin = ifelse(Type == "Enhancer",
+                                  -Means + StDevs, Means - StDevs),
+	                ymax = ifelse(Type == "Enhancer",
+                                  -Means - StDevs, Means + StDevs)),
+                width = 0.5, colour = "black", alpha = 0.6)	+
+  coord_flip() +
+  scale_y_continuous(breaks=seq(-1, 1, 0.2), labels=abs(seq(-1, 1, 0.2))) +
+  scale_fill_manual(values = c("turquoise", "coral")) +
+  labs(y = "Means", x = "Nucleotides", 
+       title = "Percentage Means per Nucleotide", 
+       fill = "CRE Type") +
+  theme_minimal()
+```
+
+```{r}
+# Saving Melting Temperature Plot
+temp_plt <- ggplot(subset_cre_temp) +
+  geom_bar(aes(x = factor(Type), 
+               y = Means, fill=Type),
+           stat = "identity", position = "identity", alpha = 0.6) +
+  geom_errorbar(aes(x = factor(Type), 
+                    ymin = Means - StDevs,
+                    ymax = Means + StDevs),
+                width = 0.5, colour = "black", alpha = 0.6) +
+  labs(y = "Means", x = "", 
+       # title = "Melting Temperature Means", 
+       fill = "") +
+  scale_y_continuous(breaks = seq(0, 100, 10),
+                     labels = seq(0, 100, 10)) +
+  guides(fill = "none") +
+  theme_minimal()
+
+# Saving Shannon Coefficient Plot
+shan_plt <- ggplot(subset_cre_shan) +
+  geom_bar(aes(x = factor(Type), 
+               y = Means, fill=Type),
+           stat = "identity", position = "identity", alpha = 0.6) +
+  geom_errorbar(aes(x = factor(Type), 
+                    ymin = Means - StDevs,
+                    ymax = Means + StDevs),
+                width = 0.5, colour = "black", alpha = 0.6) +
+  labs(y = "", x = "", 
+       # title = "Shannon Entropy Means", 
+       fill = "CRE Type") +
+  scale_y_continuous(breaks=seq(0, 2, 0.25), labels=seq(0, 2, 0.25)) +
+  theme_minimal()
+
+plot_grid(temp_plt, shan_plt, ncol = 2, rel_widths = c(1,1.5),
+          labels = c("Melting Temperature", "Shannon Entropy"),
+          label_fontface = "plain",hjust = c(-0.35, -0.48), vjust = 1)
+  
+```
+
+```{r}
+#| row: screen
+#| out-height: 100%
+#| fig-align: center
+
+ggplot(subset_cre_prod) +
+  geom_bar(aes(x = factor(Field, levels = field_order_prod), 
+               y = ifelse(Type == "Enhancer", -Means, Means), 
+                          fill = paste(Type, "Means")),
+               stat = "identity", position = "identity", 
+               alpha = 0.6, width = 0.7) +
+  geom_errorbar(aes(x = factor(Field, levels = field_order_prod),
+	                ymin = ifelse(Type == "Enhancer",
+                                  -Means + StDevs, Means - StDevs),
+	                ymax = ifelse(Type == "Enhancer",
+                                  -Means - StDevs, Means + StDevs)),
+                width = 0.5, colour = "black", alpha = 0.6)	+
+  coord_flip() +
+  scale_y_continuous(breaks=seq(-30, 30, 10), labels=abs(seq(-30, 30, 10))) +
+  scale_fill_manual(values = c("turquoise", "coral")) +
+  labs(y = "Means", x = "Kmers", 
+       title = "KSG-Product Means per Kmer", 
+       fill = "CRE Type") +
+  theme_minimal()
+```
+
+```{r}
+#| row: screen
+#| out-height: 100%
+#| fig-align: center
+
+ggplot(subset_cre_barc) +
+  geom_bar(aes(x = factor(Field, levels = field_order_barc), 
+               y = ifelse(Type == "Enhancer", -Means, Means), 
+                          fill = paste(Type, "Means")),
+               stat = "identity", position = "identity", 
+               alpha = 0.6, width = 0.7) +
+  geom_errorbar(aes(x = factor(Field, levels = field_order_barc),
+	                ymin = ifelse(Type == "Enhancer",
+                                  -Means + StDevs, Means - StDevs),
+	                ymax = ifelse(Type == "Enhancer",
+                                  -Means - StDevs, Means + StDevs)),
+                width = 0.5, colour = "black", alpha = 0.6)	+
+  coord_flip() +
+  scale_y_continuous(breaks=seq(-10, 10, 1), labels=abs(seq(-10, 10, 1))) +
+  scale_fill_manual(values = c("turquoise", "coral")) +
+  labs(y = "Means", x = "Kmers", 
+       title = "Barcode Profile Means per Kmer", 
+       fill = "CRE Type") +
+  theme_minimal()
+```
+
+
+

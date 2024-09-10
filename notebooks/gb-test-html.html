@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.550">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Genomic-Benchmarks Test</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="gb-test_files/libs/clipboard/clipboard.min.js"></script>
+<script src="gb-test_files/libs/quarto-html/quarto.js"></script>
+<script src="gb-test_files/libs/quarto-html/popper.min.js"></script>
+<script src="gb-test_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="gb-test_files/libs/quarto-html/anchor.min.js"></script>
+<link href="gb-test_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="gb-test_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="gb-test_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="gb-test_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="gb-test_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="gb-test_files/libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="gb-test_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Genomic-Benchmarks Test</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="downloading-data" class="level2">
+<h2 class="anchored" data-anchor-id="downloading-data">Downloading data</h2>
+<div class="cell python">
+
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Listing available datasets</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> genomic_benchmarks.data_check <span class="im">import</span> list_datasets</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>list_datasets()</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspecting each dataset to select two</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> genomic_benchmarks.data_check <span class="im">import</span> info <span class="im">as</span> info_gb</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>info_gb(<span class="st">"human_nontata_promoters"</span>) <span class="co"># &lt;- This one will be used</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>info_gb(<span class="st">"human_ensembl_regulatory"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>info_gb(<span class="st">"human_enhancers_cohn"</span>)    <span class="co"># &lt;- This one will also be used</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>info_gb(<span class="st">"human_enhancers_ensembl"</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Downloading datasets</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> genomic_benchmarks.loc2seq <span class="im">import</span> download_dataset</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>os.chdir(<span class="st">"/home/davidfm/Projects/UBMI-IFC/EnhaProm/datasets/GenomicBenchmarks"</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>download_dataset(<span class="st">"human_nontata_promoters"</span>, version<span class="op">=</span><span class="dv">0</span>) </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>download_dataset(<span class="st">"human_enhancers_cohn"</span>, version<span class="op">=</span><span class="dv">0</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="formatting-data" class="level2">
+<h2 class="anchored" data-anchor-id="formatting-data">Formatting data</h2>
+<div class="cell bash">
+
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /home/davidfm/Projects/UBMI-IFC/EnhaProm/datasets/GenomicBenchmarks/</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">awk</span> <span class="st">'BEGIN{counter=0}{print "&gt;promoter_"counter"|train|positive";</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="st">     print $0; counter+=1}'</span> human_nontata_promoters/train/positive/<span class="pp">*</span>.txt <span class="dt">\</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>     <span class="op">&gt;</span> promoters_train_positive.fasta</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">awk</span> <span class="st">'BEGIN{counter=0}{print "&gt;enhancer_"counter"|train|positive"; </span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="st">     print $0; counter+=1}'</span> human_enhancers_cohn/train/positive/<span class="pp">*</span>.txt <span class="dt">\</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>     <span class="op">&gt;</span> enhancers_train_positive.fasta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="libraries-used" class="level2">
+<h2 class="anchored" data-anchor-id="libraries-used">Libraries used</h2>
+<div class="cell r">
+
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># For genome-functions.R</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringi)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(primes)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># For parallel computing</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(doParallel)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(foreach)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># For biological functions: </span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   - Local/Global alignments </span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   - DNA Shape computing</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Biostrings)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DNAshapeR)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># For my own functions</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"/home/davidfm/Projects/UBMI-IFC/EnhaProm/scripts/genome-functions.R"</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># For plotting</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="characterizing-sequences" class="level2">
+<h2 class="anchored" data-anchor-id="characterizing-sequences">Characterizing sequences</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Scanning sequences</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>prom_fasta <span class="ot">&lt;-</span> <span class="st">"datasets/GenomicBenchmarks/promoters_train_positive.fasta"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>enha_fasta <span class="ot">&lt;-</span> <span class="st">"datasets/GenomicBenchmarks/enhancers_train_positive.fasta"</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>prom_seqs <span class="ot">&lt;-</span> <span class="fu">scan</span>(prom_fasta, <span class="fu">character</span>(), <span class="at">quote =</span> <span class="st">""</span>)[<span class="fu">seq</span>(<span class="dv">2</span>, <span class="dv">29484</span>, <span class="dv">2</span>)]</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>enha_seqs <span class="ot">&lt;-</span> <span class="fu">scan</span>(enha_fasta, <span class="fu">character</span>(), <span class="at">quote =</span> <span class="st">""</span>)[<span class="fu">seq</span>(<span class="dv">2</span>, <span class="dv">20842</span>, <span class="dv">2</span>)]</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepairing clusters for parallel computing</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>corescluster <span class="ot">&lt;-</span> <span class="fu">makeCluster</span>(<span class="dv">6</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">registerDoParallel</span>(corescluster)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Characterizing sequences and exporting to CSV</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>list_seqs <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">promoters =</span> prom_seqs, <span class="at">enhancers =</span> enha_seqs)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>reg_elems <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"promoters"</span>, <span class="st">"enhancers"</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (reg_elem <span class="cf">in</span> reg_elems) {</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">foreach</span>(<span class="at">i =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>) <span class="sc">%dopar%</span> {</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(stringr)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(stringi)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(primes)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    i_start <span class="ot">&lt;-</span> ((i <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">273</span>) <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    i_final <span class="ot">&lt;-</span> i <span class="sc">*</span> <span class="dv">273</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (i <span class="sc">&gt;</span> <span class="dv">1</span>) {</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>      <span class="fu">write.table</span>(<span class="fu">sequences_characterizer</span>(list_seqs[[reg_elem]][i_start<span class="sc">:</span>i_final],</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>                                          <span class="at">k_max =</span> <span class="dv">6</span>, <span class="at">optim =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">paste</span>(<span class="st">"datasets/GB-Testing/test"</span>, reg_elem, <span class="st">"-minitraining_"</span>,</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>                        i, <span class="st">".csv"</span>, <span class="at">sep =</span> <span class="st">""</span>), <span class="at">sep =</span> <span class="st">","</span>,</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>                  <span class="at">row.names =</span> <span class="cn">FALSE</span>, <span class="at">col.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>      <span class="fu">write.csv</span>(<span class="fu">sequences_characterizer</span>(list_seqs[[reg_elem]][i_start<span class="sc">:</span>i_final],</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">k_max =</span> <span class="dv">6</span>, <span class="at">optim =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>                <span class="fu">paste</span>(<span class="st">"datasets/GB-Testing/"</span>, reg_elem, <span class="st">"-minitraining_"</span>,</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>                      i, <span class="st">".csv"</span>, <span class="at">sep =</span> <span class="st">""</span>), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="concatenating-csvs" class="level2">
+<h2 class="anchored" data-anchor-id="concatenating-csvs">Concatenating CSV’s</h2>
+<div class="cell bash">
+
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> datasets/GB-Testing/testpromoters-minitraining_<span class="pp">*</span>.csv <span class="dt">\</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">&gt;</span> datasets/GB-Testing/test-1638-promoters-6mers.csv</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> datasets/GB-Testing/testenhancers-minitraining_<span class="pp">*</span>.csv <span class="dt">\</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">&gt;</span> datasets/GB-Testing/test-1638-enhancers-6mers.csv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="primary-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="primary-analysis">Primary analysis</h2>
+<div class="cell r">
+
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="st">"/home/davidfm/Projects/UBMI-IFC/EnhaProm"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>testpromoters <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"datasets/GB-Testing/test-1638-promoters-6mers.csv"</span>, </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">check.names =</span> F)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>testenhancers <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"datasets/GB-Testing/test-1638-enhancers-6mers.csv"</span>, </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">check.names =</span> F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>First we get an overviwew of the dimensions of our data:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(testpromoters)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  1638 21830</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(testenhancers)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  1638 21830</code></pre>
+</div>
+</div>
+<p>It’s noticeable the fact that we have way more columns than rows in this test table. Let’s get a glimpse of the records corresponding to the first three promoters.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># knitr::kable(testpromoters[1:3,1:30])</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: right;">A</th>
+<th style="text-align: right;">T</th>
+<th style="text-align: right;">C</th>
+<th style="text-align: right;">G</th>
+<th style="text-align: right;">temp</th>
+<th style="text-align: right;">shan</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.1673307</td>
+<td style="text-align: right;">0.2231076</td>
+<td style="text-align: right;">0.3306773</td>
+<td style="text-align: right;">0.2788845</td>
+<td style="text-align: right;">87.21315</td>
+<td style="text-align: right;">1.956136</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.2629482</td>
+<td style="text-align: right;">0.2788845</td>
+<td style="text-align: right;">0.2549801</td>
+<td style="text-align: right;">0.2031873</td>
+<td style="text-align: right;">81.00598</td>
+<td style="text-align: right;">1.990374</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0.3625498</td>
+<td style="text-align: right;">0.2031873</td>
+<td style="text-align: right;">0.2470120</td>
+<td style="text-align: right;">0.1872510</td>
+<td style="text-align: right;">80.02590</td>
+<td style="text-align: right;">1.948719</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 19%">
+<col style="width: 19%">
+<col style="width: 15%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">k2.1_prod</th>
+<th style="text-align: right;">k2.1_barc</th>
+<th style="text-align: right;">k2.1_pals</th>
+<th style="text-align: right;">k2.1_revc</th>
+<th style="text-align: right;">k2.2_prod</th>
+<th style="text-align: right;">k2.2_barc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">1.959765</td>
+<td style="text-align: right;">2.177403e+09</td>
+<td style="text-align: right;">1.374020e+12</td>
+<td style="text-align: right;">17.11198</td>
+<td style="text-align: right;">1.531862</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">2.633165</td>
+<td style="text-align: right;">1.138401e+17</td>
+<td style="text-align: right;">2.971115e+17</td>
+<td style="text-align: right;">26.44579</td>
+<td style="text-align: right;">2.624612</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">5.347025</td>
+<td style="text-align: right;">3.981015e+36</td>
+<td style="text-align: right;">8.100763e+29</td>
+<td style="text-align: right;">24.89016</td>
+<td style="text-align: right;">1.855662</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 18%">
+<col style="width: 18%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">k2.2_pals</th>
+<th style="text-align: right;">k2.2_revc</th>
+<th style="text-align: right;">k2.3_prod</th>
+<th style="text-align: right;">k2.3_barc</th>
+<th style="text-align: right;">k2.3_pals</th>
+<th style="text-align: right;">k2.3_revc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">3.845422e+15</td>
+<td style="text-align: right;">3.525451e+11</td>
+<td style="text-align: right;">26.44579</td>
+<td style="text-align: right;">2.445328</td>
+<td style="text-align: right;">4.788062e+13</td>
+<td style="text-align: right;">1.305836e+26</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2.607331e+20</td>
+<td style="text-align: right;">6.308689e+14</td>
+<td style="text-align: right;">24.89016</td>
+<td style="text-align: right;">2.513656</td>
+<td style="text-align: right;">1.320117e+14</td>
+<td style="text-align: right;">6.435389e+19</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1.156904e+25</td>
+<td style="text-align: right;">3.573059e+12</td>
+<td style="text-align: right;">34.22397</td>
+<td style="text-align: right;">3.431445</td>
+<td style="text-align: right;">6.011592e+17</td>
+<td style="text-align: right;">7.178542e+17</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 12%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">k2.3_revc</th>
+<th style="text-align: right;">k2.4_prod</th>
+<th style="text-align: right;">k2.4_barc</th>
+<th style="text-align: right;">k2.4_pals</th>
+<th style="text-align: right;">k2.4_revc</th>
+<th style="text-align: right;">k2.5_prod</th>
+<th style="text-align: right;">k2.5_barc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1.305836e+26</td>
+<td style="text-align: right;">5.5</td>
+<td style="text-align: right;">0.8121254</td>
+<td style="text-align: right;">2.425939e+04</td>
+<td style="text-align: right;">4.209683e+05</td>
+<td style="text-align: right;">24.89016</td>
+<td style="text-align: right;">2.163271</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">6.435389e+19</td>
+<td style="text-align: right;">17.6</td>
+<td style="text-align: right;">2.0647821</td>
+<td style="text-align: right;">6.207541e+13</td>
+<td style="text-align: right;">2.740751e+16</td>
+<td style="text-align: right;">32.66833</td>
+<td style="text-align: right;">2.801290</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">7.178542e+17</td>
+<td style="text-align: right;">16.5</td>
+<td style="text-align: right;">1.9121725</td>
+<td style="text-align: right;">2.419251e+12</td>
+<td style="text-align: right;">2.941608e+15</td>
+<td style="text-align: right;">40.44651</td>
+<td style="text-align: right;">3.119615</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 18%">
+<col style="width: 18%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">k2.5_pals</th>
+<th style="text-align: right;">k2.5_revc</th>
+<th style="text-align: right;">k2.6_prod</th>
+<th style="text-align: right;">k2.6_barc</th>
+<th style="text-align: right;">k2.6_pals</th>
+<th style="text-align: right;">k2.6_revc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">5.956114e+12</td>
+<td style="text-align: right;">1.907086e+14</td>
+<td style="text-align: right;">48</td>
+<td style="text-align: right;">3.032966</td>
+<td style="text-align: right;">1.321014e+23</td>
+<td style="text-align: right;">8.039297e+19</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">9.988736e+16</td>
+<td style="text-align: right;">2.535748e+18</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">2.389166</td>
+<td style="text-align: right;">2.028406e+16</td>
+<td style="text-align: right;">2.066402e+13</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3.054415e+20</td>
+<td style="text-align: right;">3.054391e+20</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">1.636697</td>
+<td style="text-align: right;">5.764911e+11</td>
+<td style="text-align: right;">8.636812e+10</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(testenhancers[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">30</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      A     T     C     G    temp     shan k2.1_prod k2.1_barc    k2.1_pals
+1 0.240 0.236 0.234 0.290 85.0392 1.993988        36 10.432345 1.885437e+37
+2 0.204 0.286 0.210 0.300 84.4652 1.978249        20  6.153015 5.673403e+20
+3 0.250 0.280 0.258 0.212 82.8252 1.992923        31  9.936447 1.640775e+32
+     k2.1_revc k2.2_prod k2.2_barc    k2.2_pals    k2.2_revc k2.3_prod
+1 8.632413e+30  24.89016  6.027803 1.579134e+29 1.707234e+31  76.22611
+2 1.061673e+53  23.33452  4.984255 4.485619e+32 1.810188e+35  73.11484
+3 5.563175e+39  46.66905  9.301359 9.951038e+37 3.612544e+25  60.66976
+  k2.3_barc    k2.3_pals    k2.3_revc k2.4_prod k2.4_barc    k2.4_pals
+1  13.43518 3.557032e+41 5.830130e+44      20.9  5.182017 2.534298e+18
+2  13.29662 3.273426e+39 3.755909e+39      22.0  6.098819 2.555384e+17
+3  12.53356 4.255600e+33 3.010280e+57      27.5  6.353834 3.581633e+31
+     k2.4_revc k2.5_prod k2.5_barc    k2.5_pals    k2.5_revc k2.6_prod
+1 2.395938e+20  43.55778  9.672032 1.852950e+24 3.825771e+48        80
+2 2.343823e+21  48.22468 10.185028 1.559529e+27 2.552638e+46        58
+3 2.035799e+26  57.55849 10.894642 3.730036e+31 2.060459e+35        60
+  k2.6_barc    k2.6_pals    k2.6_revc
+1 14.452432 1.791119e+41 4.233849e+41
+2  7.732096 2.784552e+29 9.930851e+52
+3  9.025510 1.288568e+31 2.183286e+27</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>meanpromoters <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(testpromoters)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>meanenhancers <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(testenhancers)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>sdpromoters <span class="ot">&lt;-</span> <span class="fu">apply</span>(testpromoters, <span class="dv">2</span>, sd)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>sdenhancers <span class="ot">&lt;-</span> <span class="fu">apply</span>(testenhancers, <span class="dv">2</span>, sd)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># names_test &lt;- rep(names(testpromoters),2)</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>cre_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Type =</span> <span class="fu">factor</span>(<span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"Promoter"</span>,<span class="st">"Enhancer"</span>), </span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">each =</span> <span class="fu">length</span>(testpromoters))),</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>                          <span class="at">Field =</span> <span class="fu">rep</span>(<span class="fu">names</span>(testpromoters),<span class="dv">2</span>),</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">Means =</span> <span class="fu">c</span>(meanpromoters, meanenhancers),</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>                          <span class="at">StDevs =</span> <span class="fu">c</span>(sdpromoters, sdenhancers))</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co"># head(cre_summary)</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(cre_summary[<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,<span class="dv">21831</span><span class="sc">:</span><span class="dv">21840</span>),])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Field</th>
+<th style="text-align: right;">Means</th>
+<th style="text-align: right;">StDevs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: left;">A</td>
+<td style="text-align: right;">1.911256e-01</td>
+<td style="text-align: right;">7.145510e-02</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: left;">T</td>
+<td style="text-align: right;">1.995826e-01</td>
+<td style="text-align: right;">7.599340e-02</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: left;">C</td>
+<td style="text-align: right;">2.962655e-01</td>
+<td style="text-align: right;">8.067840e-02</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: left;">G</td>
+<td style="text-align: right;">3.130263e-01</td>
+<td style="text-align: right;">8.524230e-02</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: left;">temp</td>
+<td style="text-align: right;">8.720208e+01</td>
+<td style="text-align: right;">5.379461e+00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: left;">shan</td>
+<td style="text-align: right;">1.891724e+00</td>
+<td style="text-align: right;">9.437000e-02</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: left;">k2.1_prod</td>
+<td style="text-align: right;">1.196276e+01</td>
+<td style="text-align: right;">8.995306e+00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: left;">k2.1_barc</td>
+<td style="text-align: right;">1.500971e+00</td>
+<td style="text-align: right;">1.229003e+00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">9</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: left;">k2.1_pals</td>
+<td style="text-align: right;">2.634405e+51</td>
+<td style="text-align: right;">1.065029e+53</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: left;">k2.1_revc</td>
+<td style="text-align: right;">9.789346e+62</td>
+<td style="text-align: right;">3.960331e+64</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">21831</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: left;">A</td>
+<td style="text-align: right;">2.653712e-01</td>
+<td style="text-align: right;">5.853000e-02</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">21832</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: left;">T</td>
+<td style="text-align: right;">2.678205e-01</td>
+<td style="text-align: right;">5.815610e-02</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">21833</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: left;">C</td>
+<td style="text-align: right;">2.351111e-01</td>
+<td style="text-align: right;">5.648440e-02</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">21834</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: left;">G</td>
+<td style="text-align: right;">2.316972e-01</td>
+<td style="text-align: right;">5.435370e-02</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">21835</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: left;">temp</td>
+<td style="text-align: right;">8.269434e+01</td>
+<td style="text-align: right;">3.785299e+00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">21836</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: left;">shan</td>
+<td style="text-align: right;">1.959202e+00</td>
+<td style="text-align: right;">3.892580e-02</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">21837</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: left;">k2.1_prod</td>
+<td style="text-align: right;">4.093346e+01</td>
+<td style="text-align: right;">1.835697e+01</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">21838</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: left;">k2.1_barc</td>
+<td style="text-align: right;">1.208127e+01</td>
+<td style="text-align: right;">5.751107e+00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">21839</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: left;">k2.1_pals</td>
+<td style="text-align: right;">2.567318e+112</td>
+<td style="text-align: right;">1.038419e+114</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">21840</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: left;">k2.1_revc</td>
+<td style="text-align: right;">3.321646e+121</td>
+<td style="text-align: right;">1.344343e+123</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get only 'prod' columns of each kmer</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>k2 <span class="ot">&lt;-</span> <span class="fu">n_ki</span>(<span class="dv">2</span>); k3 <span class="ot">&lt;-</span> <span class="fu">n_ki</span>(<span class="dv">3</span>); k4 <span class="ot">&lt;-</span> <span class="fu">n_ki</span>(<span class="dv">4</span>); k5 <span class="ot">&lt;-</span> <span class="fu">n_ki</span>(<span class="dv">5</span>); k6 <span class="ot">&lt;-</span> <span class="fu">n_ki</span>(<span class="dv">6</span>) </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>kmer_sections_indexes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                           k2, </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>                           k2 <span class="sc">+</span> <span class="dv">1</span>, </span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                           k2 <span class="sc">+</span> k3, </span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>                           k2 <span class="sc">+</span> k3 <span class="sc">+</span> <span class="dv">1</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>                           k2 <span class="sc">+</span> k3 <span class="sc">+</span> k4, </span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>                           k2 <span class="sc">+</span> k3 <span class="sc">+</span> k4 <span class="sc">+</span> <span class="dv">1</span>,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>                           k2 <span class="sc">+</span> k3 <span class="sc">+</span> k4 <span class="sc">+</span> k5, </span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>                           k2 <span class="sc">+</span> k3 <span class="sc">+</span> k4 <span class="sc">+</span> k5 <span class="sc">+</span> <span class="dv">1</span>, </span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>                           k2 <span class="sc">+</span> k3 <span class="sc">+</span> k4 <span class="sc">+</span> k5 <span class="sc">+</span> k6)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>prod_indexes <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">7</span>,<span class="dv">21827</span>,<span class="dv">4</span>)</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>barc_indexes <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">8</span>,<span class="dv">21828</span>,<span class="dv">4</span>)</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>pals_indexes <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">9</span>,<span class="dv">21829</span>,<span class="dv">4</span>)</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>revc_indexes <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">10</span>,<span class="dv">21830</span>,<span class="dv">4</span>)</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>all_prod_indexes <span class="ot">&lt;-</span> <span class="fu">c</span>(prod_indexes, <span class="dv">21830</span> <span class="sc">+</span> prod_indexes)</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>all_barc_indexes <span class="ot">&lt;-</span> <span class="fu">c</span>(barc_indexes, <span class="dv">21830</span> <span class="sc">+</span> barc_indexes)</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>all_pals_indexes <span class="ot">&lt;-</span> <span class="fu">c</span>(pals_indexes, <span class="dv">21830</span> <span class="sc">+</span> pals_indexes)</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>all_revc_indexes <span class="ot">&lt;-</span> <span class="fu">c</span>(revc_indexes, <span class="dv">21830</span> <span class="sc">+</span> revc_indexes)</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(testenhancers[, barc_indexes])[,<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>,<span class="fu">length</span>(barc_indexes))])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">k2.1_barc</th>
+<th style="text-align: right;">k2.2_barc</th>
+<th style="text-align: right;">k2.3_barc</th>
+<th style="text-align: right;">k2.4_barc</th>
+<th style="text-align: right;">k2.5_barc</th>
+<th style="text-align: right;">k2.6_barc</th>
+<th style="text-align: right;">k2.7_barc</th>
+<th style="text-align: right;">k2.8_barc</th>
+<th style="text-align: right;">k6.4096_barc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">10.432345</td>
+<td style="text-align: right;">6.027803</td>
+<td style="text-align: right;">13.435177</td>
+<td style="text-align: right;">5.182017</td>
+<td style="text-align: right;">9.672032</td>
+<td style="text-align: right;">14.452432</td>
+<td style="text-align: right;">2.0213095</td>
+<td style="text-align: right;">13.731694</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">6.153015</td>
+<td style="text-align: right;">4.984254</td>
+<td style="text-align: right;">13.296620</td>
+<td style="text-align: right;">6.098819</td>
+<td style="text-align: right;">10.185028</td>
+<td style="text-align: right;">7.732096</td>
+<td style="text-align: right;">1.3635487</td>
+<td style="text-align: right;">10.150355</td>
+<td style="text-align: right;">0.3058662</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">9.936447</td>
+<td style="text-align: right;">9.301359</td>
+<td style="text-align: right;">12.533556</td>
+<td style="text-align: right;">6.353834</td>
+<td style="text-align: right;">10.894642</td>
+<td style="text-align: right;">9.025510</td>
+<td style="text-align: right;">1.3565393</td>
+<td style="text-align: right;">16.335286</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">23.252879</td>
+<td style="text-align: right;">8.744180</td>
+<td style="text-align: right;">13.868229</td>
+<td style="text-align: right;">9.853451</td>
+<td style="text-align: right;">12.204317</td>
+<td style="text-align: right;">3.958776</td>
+<td style="text-align: right;">0.0930320</td>
+<td style="text-align: right;">8.444184</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3.814939</td>
+<td style="text-align: right;">7.617881</td>
+<td style="text-align: right;">9.290377</td>
+<td style="text-align: right;">5.365261</td>
+<td style="text-align: right;">10.457174</td>
+<td style="text-align: right;">13.017956</td>
+<td style="text-align: right;">1.4893074</td>
+<td style="text-align: right;">14.727846</td>
+<td style="text-align: right;">2.7938687</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">14.929810</td>
+<td style="text-align: right;">6.939986</td>
+<td style="text-align: right;">12.525913</td>
+<td style="text-align: right;">11.864119</td>
+<td style="text-align: right;">10.686542</td>
+<td style="text-align: right;">2.227940</td>
+<td style="text-align: right;">0.9421584</td>
+<td style="text-align: right;">7.264738</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(testenhancers[, barc_indexes], <span class="dv">5</span>)[kmer_sections_indexes], <span class="at">table.attr =</span> <span class="st">"quarto-disable-processing=true"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    kableExtra<span class="sc">::</span><span class="fu">column_spec</span>(<span class="at">column =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>, <span class="at">width =</span> <span class="st">"0.4in"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<table class="table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">k2.1_barc</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">k2.16_barc</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">k3.1_barc</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">k3.64_barc</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">k4.1_barc</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">k4.256_barc</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">k5.1_barc</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">k5.1024_barc</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">k6.1_barc</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">k6.4096_barc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">10.432345</td>
+<td style="text-align: right; width: 0.4in;">7.337222</td>
+<td style="text-align: right; width: 0.4in;">3.4298935</td>
+<td style="text-align: right; width: 0.4in;">2.133496</td>
+<td style="text-align: right;">0.8724755</td>
+<td style="text-align: right;">0.2043103</td>
+<td style="text-align: right;">0.000000</td>
+<td style="text-align: right;">0.0000000</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">6.153015</td>
+<td style="text-align: right; width: 0.4in;">19.441056</td>
+<td style="text-align: right; width: 0.4in;">1.9076157</td>
+<td style="text-align: right; width: 0.4in;">7.449599</td>
+<td style="text-align: right;">0.2736402</td>
+<td style="text-align: right;">1.8634239</td>
+<td style="text-align: right;">0.000000</td>
+<td style="text-align: right;">0.6130383</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.3058662</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">9.936447</td>
+<td style="text-align: right; width: 0.4in;">12.059759</td>
+<td style="text-align: right; width: 0.4in;">3.6860719</td>
+<td style="text-align: right; width: 0.4in;">4.791785</td>
+<td style="text-align: right;">1.4367855</td>
+<td style="text-align: right;">2.0880247</td>
+<td style="text-align: right;">0.000000</td>
+<td style="text-align: right;">0.8123330</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">23.252879</td>
+<td style="text-align: right; width: 0.4in;">12.044970</td>
+<td style="text-align: right; width: 0.4in;">11.4527954</td>
+<td style="text-align: right; width: 0.4in;">5.043369</td>
+<td style="text-align: right;">5.8892630</td>
+<td style="text-align: right;">2.0034714</td>
+<td style="text-align: right;">2.332278</td>
+<td style="text-align: right;">0.4316400</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3.814939</td>
+<td style="text-align: right; width: 0.4in;">11.720066</td>
+<td style="text-align: right; width: 0.4in;">0.8633094</td>
+<td style="text-align: right; width: 0.4in;">4.455931</td>
+<td style="text-align: right;">0.0810805</td>
+<td style="text-align: right;">3.7301540</td>
+<td style="text-align: right;">0.000000</td>
+<td style="text-align: right;">3.2607779</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2.7938687</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(cre_summary[<span class="fu">c</span>(prod_indexes[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>],(<span class="dv">21830</span><span class="sc">+</span>prod_indexes)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]),])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Field</th>
+<th style="text-align: right;">Means</th>
+<th style="text-align: right;">StDevs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: left;">k2.1_prod</td>
+<td style="text-align: right;">11.962760</td>
+<td style="text-align: right;">8.995306</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">11</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: left;">k2.2_prod</td>
+<td style="text-align: right;">15.840314</td>
+<td style="text-align: right;">6.536126</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">15</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: left;">k2.3_prod</td>
+<td style="text-align: right;">27.649084</td>
+<td style="text-align: right;">9.205828</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">19</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: left;">k2.4_prod</td>
+<td style="text-align: right;">8.638156</td>
+<td style="text-align: right;">6.974283</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">23</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: left;">k2.5_prod</td>
+<td style="text-align: right;">22.012519</td>
+<td style="text-align: right;">7.995609</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">21837</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: left;">k2.1_prod</td>
+<td style="text-align: right;">40.933455</td>
+<td style="text-align: right;">18.356973</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">21841</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: left;">k2.2_prod</td>
+<td style="text-align: right;">39.367630</td>
+<td style="text-align: right;">9.765868</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">21845</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: left;">k2.3_prod</td>
+<td style="text-align: right;">58.095082</td>
+<td style="text-align: right;">13.575118</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">21849</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: left;">k2.4_prod</td>
+<td style="text-align: right;">31.738828</td>
+<td style="text-align: right;">12.985948</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">21853</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: left;">k2.5_prod</td>
+<td style="text-align: right;">57.394191</td>
+<td style="text-align: right;">11.806409</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>subset_cre_prod <span class="ot">&lt;-</span> cre_summary[<span class="fu">c</span>(prod_indexes[<span class="dv">17</span><span class="sc">:</span><span class="dv">64</span>],(<span class="dv">21830</span><span class="sc">+</span>prod_indexes)[<span class="dv">17</span><span class="sc">:</span><span class="dv">64</span>]),]</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>subset_cre_barc <span class="ot">&lt;-</span> cre_summary[<span class="fu">c</span>(barc_indexes[<span class="dv">17</span><span class="sc">:</span><span class="dv">64</span>],(<span class="dv">21830</span><span class="sc">+</span>barc_indexes)[<span class="dv">17</span><span class="sc">:</span><span class="dv">64</span>]),]</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>subset_cre_pals <span class="ot">&lt;-</span> cre_summary[<span class="fu">c</span>(pals_indexes[<span class="dv">17</span><span class="sc">:</span><span class="dv">64</span>],(<span class="dv">21830</span><span class="sc">+</span>pals_indexes)[<span class="dv">17</span><span class="sc">:</span><span class="dv">64</span>]),]</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>subset_cre_revc <span class="ot">&lt;-</span> cre_summary[<span class="fu">c</span>(revc_indexes[<span class="dv">17</span><span class="sc">:</span><span class="dv">64</span>],(<span class="dv">21830</span><span class="sc">+</span>revc_indexes)[<span class="dv">17</span><span class="sc">:</span><span class="dv">64</span>]),]</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">cbind</span>(subset_cre_prod[subset_cre_prod<span class="sc">$</span>Type<span class="sc">==</span><span class="st">"Promoter"</span>,],</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    subset_cre_prod[subset_cre_prod<span class="sc">$</span>Type<span class="sc">==</span><span class="st">"Enhancer"</span>,])[,<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">8</span>)][<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 15%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: right;">Means</th>
+<th style="text-align: right;">StDevs</th>
+<th style="text-align: left;">Type.1</th>
+<th style="text-align: right;">Means.1</th>
+<th style="text-align: right;">StDevs.1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">71</td>
+<td style="text-align: left;">k3.1_prod</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: right;">3.733822</td>
+<td style="text-align: right;">4.441567</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: right;">15.169109</td>
+<td style="text-align: right;">10.176757</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">75</td>
+<td style="text-align: left;">k3.2_prod</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: right;">3.208713</td>
+<td style="text-align: right;">2.679694</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: right;">9.520357</td>
+<td style="text-align: right;">4.701251</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">79</td>
+<td style="text-align: left;">k3.3_prod</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: right;">5.069128</td>
+<td style="text-align: right;">3.448887</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: right;">13.390625</td>
+<td style="text-align: right;">5.694958</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">83</td>
+<td style="text-align: left;">k3.4_prod</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: right;">2.363513</td>
+<td style="text-align: right;">2.747660</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: right;">9.863853</td>
+<td style="text-align: right;">5.715001</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">87</td>
+<td style="text-align: left;">k3.5_prod</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: right;">3.646951</td>
+<td style="text-align: right;">3.485361</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: right;">12.881026</td>
+<td style="text-align: right;">5.906393</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">91</td>
+<td style="text-align: left;">k3.6_prod</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: right;">5.124804</td>
+<td style="text-align: right;">3.324229</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: right;">11.042922</td>
+<td style="text-align: right;">5.162449</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">95</td>
+<td style="text-align: left;">k3.7_prod</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: right;">3.650813</td>
+<td style="text-align: right;">3.084850</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: right;">3.254059</td>
+<td style="text-align: right;">3.143177</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">99</td>
+<td style="text-align: left;">k3.8_prod</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: right;">3.756481</td>
+<td style="text-align: right;">2.794403</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: right;">11.358009</td>
+<td style="text-align: right;">4.689413</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">103</td>
+<td style="text-align: left;">k3.9_prod</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: right;">5.426771</td>
+<td style="text-align: right;">4.453803</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: right;">14.490419</td>
+<td style="text-align: right;">6.240096</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">107</td>
+<td style="text-align: left;">k3.10_prod</td>
+<td style="text-align: left;">Promoter</td>
+<td style="text-align: right;">9.318083</td>
+<td style="text-align: right;">4.745578</td>
+<td style="text-align: left;">Enhancer</td>
+<td style="text-align: right;">15.674036</td>
+<td style="text-align: right;">6.345508</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>field_order <span class="ot">&lt;-</span> subset_cre_prod<span class="sc">$</span>Field[<span class="dv">1</span><span class="sc">:</span><span class="dv">48</span>]</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>subset_cre_prod<span class="sc">$</span>Means</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1]  3.733822  3.208713  5.069128  2.363513  3.646951  5.124804  3.650813
+ [8]  3.756481  5.426771  9.318083 10.158642  4.176949  1.544579  2.586327
+[15]  3.239394  2.656703  3.611691  6.037643 10.872411  3.075680  7.635905
+[22] 16.233211 13.569377  9.680538  3.858207 15.529754 14.896730  3.878496
+[29]  2.538018 10.020076 10.994143  5.127896  5.050658  5.404646 10.835603
+[36]  2.981746  7.776152 17.063672 16.874431  9.484900  9.996806 18.264419
+[43] 18.109890  5.977352  2.278580  5.645854  7.411662  3.606654 15.169109
+[50]  9.520357 13.390625  9.863853 12.881026 11.042922  3.254059 11.358009
+[57] 14.490419 15.674036 18.408043 11.153142  7.060554  8.359265 11.077995
+[64]  9.899835 11.545321 14.397051 23.188692 11.087836 18.015617 19.891331
+[71]  5.727871 19.145295  2.791931  4.866958  5.859807  3.292382  7.877964
+[78] 17.602037 23.114300 13.710489 13.085873 10.235576 16.551690  8.261753
+[85] 14.303432 18.128486  5.008222 15.694325 15.411434 18.289740 19.267399
+[92] 10.688575  6.708704  9.933502 14.408686  9.522875</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>subset_cre_prod<span class="sc">$</span>StDevs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1]  4.441567  2.679694  3.448887  2.747660  3.485361  3.324229  3.084850
+ [8]  2.794403  4.453803  4.745578  5.654427  2.825089  2.320564  2.326571
+[15]  2.940212  2.932436  2.961735  4.319168  5.122931  2.710304  4.148137
+[22] 13.073051 11.370095  5.614338  3.258066 13.292805 12.485377  3.391027
+[29]  2.205837  6.267927  4.903813  3.502554  3.538477  3.306454  7.179443
+[36]  2.542758  4.163639 10.888245 14.776918  4.521492  5.794870 12.101920
+[43] 13.708462  3.609159  2.133656  3.406684  5.143815  2.739559 10.176757
+[50]  4.701251  5.694958  5.715001  5.906393  5.162449  3.143177  4.689413
+[57]  6.240096  6.345507  8.713120  4.492683  5.473509  3.767892  4.972782
+[64]  5.789404  5.183821  7.055220  8.610000  4.881815  7.569853 15.722251
+[71]  8.408784  8.852986  3.128115  8.279593  8.690941  3.054289  4.096377
+[78]  9.084188  8.638399  5.479771  5.904495  4.697275  8.449506  3.947652
+[85]  5.899648 11.718258  8.439162  6.478037  7.443246 11.906084 14.723036
+[92]  5.092138  4.127505  4.906655  9.083055  4.695775</code></pre>
+</div>
+</div>
+<div class="cell" data-layout-align="center" data-row="screen">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(subset_cre_prod) <span class="sc">+</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(Field, <span class="at">levels =</span> field_order), </span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">y =</span> <span class="fu">ifelse</span>(Type <span class="sc">==</span> <span class="st">"Enhancer"</span>, <span class="sc">-</span>Means, Means), </span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">fill =</span> <span class="fu">paste</span>(Type, <span class="st">"Means"</span>)),</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"identity"</span>, </span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">width =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(Field, <span class="at">levels =</span> field_order), </span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">y =</span> <span class="fu">ifelse</span>(Type <span class="sc">==</span> <span class="st">"Enhancer"</span>, <span class="sc">-</span>StDevs, StDevs), </span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">fill =</span> <span class="fu">paste</span>(Type, <span class="st">"SDs"</span>)),</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>               <span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"identity"</span>, </span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks=</span><span class="fu">seq</span>(<span class="sc">-</span><span class="dv">30</span>, <span class="dv">30</span>, <span class="dv">10</span>), <span class="at">labels=</span><span class="fu">abs</span>(<span class="fu">seq</span>(<span class="sc">-</span><span class="dv">30</span>, <span class="dv">30</span>, <span class="dv">10</span>))) <span class="sc">+</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Enhancer Means"</span> <span class="ot">=</span> <span class="st">"skyblue"</span>,</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>                               <span class="st">"Promoter Means"</span> <span class="ot">=</span> <span class="st">"salmon"</span>,</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>                               <span class="st">"Enhancer SDs"</span> <span class="ot">=</span> <span class="st">"turquoise"</span>,</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>                               <span class="st">"Promoter SDs"</span> <span class="ot">=</span> <span class="st">"coral"</span>)) <span class="sc">+</span></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Means/SDs"</span>, <span class="at">x =</span> <span class="st">"Kmers"</span>, </span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"KSG-Product Means and Standard-Deviations per Kmer"</span>,</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Type Means/SDs"</span>) <span class="sc">+</span></span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="gb-test_files/figure-html/unnamed-chunk-13-1.png" class="quarto-figure quarto-figure-center figure-img" style="height:100.0%" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell" data-layout-align="center" data-row="screen">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(subset_cre_prod) <span class="sc">+</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(Field, <span class="at">levels =</span> field_order), </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">y =</span> <span class="fu">ifelse</span>(Type <span class="sc">==</span> <span class="st">"Enhancer"</span>, <span class="sc">-</span>Means, Means), </span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">fill =</span> <span class="fu">paste</span>(Type, <span class="st">"Means"</span>)),</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"identity"</span>, </span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">width =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(Field, <span class="at">levels =</span> field_order),</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>                    <span class="at">ymin =</span> <span class="fu">ifelse</span>(Type <span class="sc">==</span> <span class="st">"Enhancer"</span>,</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>                                  <span class="sc">-</span>Means <span class="sc">+</span> StDevs, Means <span class="sc">-</span> StDevs),</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>                    <span class="at">ymax =</span> <span class="fu">ifelse</span>(Type <span class="sc">==</span> <span class="st">"Enhancer"</span>,</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>                                  <span class="sc">-</span>Means <span class="sc">-</span> StDevs, Means <span class="sc">+</span> StDevs)),</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>                    <span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">colour =</span> <span class="st">"black"</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks=</span><span class="fu">seq</span>(<span class="sc">-</span><span class="dv">30</span>, <span class="dv">30</span>, <span class="dv">10</span>), <span class="at">labels=</span><span class="fu">abs</span>(<span class="fu">seq</span>(<span class="sc">-</span><span class="dv">30</span>, <span class="dv">30</span>, <span class="dv">10</span>))) <span class="sc">+</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"turquoise"</span>, <span class="st">"coral"</span>)) <span class="sc">+</span></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Means"</span>, <span class="at">x =</span> <span class="st">"Kmers"</span>, </span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"KSG-Product Means per Kmer"</span>, </span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"CRE Type"</span>) <span class="sc">+</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="gb-test_files/figure-html/unnamed-chunk-14-1.png" class="quarto-figure quarto-figure-center figure-img" style="height:100.0%" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,266 @@
+---
+title: Genomic-Benchmarks Test
+format: 
+  html:
+    css: styles.css
+execute:
+  cache: true
+---
+
+## Downloading data
+::: {.cell .python} 
+:::
+```{python}
+#| label: data-download
+#| eval: false
+
+# Listing available datasets
+from genomic_benchmarks.data_check import list_datasets
+list_datasets()
+# Inspecting each dataset to select two
+from genomic_benchmarks.data_check import info as info_gb
+info_gb("human_nontata_promoters") # <- This one will be used
+info_gb("human_ensembl_regulatory")
+info_gb("human_enhancers_cohn")    # <- This one will also be used
+info_gb("human_enhancers_ensembl")
+# Downloading datasets
+from genomic_benchmarks.loc2seq import download_dataset
+import os
+os.chdir("/home/davidfm/Projects/UBMI-IFC/EnhaProm/datasets/GenomicBenchmarks")
+download_dataset("human_nontata_promoters", version=0) 
+download_dataset("human_enhancers_cohn", version=0) 
+```
+
+## Formatting data
+::: {.cell .bash} 
+:::
+```{bash}
+#| label: data-to-fasta
+#| eval: false
+
+cd /home/davidfm/Projects/UBMI-IFC/EnhaProm/datasets/GenomicBenchmarks/
+awk 'BEGIN{counter=0}{print ">promoter_"counter"|train|positive";
+     print $0; counter+=1}' human_nontata_promoters/train/positive/*.txt \
+     > promoters_train_positive.fasta
+awk 'BEGIN{counter=0}{print ">enhancer_"counter"|train|positive"; 
+     print $0; counter+=1}' human_enhancers_cohn/train/positive/*.txt \
+     > enhancers_train_positive.fasta
+```
+
+## Libraries used
+::: {.cell .r} 
+:::
+```{r}
+#| label: requirements
+#| echo: true
+
+# For genome-functions.R
+library(stringr)
+library(stringi)
+library(primes)
+# For parallel computing
+library(doParallel)
+library(foreach)
+# For biological functions: 
+#   - Local/Global alignments 
+#   - DNA Shape computing
+library(Biostrings)
+library(DNAshapeR)
+# For my own functions
+source("/home/davidfm/Projects/UBMI-IFC/EnhaProm/scripts/genome-functions.R")
+# For plotting
+library(ggplot2)
+library(dplyr)
+library(plyr)
+```
+
+## Characterizing sequences
+```{r}
+#| eval: false
+
+# Scanning sequences
+prom_fasta <- "datasets/GenomicBenchmarks/promoters_train_positive.fasta"
+enha_fasta <- "datasets/GenomicBenchmarks/enhancers_train_positive.fasta"
+prom_seqs <- scan(prom_fasta, character(), quote = "")[seq(2, 29484, 2)]
+enha_seqs <- scan(enha_fasta, character(), quote = "")[seq(2, 20842, 2)]
+# Prepairing clusters for parallel computing
+corescluster <- makeCluster(6)
+registerDoParallel(corescluster)
+# Characterizing sequences and exporting to CSV
+list_seqs <- list(promoters = prom_seqs, enhancers = enha_seqs)
+reg_elems <- c("promoters", "enhancers")
+for (reg_elem in reg_elems) {
+  foreach(i = 1:6) %dopar% {
+    library(stringr)
+    library(stringi)
+    library(primes)
+    i_start <- ((i - 1) * 273) + 1
+    i_final <- i * 273
+    if (i > 1) {
+      write.table(sequences_characterizer(list_seqs[[reg_elem]][i_start:i_final],
+                                          k_max = 6, optim = TRUE),
+                  paste("datasets/GB-Testing/test", reg_elem, "-minitraining_",
+                        i, ".csv", sep = ""), sep = ",",
+                  row.names = FALSE, col.names = FALSE)
+    } else {
+	  write.csv(sequences_characterizer(list_seqs[[reg_elem]][i_start:i_final],
+                                        k_max = 6, optim = TRUE),
+                paste("datasets/GB-Testing/", reg_elem, "-minitraining_",
+                      i, ".csv", sep = ""), row.names = FALSE)
+    }
+  }
+}
+```
+
+## Concatenating CSV's
+::: {.cell .bash} 
+:::
+```{bash}
+#| eval: false
+
+cat datasets/GB-Testing/testpromoters-minitraining_*.csv \
+    > datasets/GB-Testing/test-1638-promoters-6mers.csv
+cat datasets/GB-Testing/testenhancers-minitraining_*.csv \
+    > datasets/GB-Testing/test-1638-enhancers-6mers.csv
+```
+
+## Primary analysis
+::: {.cell .r} 
+:::
+```{r}
+setwd("/home/davidfm/Projects/UBMI-IFC/EnhaProm")
+testpromoters <- read.csv("datasets/GB-Testing/test-1638-promoters-6mers.csv", 
+                          check.names = F)
+testenhancers <- read.csv("datasets/GB-Testing/test-1638-enhancers-6mers.csv", 
+                          check.names = F)
+```
+First we get an overviwew of the dimensions of our data:
+```{r}
+dim(testpromoters)
+dim(testenhancers)
+```
+It's noticeable the fact that we have way more columns than rows in this test table.
+Let's get a glimpse of the records corresponding to the first three promoters.
+```{r}
+# knitr::kable(testpromoters[1:3,1:30])
+```
+```{r}
+#| echo: false
+knitr::kable(testpromoters[1:3,1:6])
+knitr::kable(testpromoters[1:3,7:12])
+knitr::kable(testpromoters[1:3,13:18])
+knitr::kable(testpromoters[1:3,18:24])
+knitr::kable(testpromoters[1:3,25:30])
+```
+```{r}
+print(testenhancers[1:3,1:30])
+meanpromoters <- colMeans(testpromoters)
+meanenhancers <- colMeans(testenhancers)
+sdpromoters <- apply(testpromoters, 2, sd)
+sdenhancers <- apply(testenhancers, 2, sd)
+# names_test <- rep(names(testpromoters),2)
+cre_summary <- data.frame(Type = factor(rep(c("Promoter","Enhancer"), 
+                                        each = length(testpromoters))),
+                          Field = rep(names(testpromoters),2),
+                          Means = c(meanpromoters, meanenhancers),
+                          StDevs = c(sdpromoters, sdenhancers))
+# head(cre_summary)
+knitr::kable(cre_summary[c(1:10,21831:21840),])
+```
+
+```{r}
+# Get only 'prod' columns of each kmer
+k2 <- n_ki(2); k3 <- n_ki(3); k4 <- n_ki(4); k5 <- n_ki(5); k6 <- n_ki(6) 
+kmer_sections_indexes <- c(1, 
+                           k2, 
+                           k2 + 1, 
+                           k2 + k3, 
+                           k2 + k3 + 1,
+                           k2 + k3 + k4, 
+                           k2 + k3 + k4 + 1,
+                           k2 + k3 + k4 + k5, 
+                           k2 + k3 + k4 + k5 + 1, 
+                           k2 + k3 + k4 + k5 + k6)
+prod_indexes <- seq(7,21827,4)
+barc_indexes <- seq(8,21828,4)
+pals_indexes <- seq(9,21829,4)
+revc_indexes <- seq(10,21830,4)
+all_prod_indexes <- c(prod_indexes, 21830 + prod_indexes)
+all_barc_indexes <- c(barc_indexes, 21830 + barc_indexes)
+all_pals_indexes <- c(pals_indexes, 21830 + pals_indexes)
+all_revc_indexes <- c(revc_indexes, 21830 + revc_indexes)
+knitr::kable(head(testenhancers[, barc_indexes])[,c(1:8,length(barc_indexes))])
+knitr::kable(head(testenhancers[, barc_indexes], 5)[kmer_sections_indexes], table.attr = "quarto-disable-processing=true") |>
+  kableExtra::kable_styling(full_width = FALSE) |>
+	kableExtra::column_spec(column = 2:4, width = "0.4in") 
+knitr::kable(cre_summary[c(prod_indexes[1:5],(21830+prod_indexes)[1:5]),])
+```
+
+```{r}
+subset_cre_prod <- cre_summary[c(prod_indexes[17:64],(21830+prod_indexes)[17:64]),]
+subset_cre_barc <- cre_summary[c(barc_indexes[17:64],(21830+barc_indexes)[17:64]),]
+subset_cre_pals <- cre_summary[c(pals_indexes[17:64],(21830+pals_indexes)[17:64]),]
+subset_cre_revc <- cre_summary[c(revc_indexes[17:64],(21830+revc_indexes)[17:64]),]
+knitr::kable(cbind(subset_cre_prod[subset_cre_prod$Type=="Promoter",],
+	subset_cre_prod[subset_cre_prod$Type=="Enhancer",])[,c(2,1,3,4,5,7,8)][1:10,])
+field_order <- subset_cre_prod$Field[1:48]
+subset_cre_prod$Means
+subset_cre_prod$StDevs
+```
+
+```{r}
+#| row: screen
+#| out-height: 100%
+#| fig-align: center
+
+ggplot(subset_cre_prod) +
+  geom_bar(aes(x = factor(Field, levels = field_order), 
+               y = ifelse(Type == "Enhancer", -Means, Means), 
+                          fill = paste(Type, "Means")),
+               stat = "identity", position = "identity", 
+               alpha = 0.6, width = 0.7) +
+  geom_bar(aes(x = factor(Field, levels = field_order), 
+               y = ifelse(Type == "Enhancer", -StDevs, StDevs), 
+                          fill = paste(Type, "SDs")),
+               stat = "identity", position = "identity", 
+               alpha = 0.6) +
+  coord_flip() +
+  scale_y_continuous(breaks=seq(-30, 30, 10), labels=abs(seq(-30, 30, 10))) +
+  scale_fill_manual(values = c("Enhancer Means" = "skyblue",
+                               "Promoter Means" = "salmon",
+                               "Enhancer SDs" = "turquoise",
+                               "Promoter SDs" = "coral")) +
+  labs(y = "Means/SDs", x = "Kmers", 
+       title = "KSG-Product Means and Standard-Deviations per Kmer",
+       fill = "Type Means/SDs") +
+  theme_minimal()
+```
+
+```{r}
+#| row: screen
+#| out-height: 100%
+#| fig-align: center
+
+ggplot(subset_cre_prod) +
+  geom_bar(aes(x = factor(Field, levels = field_order), 
+               y = ifelse(Type == "Enhancer", -Means, Means), 
+                          fill = paste(Type, "Means")),
+               stat = "identity", position = "identity", 
+               alpha = 0.6, width = 0.7) +
+  geom_errorbar(aes(x = factor(Field, levels = field_order),
+	                ymin = ifelse(Type == "Enhancer",
+                                  -Means + StDevs, Means - StDevs),
+	                ymax = ifelse(Type == "Enhancer",
+                                  -Means - StDevs, Means + StDevs)),
+                    width = 0.5, colour = "black", alpha = 0.6)	+
+  coord_flip() +
+  scale_y_continuous(breaks=seq(-30, 30, 10), labels=abs(seq(-30, 30, 10))) +
+  scale_fill_manual(values = c("turquoise", "coral")) +
+  labs(y = "Means", x = "Kmers", 
+       title = "KSG-Product Means per Kmer", 
+       fill = "CRE Type") +
+  theme_minimal()
+```
+
+
+

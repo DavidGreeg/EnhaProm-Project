@@ -1,0 +1,10 @@
+enhancer 
+no note 106783496|GeneID:106783496
+enhancer VISTA enhancer hs705
+yes note 110120751|GeneID:110120751,63976|GeneID:63976
+enhancer VISTA enhancer hs1912
+yes note 110121223|GeneID:110121223,63976|GeneID:63976
+enhancer amplified fragment containing the chr1:3420761-3421065 (GRCh37) CAGE region
+yes note 108281140|GeneID:108281140
+enhancer amplified fragment containing the chr1.1353 DHS
+yes note 108281186|GeneID:108281186
