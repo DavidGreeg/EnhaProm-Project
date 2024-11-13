@@ -1,8 +1,41 @@
 ---
-title: Genomic-Benchmarks Test
-pdf-engine: xelatex
 format: 
   pdf: 
+    documentclass: article
+    include-in-header:
+      - text: |
+         \newcommand{\fontmydefault}{\fontspec{Liberation Serif}}
+         \newcommand{\fontlibertsan}[1]{{\fontspec{Liberation Sans} #1}}
+         \newcommand{\fontlibertser}[1]{{\fontspec{Liberation Serif} #1}}
+         \newcommand{\fontlibertsnn}[1]{{\fontspec{Liberation Sans Narrow} #1}}
+         \newcommand{\fontnimbussan}[1]{{\fontspec{Nimbus Sans} #1}}
+         \newcommand{\fontnimbussnn}[1]{{\fontspec{Nimbus Sans Narrow} #1}}
+         \newcommand{\fontdejavusan}[1]{{\fontspec{DejaVu Sans} #1}}
+         \newcommand{\fontdejavuser}[1]{{\fontspec{DejaVu Serif} #1}}
+         \newcommand{\myfontchart}[1]{{\fontfamily{bch}\selectfont #1}}
+         \setlength{\defaultaddspace}{0pt} %This prevents tables in kable to display interpaces every 5 rows
+    include-before-body:	
+      - text: |
+         \begin{titlepage}
+         \begin{flushleft}
+           { UBMI-IFC, UNAM } \\
+           { Coyoacan, CDMX }
+         \end{flushleft}
+         \vspace*{3cm}
+         \begin{center}
+           { \Large Sequece Characterization Test } \\[1cm]
+           { \large Using Genomic-Benchmarks Data }
+         \end{center}
+         \vfill
+         \begin{flushright}
+         \begin{tabular}{l@{\hspace*{\tabcolsep}}l}
+           Author: & Fuentes David \\
+           Tutors: & \\
+           & - PhD. Poot Augusto \\
+           & - MSc. Pedraza Carlos \\
+         \end{tabular}
+         \end{flushright}
+         \end{titlepage}
     toc: true
     number-sections: true
     colorlinks: true
@@ -13,6 +46,8 @@ format:
     cell-language: true
     keep-tex: true
     header-includes:
+      - \usepackage{wrapfig}
+      - \usepackage{lipsum}
       - \usepackage{array}
       - \usepackage{float}
       - \usepackage{booktabs}
@@ -21,45 +56,221 @@ format:
       - \usepackage{xcolor}
       - \usepackage{tcolorbox}
       - \usepackage{geometry}
-      - \geometry{left=0.75in, right=0.75in, top=1in, bottom=1in}
+      - \geometry{
+          left=0.4in,
+          right=0.4in,
+          top=0.5in,
+          bottom=0.5in}
       - \definecolor{pythoncol}{rgb}{0.188,0.412,0.596}
       - \definecolor{rcol}{rgb}{0.121,0.466,0.705}
       - \definecolor{bashcol}{rgb}{0.207,0.262,0.392}
-      - \newtcolorbox{pythonheader}{colback=pythoncol!70, colframe=pythoncol, fontupper=\bfseries\color{white}, boxrule=0.1mm, arc=4mm, left=2mm, right=2mm, top=1mm, bottom=1mm, halign=right, sharp corners=south}
-      - \newtcolorbox{rheader}{colback=rcol!70, colframe=rcol, fontupper=\bfseries\color{white}, boxrule=0.1mm, arc=4mm, left=2mm, right=2mm, top=1mm, bottom=1mm, halign=right, sharp corners=south}
-      - \newtcolorbox{bashheader}{colback=bashcol!70, colframe=bashcol, fontupper=\bfseries\color{white}, boxrule=0.1mm, arc=4mm, left=2mm, right=2mm, top=1mm, bottom=1mm, halign=right, sharp corners=south}
-mainfont: Liberation Serif
+      - \newtcolorbox{pythonheader}{
+          colback=pythoncol!70, colframe=pythoncol,
+          fontupper=\footnotesize\bfseries\color{white},
+          boxrule=0.1mm, arc=4mm,
+          left=1.5mm, right=1.5mm, top=0.5mm, bottom=0.5mm,
+          halign=right, sharp corners=south}
+      - \newtcolorbox{rheader}{
+          colback=rcol!70, colframe=rcol,
+          fontupper=\footnotesize\bfseries\color{white},
+          boxrule=0.1mm, arc=4mm,
+          left=1.5mm, right=1.5mm, top=0.5mm, bottom=0.5mm,
+          halign=right, sharp corners=south}
+      - \newtcolorbox{bashheader}{
+          colback=bashcol!70, colframe=bashcol,
+          fontupper=\footnotesize\bfseries\color{white},
+          boxrule=0.1mm, arc=4mm,
+          left=1.5mm, right=1.5mm, top=0.5mm, bottom=0.5mm,
+          halign=right, sharp corners=south}
+      - \newtcolorbox{testheader}[1]{
+          colback=red!5!white, colframe=red!75!black,
+          fonttitle=\bfseries, title={#1}}
+      - \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+      - \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+      - \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+      - \newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+      - \usepackage{pagecolor}
+      - \definecolor{lightbeige}{RGB}{243,246,255} 
+mainfont: Liberation Sans
+monofont: JetBrainsMono Nerd Font
+monofontoptions:
+  - Scale=0.8
 execute:
   cache: true
 ---
 
+\setlength\parindent{18pt}
+\setlength\columnsep{18pt}
+\newpage
+\twocolumn
 # Downloading data
 \begin{pythonheader}
 Python Code
 \end{pythonheader}
+\vspace{-1.75pt}
 ```{python}
-#| label: data-download
+#| label: frontend-functions-py
+#| echo: false
+
+import io
+import textwrap
+from contextlib import redirect_stdout
+
+# Quarto output wrap sometimes is deficient
+# The next python cells' output overflows without them
+def outputwrap1(output_func, set_width=50):
+	output = str(output_func)
+	wrap_output = textwrap.fill(output, width=set_width)
+	print(wrap_output)
+
+def outputwrap(func, args=(), kwargs=None, width=50):
+    if kwargs is None:
+        kwargs = {}
+    output_stream = io.StringIO()
+    with redirect_stdout(output_stream):
+        func_df = func(*args, **kwargs)
+    full_output = output_stream.getvalue()
+    wrapped_output = textwrap.fill(full_output, width=width)
+    subst_output = wrapped_output.replace(". ", ".\n\n")
+    print(subst_output)
+    print(func_df)
+```
+
+```{python}
+#| label: genomic-benchmarks-libraries
+# Note: Check 'outputwrap' functions in source 'qmd' 
+#   notebook, for further insight on output display 
+
+# To list available datasets
+from genomic_benchmarks.data_check import \
+	list_datasets
+
+# To inspect each dataset to select two
+from genomic_benchmarks.data_check import info as \
+	info_gb
+
+# To download each dataset
+from genomic_benchmarks.loc2seq import \
+	download_dataset
+
+# To position ourselves in the correct directory
+import os
+```
+
+\vspace{0.5cm}
+```{python}
+#| label: data-skimming-false
+#| eval: false
+list_datasets()
+```
+
+```{python}
+#| label: data-skimming 
+#| echo: false
+outputwrap1(list_datasets(), set_width = 45)
+# Equivalent to: list_datasets()
+```
+
+\vspace{0.5cm}
+```{python}
+#| label: dataset1-exploration-facade
 #| eval: false
 
-# Listing available datasets
-from genomic_benchmarks.data_check import list_datasets
-list_datasets()
-# Inspecting each dataset to select two
-from genomic_benchmarks.data_check import info as info_gb
-info_gb("human_nontata_promoters") # <- This one will be used
-info_gb("human_ensembl_regulatory")
-info_gb("human_enhancers_cohn")    # <- This one will also be used
-info_gb("human_enhancers_ensembl")
-# Downloading datasets
-from genomic_benchmarks.loc2seq import download_dataset
-import os
+info_gb("human_nontata_promoters", version=0)
+```
+
+```{python}
+#| label: dataset1-exploration
+#| echo: false
+
+# Equal to: 
+# info_gb("human_nontata_promoters", version=0)
+outputwrap(info_gb, 
+		   args=("human_nontata_promoters",),
+#			Note: This one will be used
+		   kwargs={"version": 0}, width=50) 
+```
+
+\vspace{0.5cm}
+```{python}
+#| label: dataset2-exploration-facade
+#| eval: false
+
+info_gb("human_ensembl_regulatory", version=0)
+```
+
+```{python}
+#| label: dataset2-exploration
+#| echo: false
+
+# Equal to: 
+# info_gb("human_ensembl_regulatory", version=0)
+outputwrap(info_gb, 
+		   args=("human_ensembl_regulatory",),
+		   kwargs={"version": 0}, width=50)
+```
+
+\vspace{0.5cm}
+```{python}
+#| label: dataset3-exploration-facade
+#| eval: false
+
+info_gb("human_enhancers_cohn", version=0)
+```
+
+```{python}
+#| label: dataset3-exploration
+#| echo: false
+
+# Equal to: 
+# info_gb("human_enhancers_cohn", version=0)
+outputwrap(info_gb, 
+		   args=("human_enhancers_cohn",),
+#			Note: This one will also be used
+		   kwargs={"version": 0}, width=50) 
+```
+
+\vspace{0.5cm}
+```{python}
+#| label: dataset4-exploration-facade
+#| eval: false
+
+info_gb("human_enhancers_ensembl", version=0)
+```
+
+```{python}
+#| label: dataset4-exploration
+#| echo: false
+
+# Equal to: 
+# info_gb("human_enhancers_ensembl", version=0)
+outputwrap(info_gb, args=("human_enhancers_ensembl",),
+			kwargs={"version": 0}, width=50)
+```
+
+\vspace{0.5cm}
+```{python}
+#| label: data-download-facade
+#| eval: false
+
+os.chdir("/path/to/Project/datasets/GenomicBenchmarks")
+
+download_dataset("human_nontata_promoters", version=0) 
+download_dataset("human_enhancers_cohn", version=0) 
+```
+
+```{python}
+#| label: data-download
+#| echo: false
+#| eval: false
+
 os.chdir("/home/davidfm/Projects/UBMI-IFC/EnhaProm/datasets/GenomicBenchmarks")
 download_dataset("human_nontata_promoters", version=0) 
 download_dataset("human_enhancers_cohn", version=0) 
 ```
 
+\newpage
 # Formatting data
-
 The downloaded data came in the form of two directories with many *.txt* files inside, and seeing that at least '*getShape()*' 
 function from '*DNAshapeR*' library required FASTA files to work and it felt right to collect all sequences in a single file, 
 I transfered all sequences of each cis-regulatory element to their single respective FASTA file and gave them a simple header.
@@ -67,9 +278,30 @@ I transfered all sequences of each cis-regulatory element to their single respec
 \begin{bashheader}
 Bash Code
 \end{bashheader}
+\vspace{-1.75pt}
+```{bash}
+#| label: data-to-fasta-facade
+#| eval: false
+
+cd /path/to/Project/datasets/GenomicBenchmarks/
+
+awk 'BEGIN{counter=0}
+     {print ">promoter_"counter"|train|positive";
+     print $0; counter+=1}' \
+     human_nontata_promoters/train/positive/*.txt \
+     > promoters_train_positive.fasta
+
+awk 'BEGIN{counter=0}
+     {print ">enhancer_"counter"|train|positive"; 
+     print $0; counter+=1}' \
+     human_enhancers_cohn/train/positive/*.txt \
+     > enhancers_train_positive.fasta
+```
+
 ```{bash}
 #| label: data-to-fasta
 #| eval: false
+#| echo: false
 
 cd /home/davidfm/Projects/UBMI-IFC/EnhaProm/datasets/GenomicBenchmarks/
 awk 'BEGIN{counter=0}{print ">promoter_"counter"|train|positive";
@@ -81,16 +313,16 @@ awk 'BEGIN{counter=0}{print ">enhancer_"counter"|train|positive";
 ```
 
 # Libraries used
-
 Here is a list of the R libraries used for the following analysis, as well as
 a reference to my own functions to be used in the characterization step.
 
 \begin{rheader}
 R Code
 \end{rheader}
+\vspace{-1.75pt}
 ```{r}
 #| label: requirements
-#| output: false
+#| echo: false
 
 # For genome-functions.R
 library(stringr)
@@ -105,10 +337,12 @@ library(foreach)
 library(Biostrings)
 library(DNAshapeR)
 # For plotting
-library(cowplot)
+library(paletteer) # for color palettes
+library(cowplot) # for 'plot_grid'
 library(ggplot2)
 library(dplyr)
 library(plyr)
+library(see) # for 'geom_violinhalf'
 # For pretty tables
 library(knitr)
 library(kableExtra)
@@ -116,19 +350,244 @@ library(kableExtra)
 source("/home/davidfm/Projects/UBMI-IFC/EnhaProm/scripts/genome-functions.R")
 ```
 
-# Characterizing sequences
+```{r}
+#| label: requirements-facade
+#| eval: false
 
+# For genome-functions.R
+library(stringr)
+library(stringi)
+library(primes)
+# For parallel computing
+library(doParallel)
+library(foreach)
+# For biological functions: 
+#   - Local/Global alignments 
+#   - DNA Shape computing
+library(Biostrings)
+library(DNAshapeR)
+# For plotting
+library(paletteer)
+library(cowplot)
+library(ggplot2)
+library(dplyr)
+library(plyr)
+library(see)
+# For pretty tables
+library(knitr)
+library(kableExtra)
+# For my own functions
+source("/path/to/Project/scripts/genome-functions.R")
+```
+
+```{r}
+#| label: frontend-functions-r
+#| include: false
+#| cache: false
+
+required_libs <- function(libs)
+  for(lib in libs) suppressPackageStartupMessages(library(lib, character.only = TRUE))
+
+# for some reason we have to specify inside 'foreach' the required libraries that 
+# the sequence characterizer uses even though they are already required inside 
+# 'genome-functions.R'
+
+required_libs(c("knitr", "kableExtra", "stringi")) # teatable requires those libs
+
+teatable <- function(tabl, cat=FALSE, decay = TRUE, pale = TRUE, colsize) {
+  if (!decay) { rowcolors <-  c("#a3cfa3", "#b3e6b3", "green!20")
+  } else { if (!pale) { rowcolors <- c("#8c8c66", "#e6e6cc", "#c2c299")
+    } else { rowcolors <- c("#ccccb3", "#f4f4e2", "#e0e0cc")} }
+
+  kbl_tabl <- kbl(tabl, align = 'c', booktabs = T, longtable = F) %>%
+              kable_styling(position = "center",
+                            latex_options = c("striped",
+                                              "scale_down",
+                                               "hold_position"),
+                            stripe_color = rowcolors[3], full_width = F) %>%
+              row_spec(seq(2, nrow(tabl), by = 2), background = rowcolors[2]) %>%
+              row_spec(0, background = rowcolors[1]) #%>%
+
+  if (!missing(colsize))
+    kbl_tabl <- kbl_tabl %>% column_spec(1:ncol(tabl), width = colsize) #|>
+
+  kbl_tabl <- gsub("\\\\midrule", "\\\\specialrule\\{0.6pt\\}\\{0.8pt\\}\\{0.6pt\\}", kbl_tabl)
+  kbl_tabl <- gsub("\\\\toprule", "\\\\specialrule\\{1pt\\}\\{0pt\\}\\{1pt\\}", kbl_tabl)
+  kbl_tabl <- gsub("\\\\bottomrule", "\\\\specialrule\\{1pt\\}\\{0.6pt\\}\\{0pt\\}", kbl_tabl)
+  kbl_tabl <- gsub("\\\\begin\\{table\\}([^\n]*)", "\\\\begin\\{table\\}\\1\n\\\\footnotesize", kbl_tabl)
+
+ #  if (cat)
+	# kbl_tabl <- strsplit(kbl_tabl, "\n")
+
+  if (!cat) {asis_output(kbl_tabl)} else {cat(kbl_tabl)}
+}
+
+# for some reason the latex command ''\twocolumn' has incompatibilities with 'knitr' 
+# longtable format (their default type of table), so 'teatable' is a function to work
+# around that limitation. However for some reason each cell that uses it requires to 
+# have 'cache: false' set, so it can be reloaded each time the notebook is rendered.
+
+teetable <- function(tabl){
+  kbl(as.data.frame(tabl), booktabs = T, longtable = F, linesep = "") %>%
+    kable_styling(position = "center",
+                  latex_options = c("striped", "scale_down", "hold_position")) #%>% 
+    #column_spec(1:6, width="6em")#|>
+  # After coloring 'coffeetable()' I felt like teatable then should display some color
+}
+
+rm_lastchar <- function(chain)
+  return(substr(chain, 1, nchar(chain)-1))
+
+ncol_latex <- function(btab_str)
+  return(nchar(strsplit(rm_lastchar(btab_str), "\\}.*\\{")[[1]][2]))
+  # return(nchar(gsub("\\{[a-z0-9.]+\\}|\\|","",str_split_fixed(substr(btab_str,1,nchar(btab_str)-1), "\\{", n=3)[3])))
+  # ^more general take on possible '\begin{tabular}' configurations
+
+state_mod <- function(logvect, inds){
+  inds <- ifelse(inds & length(logvect) >= inds, inds, stop("inds out of bounds or is NULL"))
+  logvect[inds] <- !logvect[inds]
+  return(logvect)
+}
+
+int_state_mod <- function(intvect, addvect, logvect, inds){
+  inds <- ifelse(inds & length(logvect) >= inds, inds, stop("inds out of bounds or is NULL"))
+  addvect <- ((-1)^logvect[inds])*addvect
+  intvect[inds] <- intvect[inds]+addvect
+  return(intvect)
+}
+
+get_rowspans <- function(lines_mrow)
+  return(as.numeric(gsub(".*\\\\multirow\\{-?([0-9]+)\\}.*","\\1", lines_mrow)))
+
+get_colsigns <- function(mrow_vec)
+  return(mrow_vec / replace(abs(mrow_vec), mrow_vec == 0, 1))
+
+color_multirows <- function(lines, ncols) {
+  logic_vec <- rep(0, ncols)
+  integ_vec <- rep(0, ncols)
+
+  return(sapply(lines[length(lines):1], function(line) {
+    line_cells <- unlist(strsplit(line, " & "))
+    multirow_col_inds <- grep("\\\\multirow\\{", line_cells)
+
+    # cat("\n====", line_cells[1], logic_vec, integ_vec)
+    if(length(multirow_col_inds)){
+      logic_vec <<- state_mod(logic_vec, multirow_col_inds)
+      n_rowspans <- get_rowspans(line_cells[multirow_col_inds]) - 1
+      integ_vec <<- int_state_mod(integ_vec, n_rowspans, logic_vec, multirow_col_inds)
+      for (col_i in multirow_col_inds)
+        line_cells[col_i] <- ifelse(logic_vec[col_i] == 0, 
+                                    gsub("\\[.*\\]\\{(.*) (.*)\\}", 
+                                         "\\{\\1\\\\cellcolor\\{brown!10\\} \\2\\}", line_cells[col_i]), 
+                                    gsub("\\[.*\\]\\{(.*) (.*)\\}", 
+                                         "\\{\\1\\\\cellcolor\\{brown!25\\} \\2\\}", line_cells[col_i]))
+    } else if(sum(abs(integ_vec))){
+      for (col_i in (1:ncols)[as.logical(integ_vec)])
+        line_cells[col_i] <- ifelse(logic_vec[col_i] == 0, 
+                                    paste0("\\cellcolor{brown!10}", line_cells[col_i]), 
+                                    paste0("\\cellcolor{brown!25}", line_cells[col_i]))
+      integ_vec <<- integ_vec - get_colsigns(integ_vec)
+    }
+    # cat("\n====", line_cells[1], logic_vec, integ_vec)
+
+    paste(line_cells, collapse = " & ")
+  })[length(lines):1])
+}
+
+coffeetable <- function(tabl, row_height = 1.3, collapse = TRUE, row.names = TRUE, cat = FALSE){
+# The name is actually a reference to the amount of coffee needed to get to this workaround 
+#	solution, 5 seconds later I noticed the ironic coincidence between 'tea' and 'coffee'.
+#   Note: this was before I changed the set to a brown-scale
+  if (!row.names)
+    rownames(tabl) <- NULL
+
+  kbl_tabl <- kbl(tabl, booktabs = T, longtable = F, linesep = "") %>%
+    kable_styling(position = "center", latex_options = c("scale_down", "hold_position")) #%>%
+
+  if (collapse)
+    kbl_tabl <- kbl_tabl %>% collapse_rows()
+
+  tabl_str <- toString(kbl_tabl)
+  tabl_str_lines <- unlist(strsplit(tabl_str, "\n"))
+
+  if (collapse) {
+    cmid_lines <- grep("\\\\cmidrule\\{", tabl_str_lines)
+    tabl_str_lines <- tabl_str_lines[-cmid_lines]
+  }
+
+  tabu_lines <- grep("\\\\(?:begin|end)\\{tabular\\}", tabl_str_lines)
+  tabl_str_lines[tabu_lines[1]-1] <- paste0("\\renewcommand{\\arraystretch}{", as.character(row_height), "}\n", tabl_str_lines[tabu_lines[1]-1])
+  tabl_str_lines[tabu_lines[2]] <- paste0(tabl_str_lines[tabu_lines[2]], "\n\\renewcommand{\\arraystretch}{1}\n")
+  tabl_str_lines[tabu_lines[1]-1] <- paste0("\\footnotesize\n", tabl_str_lines[tabu_lines[1]-1])
+
+  # btab_i <- grep("begin\\{tabular\\}", tabl_str_lines)
+  # btab_str <- tabl_str_lines[btab_i]
+  # ncol_btab_str <- ncol_latex(btab_str)
+  # sub_btab_str <- paste0("\\]\\{.{", ncol_btab_str, "}\\}")
+  # new_btab_str <- paste0("\\]\\{", paste(rep("c", ncol_btab_str), collapse = " "), "\\}")
+  # tabl_str_lines[btab_i] <- sub(sub_btab_str, new_btab_str, btab_str)
+  # # new_btab_str <- paste0("\\]\\{", paste(rep(">{\\\\centering\\\\arraybackslash}c", ncol_btab_str), collapse = " "), "\\}")
+
+  inter_lines <- grep("\\b\\\\midrule\\b|\\b\\\\bottomrule\\b", tabl_str_lines)
+  all_i <- seq(inter_lines[1]+1, inter_lines[2]-1) 
+  evn_i <- seq(inter_lines[1]+1, inter_lines[2]-1, 2)
+  odd_i <- all_i[! all_i %in% evn_i]
+
+  if (collapse) {
+    tabl_str_lines[all_i] <- color_multirows(tabl_str_lines[all_i], ncol_latex(tabl_str_lines[tabu_lines[1]]))
+  }
+  # tabl_str_liness <- stri_split_fixed(tabl_str_lines[all_i], " &", n = 2)
+  # tabl_str_lines[all_i] <- unlist(lapply(tabl_str_liness, function(x) paste0("\\raisebox{2ex}{", x[1], "} & ", x[-1])))
+
+  # tabl_str_lines[all_i] <- paste0("\\rule{0pt}{4ex}", tabl_str_lines[all_i])
+  tabl_str_lines[all_i[1]-2] <- paste0("\\rowcolor{brown!42}\n", tabl_str_lines[all_i[1]-2])
+  tabl_str_lines[all_i[1]-3] <- "\\specialrule{1pt}{0pt}{0.5pt}"  # Replace '\toprule' and '\midrule'. Apparently this can also 
+  tabl_str_lines[all_i[1]-1] <- "\\specialrule{0.6pt}{1pt}{0pt}"  # be done by setting '\aboverulesep' and '\belowrulesep' 
+  tabl_str_lines[all_i] <- paste0(tabl_str_lines[all_i], "[-0.12pt]")
+  tabl_str_lines[evn_i] <- paste0("\\rowcolor{brown!25}\n", tabl_str_lines[evn_i])
+  tabl_str_lines[odd_i] <- paste0("\\rowcolor{brown!10}\n", tabl_str_lines[odd_i])
+  tabl_str <- paste(tabl_str_lines, collapse = "\n")
+  # cat(tabl_str)
+  # asis_output(tabl_str)
+  if (!cat) {asis_output(tabl_str)} else {cat(tabl_str)}
+}
+
+# NOTE: 'get_legend' doesn't seem to work right with 'plot_grid' along with 'ggplot2=3.5'
+# This solution was taken from: 'https://github.com/wilkelab/cowplot/issues/202'
+get_legend_bypass <- function(plot) { 
+  # return all legend candidates
+  legends <- get_plot_component(plot, "guide-box", return_all = TRUE)
+  # find non-zero legends
+  nonzero <- vapply(legends, \(x) !inherits(x, "zeroGrob"), TRUE)
+  idx <- which(nonzero)
+  # return first non-zero legend if exists, and otherwise first element (which will be a zeroGrob) 
+  if (length(idx) > 0) {
+    return(legends[[idx[1]]])
+  } else {
+    return(legends[[1]])
+  }
+}
+```
+
+\newpage
+# Characterizing sequences
 Here, we characterize a subset from each of our datasets: 1638 sequences per 
 regulatory element; 3276 in total. However, there's a circumstance about the 
 sequences that has to be noted:
 
 * Both datasets have considerably different elements lengthwise:
+
 	1. All promoters have a length of 251 nucleotides.
-	2. All enhancers have a length of 500 nucleotides.
+
+    2. All enhancers have a length of 500 nucleotides.
+
+* All features per sequence must be numerical and two-dimensional since we want
+it to be fed eventually to a simple classifier (like a Support Vector Machine).
 
 ```{r}
 #| label: csv-scanning
 #| eval: false
+#| echo: false
 
 # Scanning sequences
 prom_fasta <- "datasets/GenomicBenchmarks/promoters_train_positive.fasta"
@@ -137,13 +596,33 @@ prom_seqs <- scan(prom_fasta, character(), quote = "")[seq(2, 29484, 2)]
 enha_seqs <- scan(enha_fasta, character(), quote = "")[seq(2, 20842, 2)]
 ```
 
+```{r}
+#| label: csv-scanning-facade
+#| eval: false
+
+proj_path <- "path/to/Project/datasets/GenomicBenchmarks"
+prom_fastaname <- "promoters_train_positive.fasta"
+enha_fastaname <- "enhancers_train_positive.fasta"
+
+prom_path <- paste(proj_path, prom_fastaname, sep = "/")
+enha_path <- paste(proj_path, enha_fastaname, sep = "/")
+
+# Scanning sequences
+prom_seqs <- scan(prom_path, 
+                  character(), quote="")[seq(2,29484,2)]
+enha_seqs <- scan(enha_path, 
+                  character(), quote="")[seq(2,20842,2)]
+```
+
 Given some previous tests done to 'sequences_characterizer()' I came to the
 conclusion that parallel computing might provide a higher and more complex
 set of data in a feasible time span.
 
+\vspace{0.5cm}
 ```{r}
 #| label: csv-construction
 #| eval: false
+#| echo: false
 
 # Prepairing clusters for parallel computing
 corescluster <- makeCluster(6)
@@ -155,7 +634,7 @@ for (reg_elem in reg_elems) {
   foreach(i = 1:6) %dopar% {
     library(stringr) # for some reason we have to specify for
     library(stringi) # all the libraries that the sequence
-    library(primes)  # characterizer needs
+    library(primes)  # characterizer needs. NOTE: Try to put them all inside a function
     i_start <- ((i - 1) * 273) + 1
     i_final <- i * 273
     if (i > 1) {     # Conditional so that only the first CSV has headers
@@ -174,8 +653,50 @@ for (reg_elem in reg_elems) {
 }
 ```
 
-# Concatenating CSV's
+```{r}
+#| label: csv-construction-facade
+#| eval: false
 
+# Prepairing clusters for parallel computing
+corescluster <- makeCluster(6)
+registerDoParallel(corescluster)
+
+# Characterizing sequences and exporting to CSV
+list_seqs <- list(promoters = prom_seqs,
+                  enhancers = enha_seqs)
+reg_elems <- c("promoters", "enhancers")
+libs <- c("stringr", "stringi", "primes")
+
+for (reg_elem in reg_elems) {
+  foreach(i = 1:6) %dopar% {
+    required_libs(libs)
+    i_start <- ((i - 1) * 273) + 1
+    i_final <- i * 273
+
+    if (i > 1) { # Only the first CSV has headers
+      write.table(
+        sequences_characterizer(
+          list_seqs[[reg_elem]][i_start:i_final],
+          optim = TRUE, k_max = 6),
+        paste(
+          "datasets/GB-Testing/test", reg_elem, 
+          "-training_", i, ".csv", sep = ""), 
+          row.names = FALSE, col.names = FALSE,
+          sep = ",")
+
+    } else {
+	  write.csv(
+        sequences_characterizer(
+          list_seqs[[reg_elem]][i_start:i_final],
+          optim = TRUE, k_max = 6),
+        paste(
+          "datasets/GB-Testing/", reg_elem,
+          "-training_", i, ".csv", sep = ""),
+          row.names = FALSE)
+}}}
+```
+
+# Concatenating CSV's
 It was decided to produce many files instead of appending over the same CSV table in order to 
 apply a sort of quality control checkup after the parallel computing was done. This, because when forcing the process 
 RAM overload was possible and the function could die mid-process. Since our data was separated in six tables per 
@@ -184,49 +705,57 @@ cis-regulatory element, here we only join each set together in a single CSV.
 \begin{bashheader}
 Bash Code
 \end{bashheader}
+\vspace{-1.75pt}
 ```{bash}
 #| label: csv-concatenation
 #| eval: false
+#| echo: false
 
+# Only added this cell in case I forget the original file names
 cat datasets/GB-Testing/testpromoters-minitraining_*.csv \
     > datasets/GB-Testing/test-1638-promoters-6mers.csv
 cat datasets/GB-Testing/testenhancers-minitraining_*.csv \
     > datasets/GB-Testing/test-1638-enhancers-6mers.csv
 ```
 
+```{bash}
+#| label: csv-concatenation-facade
+#| eval: false
+
+cat datasets/GB-Testing/testpromoters-training_*.csv \
+    > datasets/GB-Testing/test-1638-promoters-6mers.csv
+cat datasets/GB-Testing/testenhancers-training_*.csv \
+    > datasets/GB-Testing/test-1638-enhancers-6mers.csv
+```
+
 # Data description
 
-```{=latex}
-\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
-\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
-\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
-\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
-
-\begin{table}[H]
-\caption{Overview of each column generated by '\textit{sequences-characterizer()}'}
+\begin{table}[h]
+\caption{Overview of each column generated so far by '\textit{sequences-characterizer()}'}
+\small
 \centering
 % Using the new column types L, C, and R for custom width and orientation
-\begin{tabular}{|L{2.5cm}|C{4cm}|C{5cm}|} 
+\begin{tabular}{|L{1.5cm}|C{2.5cm}|C{4cm}|} 
 \hline
 \centering \textbf{Column} & \textbf{Description} & \textbf{Section Processed} \\
 \hline
-A & \parbox[c][1.2cm]{4cm}{\centering Percentage of Alanines} & \multirow{6}{*}{\underline{per Sequence}} \\
+A & \parbox[c][1.2cm]{2.5cm}{\centering Percentage of Alanines} & \multirow{6}{*}{\underline{per Sequence}} \\
 \cdashline{1-2}
-T & \parbox[c][1.2cm]{4cm}{\setlength\parindent{4pt}Percentage of Thymines} & \\
+T & \parbox[c][1.2cm]{2.5cm}{\centering Percentage of Thymines} & \\
 \cdashline{1-2}
-C & \parbox[c][1.2cm]{4cm}{\centering Percentage of Cytosines} & \\
+C & \parbox[c][1.2cm]{2.5cm}{\centering Percentage of Cytosines} & \\
 \cdashline{1-2}
-G & \parbox[c][1.2cm]{4cm}{\centering Percentage of Guanines} & \\
+G & \parbox[c][1.2cm]{2.5cm}{\centering Percentage of Guanines} & \\
 \cdashline{1-2}
-temp & \parbox[c][1.2cm]{4cm}{\centering Melting Temperature} & \\
+temp & \parbox[c][1.2cm]{2.5cm}{\centering Melting Temperature} & \\
 \cdashline{1-2}
-shan & \parbox[c][1.2cm]{4cm}{\centering Shannon Coefficient} & \\
+shan & \parbox[c][1.2cm]{2.5cm}{\centering Shannon Coefficient} & \\
 \hline
-kN.M\_prod & \parbox[c][1.25cm]{4cm}{\centering KSG Product} & \multirow{4}{*}{\parbox[t]{8cm}{
-\setlength\parindent{45pt}\underline{per Kmer:}\\\\
-each possible kmer of size N\\
-is identified on a scale of 1 to\\
-$4^N$ denoted by M.\\\\
+kN.M\_prod & \parbox[c][1.25cm]{2.5cm}{\centering KSG Product} & \multirow{4}{*}{\parbox[t]{4cm}{
+\setlength\parindent{35pt}\underline{per Kmer:}\\\\
+each possible kmer of \\ size \textit{N}
+is identified on a \\ scale of 1 to
+$4^N$ denoted \\ by \textit{M}.\\\\
 \texttt{
 i.e. k3.1 (or the first\\
 kmer of size 3) would be\\
@@ -234,15 +763,14 @@ AAA; k4.2 would be AAAC\\
 }
 }} \\
 \cdashline{1-2}
-kN.M\_barc & \parbox[c][1.2cm]{4cm}{\centering Barcode Profile} & \\
+kN.M\_barc & \parbox[c][1.2cm]{2.5cm}{\centering Barcode Profile} & \\
 \cdashline{1-2}
-kN.M\_pals & \parbox[c][1.2cm]{4cm}{\centering Palindrome Profile} & \\
+kN.M\_pals & \parbox[c][1.2cm]{2.5cm}{\centering Palindrome Profile} & \\
 \cdashline{1-2}
-kN.M\_revc & \parbox[c][1.7cm]{4cm}{\centering Reverse Complement Profile} & \\
+kN.M\_revc & \parbox[c][1.7cm]{2.5cm}{\centering Reverse Complement Profile} & \\
 \hline
 \end{tabular}
 \end{table}
-```
 
 Prior to our primary analysis, it feels reasonable to explain the columns per sequence produced by our
 tabulator '*sequences_characterizer()*'. From here we'll first describe the ones computed sequence-wise, 
@@ -254,14 +782,14 @@ dataframe. The ones in **black** are already integrated in the table, the ones i
 \underline{Per sequence}
 
 * From *'genome-functions.R'*:
-	* **A, T, C, G** - *Nucleotide Percentages* per sequence.
+    * **A, T, C, G** - *Nucleotide Percentages* per sequence.
 
-	* **temp** - \textit{Melting \underline{Temp}erature}: Temperature at which DNA's double helix dissociates 
-into single strands. *It's dependent on GC percentage and sequence length.*
+    * **temp** - \textit{Melting \underline{Temp}erature}: Temperature at which DNA's double helix dissociates 
+	into single strands. *It's dependent on GC percentage and sequence length.*
 
-	* **shan** - \textit{\underline{Shan}non Entropy Coefficient}: Statistical quantifier of information in a 
-system. Measures the uncertainty a set of data has. In this case is a nucleotide-diversity metric. 
-*It's dependent on nucleotide percentages.*
+    * **shan** - \textit{\underline{Shan}non Entropy Coefficient}: Statistical quantifier of information in a 
+    system. Measures the uncertainty a set of data has. In this case is a nucleotide-diversity metric. 
+    *It's dependent on nucleotide percentages.*
 
 * From *'Biostrings'*:
 	* \color{red}**la_sc** \color{black} - \textit{\underline{L}ocal \underline{A}lignment \underline{Sc}ore}
@@ -271,39 +799,55 @@ system. Measures the uncertainty a set of data has. In this case is a nucleotide
 	* \color{red}**ga_sc** \color{black} - \textit{\underline{G}lobal \underline{A}lignment \underline{Sc}ore}
 
 	* \color{red}**ga_id** \color{black} - \textit{\underline{G}lobal \underline{A}lignment \underline{Id}entity}
-	
+
+
 \underline{Per kmer}
-\newfontfamily\mynimbus{Nimbus Sans Narrow}
+
+Kmer characterization came with many challenges, principally to provide each kmer with a distinct signature 
+value dependent on their sequence structure. This under the assumption that .
 
 * From *'genome-functions.R'*:
+	* **kN.M_prod** - \textit{KSG \underline{Prod}uct}: Its obtained by multiplying \fontnimbussnn{\textbf{
+	\underline{K}mer-Percentage * \underline{S}hannon Entropy * \underline{G}C-Percentage}} (*in concept*). 
+	The justification for this comes from the desire to give each kmer a distictive signal based on their 
+	sequence. However many kmers can produce the same value depending on the function, for example, the kmers 
+	\fontnimbussnn{\textbf{'AAAT', 'ATAA', 'CCGC'}} and \fontnimbussnn{\textbf{'TGGG'}} all have the *same Entropy 
+	Coefficient* (0.811), while \fontnimbussnn{\textbf{'GGAT', 'CAAG', 'AACC'}} and \fontnimbussnn{\textbf{'TGCT'}} 
+	all have the *same GC Percentage* (0.5). Additionally, it is a little tricky to *keep the product from becoming 
+	zero* when the sequence is either devoid of C/G nucleotides (e.g. \textbf{\fontnimbussnn{gc\_percentage('ATTA')
+	=0}}), or lacks nucleotide diversity (e.g. \textbf{\fontnimbussnn{shannon\_entropy('GGGG')=0}}). 
+	\newline\small\fontlibertser{Refer to 'Theory \& Code Annex', Sections 2 \& 3, for more details.}\normalsize
 
-	* **kN.M_prod** - \textit{KSG \underline{Prod}uct}: Its obtained by multiplying \mynimbus\textbf{
-\underline{K}mer-Percentage * \underline{S}hannon Entropy * \underline{G}C-Percentage} \fontspec{Liberation Serif} (in concept).
-However, this is a little tricky since you don't want the product to be zero if a sequence is solely composed of A/T nucleotides. 
+    * **kN.M_barc** - \textit{\underline{Barc}ode Profile}: Its obtained by generating a vector with size equal to
+	the kmer amount (which is equivalent to \fontnimbussnn{\textbf{'sequence length'} - \textbf{'kmer length'} + 1})
+	and filling it with one prime number per cell in ascending order. Afterwars we use a logical (\fontnimbussnn{
+	\textbf{1's \& 0's}}) vector of the same size to represent each kmer's positions in the sequence. *In concept*, 
+	if we multiply both vectors we will get a set of prime numbers representing the positions of each kmer inside 
+	the sequence. If we multiply as well the elements inside this set, we will obtain an exlusive value for each 
+	kmer in each sequence, and only the sequences with the same kmers in the same place will be divisible by the 
+	corresponding prime.
 
-	* **kN.M_barc** - \textit{\underline{Barc}ode Profile}:
+    * **kN.M_pals** - \textit{\underline{Pal}indrome\underline{s}' Profile}:
 
-	* **kN.M_pals** - \textit{\underline{Pal}indrome\underline{s}' Profile}:
-
-	* **kN.M_revc** - \textit{\underline{Rev}erse \underline{C}omplement Profile}:
+    * **kN.M_revc** - \textit{\underline{Rev}erse \underline{C}omplement Profile}:
 
 \underline{Per kmer distribution}
 
 \underline{Per non-defined kmer}
 
-* From *'DNAshapeR'*: \newline Its produced a row per sequence and a set vectors (EP, MGW, HelT, Roll & ProT as default) obtained when
-dividing each sequence in kmers (length non-defined by me) of whose length depends on sequence-length, so I would classify it as per
+* From *'DNAshapeR'*: \newline Generates a set features as vectors (EP, MGW, HelT, Roll & ProT by default) per provided 
+FASTA file. Splits each sequence in sliding kmers of size 5 (pentamers) not defined by me, which therefore makes vector 
+size dependent on sequence-length. The features intended to be used are:
 
 	* \color{red}**sh_ep** \color{black} - Shape EP
 
-	* \color{red}**sh_mgw** \color{black} - Shape MGW
+	* \color{red}**sh_mgw** \color{black} - \textit{\underline{M}inor \underline{G}roove \underline{W}idth}
 
-	* \color{red}**sh_helt** \color{black} - Shape HelT
+	* \color{red}**sh_helt** \color{black} - \textit{\underline{Hel}ix \underline{T}wist}
 
-	* \color{red}**sh_roll** \color{black} - Shape Roll
+	* \color{red}**sh_prot** \color{black} - \textit{\underline{Pro}peller \underline{T}wist}
 
-	* \color{red}**sh_prot** \color{black} - Shape ProT
-
+	* \color{red}**sh_roll** \color{black} - \textit{\underline{Roll}}
 
 
 # Primary analysis
@@ -313,265 +857,398 @@ We could have concatenated both tables together, however I prefer to keep them i
 \begin{rheader}
 R Code
 \end{rheader}
+\vspace{-1.75pt}
 ```{r}
 #| label: data-load
+#| echo: false
+
 setwd("/home/davidfm/Projects/UBMI-IFC/EnhaProm")
-testpromoters <- read.csv("datasets/GB-Testing/test-1638-promoters-6mers.csv", 
-                          check.names = F)
-testenhancers <- read.csv("datasets/GB-Testing/test-1638-enhancers-6mers.csv", 
-                          check.names = F)
+proms <- read.csv("datasets/GB-Testing/test-1638-promoters-6mers.csv", 
+                  check.names = F)
+enhas <- read.csv("datasets/GB-Testing/test-1638-enhancers-6mers.csv", 
+                  check.names = F)
+CREs <- c("Promoter","Enhancer")
 ```
+
+```{r}
+#| label: data-load-facade
+#| eval: false
+
+setwd("/path/to/Project/")
+testdir_path <- "datasets/GB-Testing/"
+prom_csvpath <- "test-1638-promoters-6mers.csv" 
+enha_csvname <- "test-1638-enhancers-6mers.csv" 
+
+proms <- read.csv(paste0(testdir_path, 
+                         prom_csvname),
+                         check.names = F)
+enhas <- read.csv(paste0(testdir_path, 
+                         enha_csvname),
+                         check.names = F)
+CREs <- c("Promoter","Enhancer")
+```
+\vspace{0.2cm}
+
 First we get an overviwew of the dimensions of our data:
+NOTE: Replace this with some kind of table
+\vspace{0.2cm}
 ```{r}
 #| label: data-dimensions
 #| layout-ncol: 2
-deparse(substitute(testpromoters))
-deparse(substitute(testenhancers))
-dim(testpromoters)
-dim(testenhancers)
+deparse(substitute(proms))
+deparse(substitute(enhas))
+dim(proms)
+dim(enhas)
 ```
-
+\vspace{0.2cm}
 
 It's noticeable the fact that we have way more columns than rows in this test table.
-Let's get a glimpse of the records corresponding to the first three promoters.
+Let's get a general glimpse of the first three promoters' rows by displaying the first 
+3 lines and first 18 columns pertaining to all *sequence-wise* variables computed so far 
+plus the first 12 *kmer-wise* variables, which align with the data related to the first 
+3 kmers (\fontnimbussnn{\textbf{'AA', 'AC'} \& \textbf{'AG'}}):
+
+\vspace{0.2cm}
 ```{r}
-#| label: false-code-prom
+#| label: head-prom-facade
 #| eval: false
-kable(testpromoters[1:3,1:18])
-```
-```{r}
-#| label: data-head-workaround-prom
-#| echo: false
-kable(testpromoters[1:3,1:6]) #|>
-  # kableExtra::add_header_above(header=c("Test Promoters"=6))
-kable(testpromoters[1:3,7:12])
-kable(testpromoters[1:3,13:18])
+
+teatable(proms[1:3,1:18])
 ```
 
-Let's get a glimpse of the records corresponding to the first three enhancers.
 ```{r}
-#| label: false-code-enha
+#| label: head-prom
+#| echo: false
+#| cache: false
+
+# Each time teatable is used, its' cell must be reloaded
+# teatable(proms[1:3,1:6], colsize = "6em")
+#   # kableExtra::add_header_above(header=c("Test Promoters"=6))
+# teatable(proms[1:3,7:12], colsize = "6em")
+# teatable(proms[1:3,13:18], colsize = "6em")
+teatable(proms[1:3,1:6], colsize = "5.75em")
+teatable(proms[1:3,7:12], colsize = "5.75em")
+teatable(proms[1:3,13:18], colsize = "5.75em")
+```
+\vspace{0.2cm}
+
+We'll get a similar panorama when looking at the first three enhancers' rows
+(although it seems like *'barcode'* values appear to be significantly larger):
+
+\vspace{0.2cm}
+```{r}
+#| label: head-enha-facade
 #| eval: false
-kable(testenhancers[1:3,1:18])
+
+teatable(enhas[1:3,1:18])
 ```
 ```{r}
-#| label: data-head-workaround-enha
+#| label: head-enha
 #| echo: false
-kable(testenhancers[1:3,1:6]) #|>
+#| cache: false
+
+teatable(enhas[1:3,1:6], colsize = "6em") #|>
   # kableExtra::add_header_above(header=c("Test Enhancers"=6))
-kable(testenhancers[1:3,7:12])
-kable(testenhancers[1:3,13:18])
+teatable(enhas[1:3,7:12], colsize = "6em")
+teatable(enhas[1:3,13:18], colsize = "6em")
 ```
 
 ```{r}
-meanpromoters <- colMeans(testpromoters)
-meanenhancers <- colMeans(testenhancers)
-sdpromoters <- apply(testpromoters, 2, sd)
-sdenhancers <- apply(testenhancers, 2, sd)
-# names_test <- rep(names(testpromoters),2)
-cre_summary <- data.frame(Type = factor(rep(c("Promoter","Enhancer"), 
-                                        each = length(testpromoters))),
-                          Field = rep(names(testpromoters),2),
-                          Means = c(meanpromoters, meanenhancers),
-                          StDevs = c(sdpromoters, sdenhancers))
-# head(cre_summary)
-kable(cre_summary[c(1:10,21831:21840),])
+#| label: data-summary
+#| cache: false
+
+mean_prom <- colMeans(proms)
+mean_enha <- colMeans(enhas)
+sd_prom <- apply(proms, 2, sd)
+sd_enha <- apply(enhas, 2, sd)
+
+names_CREs <- rep(CREs, each = length(proms))
+cre_summary <- data.frame(Type = factor(names_CREs),
+                          Field = rep(names(proms),2),
+                          Means = c(mean_prom,mean_enha),
+                          StDevs = c(sd_prom,sd_enha))
 ```
 
 ```{r}
+#| label: summary-head
+#| cache: false
+
+ldf <- length(proms)
+coffeetable(cre_summary[c(1:10,(ldf+1):(ldf+10)),])
+```
+
+```{r}
+#| layout-nrow: 3
 #| code-overflow: wrap
 # Get only 'prod' columns of each kmer
-k2 <- n_ki(2); k3 <- n_ki(3); k4 <- n_ki(4); k5 <- n_ki(5); k6 <- n_ki(6) 
-kmer_sections_indexes <- c(1, 
-                           k2, 
-                           k2 + 1, 
-                           k2 + k3, 
-                           k2 + k3 + 1,
-                           k2 + k3 + k4, 
-                           k2 + k3 + k4 + 1,
-                           k2 + k3 + k4 + k5, 
-                           k2 + k3 + k4 + k5 + 1, 
-                           k2 + k3 + k4 + k5 + k6)
-prod_indexes <- seq(7,21827,4)
-barc_indexes <- seq(8,21828,4)
-pals_indexes <- seq(9,21829,4)
-revc_indexes <- seq(10,21830,4)
-all_prod_indexes <- c(prod_indexes, 21830 + prod_indexes)
-all_barc_indexes <- c(barc_indexes, 21830 + barc_indexes)
-all_pals_indexes <- c(pals_indexes, 21830 + pals_indexes)
-all_revc_indexes <- c(revc_indexes, 21830 + revc_indexes)
-kable(head(testenhancers[, barc_indexes])[,c(1:8,length(barc_indexes))])
+
+k_Ns <- c(n_ki(2), n_ki(3), n_ki(4), n_ki(5), n_ki(6)) 
+k_inds <- c(0)
+for (k_n in k_Ns) {
+  k_inds <- c(k_inds, tail(k_inds,1) + 1)
+  k_inds <- c(k_inds, tail(k_inds,2)[1] + k_n)
+}
+k_inds <- k_inds[-1]
+# print(k_inds)
+# print((ldf-6)/4)
+# print(ldf)
 ```
 
 ```{r}
-#| label: kmer-sections-false
-#| eval: false
-kable(head(testenhancers[496:500, barc_indexes], 5)[kmer_sections_indexes])
-```
-```{r}
-#| label: kmer-sections
-#| echo: false
-subset1 <- testenhancers[496:500, barc_indexes]
-row.names(subset1) <- NULL
-kable(subset1[kmer_sections_indexes[1:5]]) |>
-  column_spec(column = 2:5, width = "1in") 
-kable(subset1[kmer_sections_indexes[6:10]]) |>
-  column_spec(column = 2:5, width = "1in") 
-```
-
-```{r}
-kable(cre_summary[c(prod_indexes[1:5],(21830+prod_indexes)[1:5]),])
-```
-
-```{r}
-subset_cre_nucl <- cre_summary[c(1:4,21830+(1:4)),]
-subset_cre_temp <- cre_summary[c(5,21830+5),]
-subset_cre_shan <- cre_summary[c(6,21830+6),]
-subset_cre_prod <- cre_summary[c(prod_indexes[17:64],(21830+prod_indexes)[17:64]),]
-subset_cre_barc <- cre_summary[c(barc_indexes[17:64],(21830+barc_indexes)[17:64]),]
-subset_cre_pals <- cre_summary[c(pals_indexes[17:64],(21830+pals_indexes)[17:64]),]
-subset_cre_revc <- cre_summary[c(revc_indexes[17:64],(21830+revc_indexes)[17:64]),]
-kable(cbind(subset_cre_prod[subset_cre_prod$Type=="Promoter",],
-      subset_cre_prod[subset_cre_prod$Type=="Enhancer",])[,c(2,1,3,4,5,7,8)][1:10,])
-field_order_nucl <- subset_cre_nucl$Field[1:4]
-field_order_prod <- subset_cre_prod$Field[1:48]
-field_order_barc <- subset_cre_barc$Field[1:48]
-```
-```{r}
-subset_cre_temp$Means
-subset_cre_temp$StDevs
-```
-```{r}
-subset_cre_shan$Means
-subset_cre_shan$StDevs
-```
-<!---->
-<!-- ```{r} -->
-<!-- subset_cre_prod$Means -->
-<!-- subset_cre_prod$StDevs -->
-<!-- ``` -->
-<!---->
-<!-- ```{r} -->
-<!-- subset_cre_barc$Means -->
-<!-- subset_cre_barc$StDevs -->
-<!-- ``` -->
-
-```{r}
-#| row: screen
-#| out-height: 100%
+#| label: kmer-set-sizes
+#| crop: true
+#| fig-height: 7
 #| fig-align: center
 
-ggplot(subset_cre_nucl) +
-  geom_bar(aes(x = factor(Field, levels = field_order_nucl), 
-               y = ifelse(Type == "Enhancer", -Means, Means), 
-               fill = paste(Type, "Means")),
-           stat = "identity", position = "identity", 
-           alpha = 0.6, width = 0.7) +
-  geom_errorbar(aes(x = factor(Field, levels = field_order_nucl),
-	                ymin = ifelse(Type == "Enhancer",
-                                  -Means + StDevs, Means - StDevs),
-	                ymax = ifelse(Type == "Enhancer",
-                                  -Means - StDevs, Means + StDevs)),
-                width = 0.5, colour = "black", alpha = 0.6)	+
-  coord_flip() +
-  scale_y_continuous(breaks=seq(-1, 1, 0.2), labels=abs(seq(-1, 1, 0.2))) +
-  scale_fill_manual(values = c("turquoise", "coral")) +
-  labs(y = "Means", x = "Nucleotides", 
-       title = "Percentage Means per Nucleotide", 
-       fill = "CRE Type") +
-  theme_minimal()
-```
+kmer_set_sizes <- data.frame(sizes = k_Ns,
+  k_sets = c("2","3","4","5","6"))
 
-```{r}
-# Saving Melting Temperature Plot
-temp_plt <- ggplot(subset_cre_temp) +
-  geom_bar(aes(x = factor(Type), 
-               y = Means, fill=Type),
-           stat = "identity", position = "identity", alpha = 0.6) +
-  geom_errorbar(aes(x = factor(Type), 
-                    ymin = Means - StDevs,
-                    ymax = Means + StDevs),
-                width = 0.5, colour = "black", alpha = 0.6) +
-  labs(y = "Means", x = "", 
-       # title = "Melting Temperature Means", 
-       fill = "") +
-  scale_y_continuous(breaks = seq(0, 100, 10),
-                     labels = seq(0, 100, 10)) +
-  guides(fill = "none") +
-  theme_minimal()
-
-# Saving Shannon Coefficient Plot
-shan_plt <- ggplot(subset_cre_shan) +
-  geom_bar(aes(x = factor(Type), 
-               y = Means, fill=Type),
-           stat = "identity", position = "identity", alpha = 0.6) +
-  geom_errorbar(aes(x = factor(Type), 
-                    ymin = Means - StDevs,
-                    ymax = Means + StDevs),
-                width = 0.5, colour = "black", alpha = 0.6) +
-  labs(y = "", x = "", 
-       # title = "Shannon Entropy Means", 
-       fill = "CRE Type") +
-  scale_y_continuous(breaks=seq(0, 2, 0.25), labels=seq(0, 2, 0.25)) +
-  theme_minimal()
-
-plot_grid(temp_plt, shan_plt, ncol = 2, rel_widths = c(1,1.5),
-          labels = c("Melting Temperature", "Shannon Entropy"),
-          label_fontface = "plain",hjust = c(-0.35, -0.48), vjust = 1)
+ggplot(kmer_set_sizes, aes(x = "", y = sizes,
+                           fill = k_sets))+ 
+  geom_bar(width = 1, stat = "identity") + 
+  labs(y = "Count", x = "", 
+       title = "Kmers per Kmer Size", 
+       fill = "k =") +
+  coord_polar("y", start = 0) +
+  theme_minimal() +
+  scale_fill_paletteer_d("PNWColors::Bay") +
+  theme(legend.position = "right", 
+        axis.title = element_text(size = 15),
+        text = element_text(size = rel(4.25)),
+        legend.text = element_text(size = 13),
+        legend.title = element_text(size = 13.5),
+        axis.text.y = element_text(family = "mono"),
+        plot.title = element_text(size = 16, hjust = 0.5))
   
 ```
 
 ```{r}
-#| row: screen
-#| out-height: 100%
-#| fig-align: center
+#| label: indexes
 
-ggplot(subset_cre_prod) +
-  geom_bar(aes(x = factor(Field, levels = field_order_prod), 
-               y = ifelse(Type == "Enhancer", -Means, Means), 
-                          fill = paste(Type, "Means")),
-               stat = "identity", position = "identity", 
-               alpha = 0.6, width = 0.7) +
-  geom_errorbar(aes(x = factor(Field, levels = field_order_prod),
-	                ymin = ifelse(Type == "Enhancer",
-                                  -Means + StDevs, Means - StDevs),
-	                ymax = ifelse(Type == "Enhancer",
-                                  -Means - StDevs, Means + StDevs)),
-                width = 0.5, colour = "black", alpha = 0.6)	+
-  coord_flip() +
-  scale_y_continuous(breaks=seq(-30, 30, 10), labels=abs(seq(-30, 30, 10))) +
-  scale_fill_manual(values = c("turquoise", "coral")) +
-  labs(y = "Means", x = "Kmers", 
-       title = "KSG-Product Means per Kmer", 
-       fill = "CRE Type") +
-  theme_minimal()
+pe_arr <- function(seq_data)
+  return(array(seq_data, dim = c((ldf-6)/4, 2),
+    dimnames = list(1:((ldf-6)/4), c("prom","enha"))))
+
+indxs <- list(
+  prod = pe_arr(c(seq(7,ldf-3,4), ldf + seq(7,ldf-3,4))),
+  barc = pe_arr(c(seq(8,ldf-2,4), ldf + seq(8,ldf-2,4))),
+  pals = pe_arr(c(seq(9,ldf-1,4), ldf + seq(9,ldf-1,4))),
+  revc = pe_arr(c(seq(10,ldf,4), ldf + seq(10,ldf,4))))
+```
+
+Now, for the sake of text-space optimization, we'll make some plotting
+functions (principally pyramid, bar and violin plots), in order to 
+visualize our data. 
+
+```{r}
+#| label: chunk-shortening-functions
+
+# To plot pyramid-plots
+pyrplot_ <- function(cre_data, kmer_labels, title, 
+                    x_label, y_label, y_breaks) {
+  CREs <- c("Enhancer", "Promoter")
+  field_order <- filter(cre_data, Type==CREs[1])$Field
+  fact_field_order <- factor(cre_data$Field, field_order)
+
+  if (missing(kmer_labels)) kmer_labels <- field_order
+
+  ggplot(cre_data) +
+    geom_bar(aes(x = fact_field_order, 
+                 y = ifelse(Type == CREs[1],
+                            -Means, Means), 
+                 fill = paste(Type, "Means")),
+             stat = "identity", position = "identity", 
+             alpha = 0.6, width = 0.7) +
+    geom_errorbar(aes(x = fact_field_order,
+                      ymin = ifelse(Type == CREs[1],
+                                   -Means + StDevs,
+	                                Means - StDevs),
+                      ymax = ifelse(Type == CREs[1],
+                                   -Means - StDevs,
+                                    Means + StDevs)),
+                  width = 0.5, alpha = 0.6,
+                  colour = "black") +
+    coord_flip() +
+    scale_x_discrete(labels = kmer_labels) +
+    scale_y_continuous(breaks = y_breaks,
+                       labels = abs(y_breaks)) +
+    scale_fill_manual(values = c("turquoise", "coral"),
+                      labels = CREs) +
+    labs(y = "Means", x = x_label,
+         title = title, fill = "CRE Type") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          axis.title = element_text(size = 15),
+          text = element_text(size = rel(4.25)),
+          legend.text = element_text(size = 13),
+          legend.title = element_text(size = 13.5),
+          axis.text.y = element_text(family = "mono"),
+          plot.title = element_text(size = 16, hjust = 0.5))
+}
+
+barplot_ <- function(cre_data, y_breaks, y_axis_title="",
+					 fill_legend_title="") {
+  ggplot(cre_data) +
+    geom_bar(aes(x = factor(Type), 
+                 y = Means, fill = Type),
+             stat = "identity", position = "identity",
+             alpha = 0.6) +
+    geom_errorbar(aes(x = factor(Type), 
+                      ymin = Means - StDevs,
+                      ymax = Means + StDevs),
+                  alpha = 0.6, width = 0.5,
+                  colour = "black") +
+    labs(y = y_axis_title, x = "",
+         fill = fill_legend_title) +
+    scale_y_continuous(breaks = y_breaks,
+                       labels = y_breaks) +
+    scale_fill_manual(values = c("turquoise", "coral")) +
+    theme_minimal() +
+    theme(legend.position = "none",
+          text = element_text(size = rel(4.5)),
+          axis.title = element_text(size = 16))
+}
+
+hvioplot_ <- function(data, y_var, y_label = "",
+                     fill_legend_title = "") {
+  # x_breaks <- seq(-0.12,0.12,0.06)
+  ggplot(data, aes(x = 0, y = !!sym(y_var), fill = type)) +
+    geom_violinhalf(flip = 1, adjust = 0.25,
+                    trim = FALSE, scale = "count",
+                    position = position_dodge(width = 0),
+                    linewidth = 0.1, alpha = 0.6) +
+    theme_minimal() +
+    # scale_x_continuous(breaks = x_breaks ,
+    #                    labels = abs(x_breaks )) +
+    scale_fill_manual(values = c("turquoise", "coral")) +
+    labs(x = "", y = y_label, fill = fill_legend_title) +
+    theme(legend.position = "none",
+          text = element_text(size = rel(4.5)),
+          axis.title = element_text(size = 13))
+}
 ```
 
 ```{r}
-#| row: screen
-#| out-height: 100%
-#| fig-align: center
-
-ggplot(subset_cre_barc) +
-  geom_bar(aes(x = factor(Field, levels = field_order_barc), 
-               y = ifelse(Type == "Enhancer", -Means, Means), 
-                          fill = paste(Type, "Means")),
-               stat = "identity", position = "identity", 
-               alpha = 0.6, width = 0.7) +
-  geom_errorbar(aes(x = factor(Field, levels = field_order_barc),
-	                ymin = ifelse(Type == "Enhancer",
-                                  -Means + StDevs, Means - StDevs),
-	                ymax = ifelse(Type == "Enhancer",
-                                  -Means - StDevs, Means + StDevs)),
-                width = 0.5, colour = "black", alpha = 0.6)	+
-  coord_flip() +
-  scale_y_continuous(breaks=seq(-10, 10, 1), labels=abs(seq(-10, 10, 1))) +
-  scale_fill_manual(values = c("turquoise", "coral")) +
-  labs(y = "Means", x = "Kmers", 
-       title = "Barcode Profile Means per Kmer", 
-       fill = "CRE Type") +
-  theme_minimal()
+#| label: visual-table
+#| echo: false
+#| eval: false
+# This is just a neat table I liked
+# ...don't really know why
+cols_names <- colnames(subset_cre_prod)
+pcol_names <- paste0(cols_names, ".P")
+ecol_names <- paste0(cols_names, ".E")
+pcol_names[2] <- cols_names[2]
+newc_names <- c(pcol_names, ecol_names)
+cols_order <- c(2,1,3,4,5,7,8)
+visual_table <- head(cbind(
+  filter(subset_cre_prod, Type == "Promoter"),
+  filter(subset_cre_prod, Type == "Enhancer")
+              )[, cols_order], 10)
+colnames(visual_table) <- newc_names[cols_order]
+coffeetable(visual_table, row.names = FALSE)
 ```
 
+```{r}
+#| label: figure-nucl
+#| row: screen
+#| fig-height: 7
+#| crop: true
+#| fig-align: center
+
+pyrplot_(cre_summary[c(1:4, ldf + (1:4)), ], 
+      x_label = "Nucleotides", y_breaks = seq(-1,1,0.2), 
+      title = "Percentage Means per Nucleotide")
+```
+
+```{r}
+#| label: subset-temp-shan
+
+data_e <- cbind(type = rep("Enhancer",
+                length(enhas$temp)), enhas[,5:6])
+data_p <- cbind(type = rep("Promoter",
+                length(proms$temp)), proms[,5:6])
+subset_tm_sh <- rbind(data_e, data_p)
+
+```
+
+```{r}
+#| label: subset-temp-shan-3
+#| row: screen
+#| crop: true
+#| fig-height: 7
+#| fig-align: center
+
+# Saving Melting Temperature Violin Plot 
+tm_violin <- hvioplot_(data = subset_tm_sh, 
+                       y_var = "temp", 
+                       y_label = "Density")
+
+# Saving Shannon Violin Plot 
+sh_violin <- hvioplot_(data = subset_tm_sh, 
+                       y_var = "shan", 
+                       fill_legend_title = "CRE Type")
+
+# Get legend
+legend_violin <- get_legend_bypass(sh_violin +
+  guides(color = guide_legend(nrow = 1)) +
+  theme(legend.position = "bottom",
+        legend.title = element_text(size = 13.5),
+        legend.text = element_text(size = 13)))
+
+# Merging of Violin-Plots 
+grid_violin <- plot_grid(tm_violin, sh_violin, NULL,
+                 ncol = 3, rel_widths = c(1,1,0.1),
+                 labels = c("Melting Temperature",
+                 "Shannon Entropy"), label_size = 16,
+                 label_fontface = "plain", vjust = 1,
+                 hjust = c(-0.38, -0.48))
+
+# Adding legend at the bottom
+plot_grid(grid_violin, legend_violin,
+          ncol = 1, rel_heights = c(12,1))
+```
+
+```{r}
+#| label: figure-shan-temp
+#| row: screen
+#| crop: true
+#| fig-height: 7
+#| fig-align: center
+
+# Saving Melting Temperature Bar-Plot
+temp_plot <- barplot_(filter(cre_summary, Field=="temp"), 
+                      y_breaks = seq(0, 100, 10), 
+                      y_axis_title = "Means")
+
+# Saving Shannon Coefficient Bar-Plot
+shan_plot <- barplot_(filter(cre_summary, Field=="shan"), 
+                      y_breaks = seq(0, 2, 0.25), 
+                      fill_legend_title = "CRE Type")
+
+# Merging of Bar-Plots
+plot_grid(temp_plot, shan_plot,  
+    ncol = 2, rel_widths = c(1,1), 
+    vjust = 1, hjust = c(-0.35, -0.48),
+    label_size = 16, label_fontface = "plain",
+    labels = c("Melting Temperature", "Shannon Entropy")) 
+```
+
+
+```{r}
+#| label: figure-prods
+#| fig-height: 8
+#| row: screen
+#| fig-align: center
+
+kmer_names <- combi_kmers(k=3)[1:48]
+
+pyrplot_(cre_summary[indxs$prod[17:64,],], kmer_names,
+         x_label = "Kmers", y_breaks = seq(-30,30,10), 
+         title = "KSG-Product Means per Kmer")
+
+pyrplot_(cre_summary[indxs$barc[17:64,],], kmer_names,
+         x_label = "Kmers", y_breaks = seq(-10,10,1), 
+         title = "Barcode Profile Means per Kmer")
+```
 
 

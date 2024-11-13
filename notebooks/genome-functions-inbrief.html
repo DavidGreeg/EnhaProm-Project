@@ -136,6 +136,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>palindromeseq <span class="ot">&lt;-</span> <span class="st">"CAAGCTTGTGCAGTGTTGCTGTTCTATCTCGGCTCACTGCAAGCTGTTCACGCCATGTTCTGTT"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
+<section id="sequence-import" class="level3">
+<h3 class="anchored" data-anchor-id="sequence-import">Sequence Import</h3>
+</section>
 <section id="counts-per-base" class="level3">
 <h3 class="anchored" data-anchor-id="counts-per-base">Counts per Base</h3>
 <p>Gets counts of each nucleotide in the sequence.</p>
@@ -388,7 +391,7 @@ TTA TTC TTG TTT
 <span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a><span class="co"># use 1.001^0=1 as a first possible position</span></span>
 <span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kmer_barcode</span>(<span class="at">kmer =</span> <span class="st">"TCT"</span>, <span class="at">windows =</span> k3_tseq1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 4.06758</code></pre>
+<pre><code>[1] 0.07164804</code></pre>
 </div>
 </div>
 </section>
@@ -426,22 +429,28 @@ AAGCCACG AGCCACGA GCCACGAG CCACGAGT CACGAGTC ACGAGTCC CGAGTCCC GAGTCCCA
 </div>
 <div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="fu">func_per_windows</span>(<span class="at">kmers =</span> all_k3, <span class="at">windows =</span> k3_tseq1, <span class="at">func =</span> kmer_barcode)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>     AAA      AAC      AAG      AAT      ACA      ACC      ACG      ACT 
-1.031470 0.000000 1.032501 0.000000 0.000000 0.000000 1.037674 0.000000 
-     AGA      AGC      AGG      AGT      ATA      ATC      ATG      ATT 
-0.000000 1.033533 0.000000 2.050835 1.029410 1.024278 0.000000 0.000000 
-     CAA      CAC      CAG      CAT      CCA      CCC      CCG      CCT 
-0.000000 1.036637 1.009036 1.023255 3.088589 1.043915 1.003003 1.020191 
-     CGA      CGC      CGG      CGT      CTA      CTC      CTG      CTT 
-1.038712 1.004006 0.000000 0.000000 0.000000 4.055410 0.000000 2.043464 
-     GAA      GAC      GAG      GAT      GCA      GCC      GCG      GCT 
-0.000000 0.000000 1.039750 0.000000 0.000000 1.034567 0.000000 1.005010 
-     GGA      GGC      GGG      GGT      GTA      GTC      GTG      GTT 
-0.000000 0.000000 0.000000 0.000000 0.000000 3.053886 0.000000 0.000000 
-     TAA      TAC      TAG      TAT      TCA      TCC      TCG      TCT 
-1.030439 0.000000 0.000000 1.028381 1.022233 4.071067 0.000000 4.067580 
-     TGA      TGC      TGG      TGT      TTA      TTC      TTG      TTT 
-0.000000 0.000000 0.000000 1.000000 1.027354 1.018154 0.000000 0.000000 </code></pre>
+<pre><code>        AAA         AAC         AAG         AAT         ACA         ACC 
+0.032500996 0.000000000 0.033533497 0.000000000 0.000000000 0.000000000 
+        ACG         ACT         AGA         AGC         AGG         AGT 
+0.038711510 0.000000000 0.000000000 0.034567031 0.000000000 0.052885927 
+        ATA         ATC         ATG         ATT         CAA         CAC 
+0.030439088 0.025302313 0.000000000 0.000000000 0.000000000 0.037673836 
+        CAG         CAT         CCA         CCC         CCG         CCT 
+0.010045120 0.024278035 0.091677624 0.044959381 0.004006004 0.021211336 
+        CGA         CGC         CGG         CGT         CTA         CTC 
+0.039750222 0.005010010 0.000000000 0.000000000 0.000000000 0.059465509 
+        CTG         CTT         GAA         GAC         GAG         GAT 
+0.000000000 0.045507762 0.000000000 0.000000000 0.040789972 0.000000000 
+        GCA         GCC         GCG         GCT         GGA         GGC 
+0.000000000 0.035601598 0.000000000 0.006015020 0.000000000 0.000000000 
+        GGG         GGT         GTA         GTC         GTG         GTT 
+0.000000000 0.000000000 0.000000000 0.056939813 0.000000000 0.000000000 
+        TAA         TAC         TAG         TAT         TCA         TCC 
+0.031469527 0.000000000 0.000000000 0.029409678 0.023254780 0.075137667 
+        TCG         TCT         TGA         TGC         TGG         TGT 
+0.000000000 0.071648040 0.000000000 0.000000000 0.000000000 0.001000000 
+        TTA         TTC         TTG         TTT 
+0.028381297 0.019171973 0.000000000 0.000000000 </code></pre>
 </div>
 </div>
 <div class="cell">

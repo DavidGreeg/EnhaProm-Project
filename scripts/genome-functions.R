@@ -116,6 +116,8 @@ kmer_diversity <- function(kmer_counts, percentage = TRUE) {
 counts_per_window <- function(sequence, k = 2, s = 1, seq_kmers, all_kmers,
                               percentage = FALSE) {
   if (missing(seq_kmers)) {
+    if (missing(sequence))
+      stop("No 'sequence' nor 'seq_kmers' parameters provided")
     seq_kmers <- kmer_windows(sequence, k = k, s = s)
   }
   if (missing(all_kmers)) {
@@ -260,6 +262,15 @@ shannon_entropy <- function(sequence, base_counts, base_percs) {
     bpercs <- base_percs
   }
   return(-sum(bpercs * ifelse(bpercs > 0, log(bpercs, 2), 1)))
+}
+
+# =============================================================================
+# EXP(GC PERCENTAGE) / SEQUENCE SHANNON ENTROPY: GC% normalized by Shannon    #
+# =============================================================================
+
+egc_ssh_ratio <- function(sequence, shannon) {
+  egc_perc <- exp(gc_percentage(sequence))
+  return(egc_perc / shannon)
 }
 
 # =============================================================================

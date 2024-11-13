@@ -1,0 +1,699 @@
+---
+format: 
+  pdf: 
+    documentclass: article
+    include-in-header:
+      - text: |
+         \newcommand{\fontmydefault}{\fontspec{Liberation Serif}}
+         \newcommand{\fontlibertsan}[1]{{\fontspec{Liberation Sans} #1}}
+         \newcommand{\fontlibertsnn}[1]{{\fontspec{Liberation Sans Narrow} #1}}
+         \newcommand{\fontnimbussan}[1]{{\fontspec{Nimbus Sans} #1}}
+         \newcommand{\fontnimbussnn}[1]{{\fontspec{Nimbus Sans Narrow} #1}}
+         \newcommand{\fontdejavusan}[1]{{\fontspec{DejaVu Sans} #1}}
+         \newcommand{\fontdejavuser}[1]{{\fontspec{DejaVu Serif} #1}}
+         \newcommand{\myfontchart}[1]{{\fontfamily{bch}\selectfont #1}}
+         \usepackage{colortbl}
+         \usepackage{multicol}
+         \newenvironment{thintabl}
+           {
+             \renewcommand{\arraystretch}{1}     % Row height
+             \setlength{\arrayrulewidth}{1.5pt}  % Line thickness
+             \setlength{\tabcolsep}{0pt}         % Column padding
+             \tabular    % Start regular tabular environment
+           }
+           {
+             \endtabular  % End regular tabular environment
+           }
+         \usepackage{eqparbox}
+         \makeatletter % This is used to change the behavior of '@' in code below
+         \NewDocumentCommand{\eqmathbox}{o O{c} m}{ % This allows \eqparbox to be
+           \IfValueTF{#1}                           % used inside (math) equations
+             {\def\eqmathbox@##1##2{\eqmakebox[#1][#2]{$##1##2$}}}
+             {\def\eqmathbox@##1##2{\eqmakebox{$##1##2$}}}
+           \mathpalette\eqmathbox@{#3}
+         }
+         \makeatother
+    include-before-body:
+      - text: |
+         \begin{titlepage}
+         \begin{flushleft}
+           { UBMI-IFC, UNAM } \\
+           { Coyoacan, CDMX }
+         \end{flushleft}
+         \vspace*{3cm}
+         \begin{center}
+           { \Large Sequece Characterization Test } \\[1cm]
+           { \large Using Genomic-Benchmarks Data } \\[1.5cm]
+           { \fontlibertsan{\textbf{THEORY \& CODE ANNEX}} }
+         \end{center}
+         \vfill
+         \begin{flushright}
+         \begin{tabular}{r@{:\hspace*{\tabcolsep}}l}
+           Author & \parbox[t]{2.4cm}{\raggedleft Fuentes-Mendez \\ David Gregorio} \\
+         \end{tabular}
+         \end{flushright}
+         \end{titlepage}
+    toc: true
+    number-sections: true
+    colorlinks: true
+    papersize: letter
+    fig-format: png
+    fig-width: 7
+    fig-height: 5
+    cell-language: true
+    keep-tex: true
+    header-includes:
+      - \usepackage{wrapfig}
+      - \usepackage{array}
+      - \usepackage{float}
+      - \usepackage{booktabs}
+      - \usepackage{arydshln}
+      - \usepackage{multirow}
+      - \usepackage{multicol}
+      - \usepackage{xcolor}
+      - \usepackage{tcolorbox}
+      - \usepackage{geometry}
+      - \usepackage{amsmath}
+      - \geometry{
+          left=0.5in,
+          right=0.5in,
+          top=0.5in,
+          bottom=0.5in}
+      - \definecolor{pythoncol}{rgb}{0.188,0.412,0.596}
+      - \definecolor{rcol}{rgb}{0.121,0.466,0.705}
+      - \definecolor{bashcol}{rgb}{0.207,0.262,0.392}
+      - \newtcolorbox{pythonheader}{
+          colback=pythoncol!70, colframe=pythoncol,
+          fontupper=\footnotesize\bfseries\color{white},
+          boxrule=0.1mm, arc=4mm,
+          left=1.5mm, right=1.5mm, top=0.5mm, bottom=0.5mm,
+          halign=right, sharp corners=south}
+      - \newtcolorbox{rheader}{
+          colback=rcol!70, colframe=rcol,
+          fontupper=\footnotesize\bfseries\color{white},
+          boxrule=0.1mm, arc=4mm,
+          left=1.5mm, right=1.5mm, top=0.5mm, bottom=0.5mm,
+          halign=right, sharp corners=south}
+      - \newtcolorbox{bashheader}{
+          colback=bashcol!70, colframe=bashcol,
+          fontupper=\footnotesize\bfseries\color{white},
+          boxrule=0.1mm, arc=4mm,
+          left=1.5mm, right=1.5mm, top=0.5mm, bottom=0.5mm,
+          halign=right, sharp corners=south}
+      - \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+      - \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+      - \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+      - \newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+mainfont: Liberation Serif
+monofont: JetBrainsMono Nerd Font
+monofontoptions:
+  - Scale=0.8
+execute:
+  cache: true
+---
+
+
+\setlength\parindent{18pt}
+\setlength\columnsep{18pt}
+\newpage
+\twocolumn
+# Data Recollection
+## Data Sources and Sequence Lengths
+### Promoter Elements: Core, Proximal and Distal
+### Enhancer Elements:
+## Isolation & Delimitation Difficulties
+## Promoter Bashing & Enhancer Trapping
+# Determining Sequence Characterization
+## Key Concepts
+
+Biological sequences often contain dependencies, such as motifs, repeat regions, 
+or structural constraints, that influence nucleotide placement.
+
+```{r}
+#| label: libraries
+#| echo: false
+
+library(partitions)
+library(knitr)
+source('../scripts/genome-functions.R')
+```
+
+```{r}
+#| label: frontend-functions
+#| echo: false
+
+# Function to wrap output text
+wrap_output <- function(func_out, width = 50) {
+  output <- capture.output(func_out)
+  wrapped_output <- lapply(output, strwrap,
+                           width = width)
+  cat(wrapped_output, sep = "\n")
+}
+outputwrap <- function(func_out, width = 50) {
+  wrapped <- strwrap(gsub(',', '', toString(
+                 format(
+                   round(func_out,
+                         digits=2),
+                        nsmall=2))),
+                     width=width)
+  wrapped[1] <- paste("\n\n[1]", wrapped[1])
+  wrapped[2:length(wrapped)] <- paste("\n   ", wrapped[2:length(wrapped)])
+  cat(wrapped)
+}
+addpadd <- function(func_out) {
+  captout <- capture.output(func_out)
+  captout[1] <- paste("\n", captout[1], sep="")
+  captout[2:length(captout)] <- paste("\n", captout[2:length(captout)], sep="")
+  captout <- append(captout, "\n\t")
+  cat(captout)
+}
+hspace <- function()
+  knitr::asis_output("\\textcolor{white}{\\tiny\\texttt{hi}}\\normalsize")
+```
+
+\begin{rheader}
+R Code
+\end{rheader}
+```{r}
+#| label: some-functions
+
+uniq_values <- function(vect, round_digits = 4){
+  return(round(as.numeric(
+                 names(table(vect))
+         ), digits = round_digits))}
+uniq_not <- function(vect, round_digits=4){
+  return(round(unique(sort(vect)), digits=round_digits))}
+# ^For some reason returned duplicated values when 
+#  processing floating values from "gc-percentage"
+```
+
+## Whole-Sequence Characterization
+## Kmer Characterization
+
+```{r}
+#| label: all-kmers
+#| layout-ncol: 4
+
+all_k3 <- combi_kmers(k = 3)
+all_k4 <- combi_kmers(k = 4)
+all_k5 <- combi_kmers(k = 5)
+all_k6 <- combi_kmers(k = 6)
+
+length(all_k3);length(all_k4)
+length(all_k5);length(all_k6)
+```
+
+## Kmer Distribution Characterization
+## Characterization Dependence on Sequence Length
+# Understanding:\newline GC Percentage & Melting Temperature
+## GC Percentage: Definition & Formula 
+*GC Percentage* (also called GC content) refers to the proportion of guanine (G) and cytosine (C) bases in a DNA 
+sequence. Since G and C bases form three hydrogen bonds (as opposed to the two bonds between adenine (A) and 
+thymine (T) in DNA, sequences with a higher GC content are typically more stable and harder to denature. It 
+can be calculated using ths simple formula:
+
+\small
+\begin{equation}
+GC\% = \frac{(\text{\textbf{C} count} + \text{\textbf{G} count})}{\text{Sequence Length}}
+\end{equation}
+\normalsize
+
+## Melting Temperature: Definition & Formula
+*Melting Temperature* (Tm) refers to the temperature at DNA denatures into two separate strands. It is critical, for
+example, in experiments like PCR (*Polymerase Chain Reaction*) because the annealing temperature is usually set a 
+few degrees below the Tm to allow proper primer binding. It can be estimated using the following formulas:
+\vspace{0.08cm}
+
+* **For short sequences** (3 to 13~20 nucleotides)**:**
+\small\begin{equation}
+Tm=2(\text{\textbf{A} count} + \text{\textbf{T} count}) + 4(\text{\textbf{C} count} + \text{\textbf{G} count})
+\end{equation}\normalsize
+\vspace{0.04cm}
+* **For long sequences** (>13~20 nucleotides)**:**
+\small\begin{equation}
+Tm=64.9 + 41 * \frac{(\text{\textbf{A} count} + \text{\textbf{T} count}) - 16.4}{\text{Sequence Length}}
+\end{equation}\normalsize
+\vspace{0.04cm}
+
+## Issues in Kmer Characterization
+
+\begin{wrapfigure}{r}{4.8cm}
+\caption{GC\% Redundancy}
+\label{fig:gc-redundancy}
+\setlength{\tabcolsep}{0pt}          % Remove column padding
+\renewcommand{\arraystretch}{1.65}   % Adjust higher row height 
+\setlength{\arrayrulewidth}{1.5pt}   % Set thick frame lines
+\centering
+
+\colorbox{gray!20}{\makebox[1cm][c]{\fontlibertsan{\textbf{GC\%:}}}}
+\makebox[3.3cm][c]{\fontlibertsan{Example Sequences:}} \\[0.25cm]
+
+\makebox[0.85cm][r]{}
+\begin{thintabl}{C{0.79cm} C{0.79cm} C{0.79cm} C{0.79cm}}
+    \arrayrulecolor{white}
+    \rowcolor{red!10}
+    A & A & \cellcolor{red!17}\textbf{G} & T \\  
+    \hline
+    \rowcolor{red!10}
+    T & \cellcolor{red!17}\textbf{C} & A & T \\  
+    \hline
+    \rowcolor{red!10}
+    \cellcolor{red!17}\textbf{G} & A & T & A \\  
+    \hline
+\end{thintabl} \\[0pt]
+\colorbox{gray!20}{\makebox[1cm][c]{\fontlibertsan{\textbf{0.25}}}}
+\begin{tabular}{|m{0.75cm}|m{0.75cm}|m{0.75cm}|m{0.75cm}|}
+    \hline
+    \cellcolor{red!50} & & & \\  
+    \hline
+\end{tabular} \\[0.25cm]
+
+\makebox[0.85cm][r]{}
+\begin{thintabl}{C{0.79cm} C{0.79cm} C{0.79cm} C{0.79cm}}
+    \arrayrulecolor{white}
+    \rowcolor{red!17}
+    \cellcolor{red!10}A & \textbf{G} & \cellcolor{red!10}T & \textbf{C} \\  
+    \hline 
+    \rowcolor{red!17}
+    \cellcolor{red!10}T & \textbf{G} & \textbf{G} & \cellcolor{red!10}T \\  
+    \hline
+    \rowcolor{red!17}
+    \textbf{C} & \textbf{G} & \cellcolor{red!10}A & \cellcolor{red!10}A \\  
+    \hline
+\end{thintabl} \\[0pt]
+\colorbox{gray!20}{\makebox[1cm][c]{\fontlibertsan{\textbf{0.50}}}}
+\begin{tabular}{|m{0.75cm}|m{0.75cm}|m{0.75cm}|m{0.75cm}|}
+    \hline
+    \cellcolor{red!50} & \cellcolor{red!50} & & \\ 
+    \hline
+\end{tabular} \\[0.25cm]
+
+\makebox[0.85cm][r]{}
+\begin{thintabl}{C{0.79cm} C{0.79cm} C{0.79cm} C{0.79cm}}
+    \arrayrulecolor{white}
+    \rowcolor{red!17}
+    \textbf{G} & \cellcolor{red!10}A & \textbf{C} & \textbf{G} \\  
+    \hline
+    \rowcolor{red!17}
+    \textbf{C} & \textbf{C} & \cellcolor{red!10}T & \textbf{C} \\  
+    \hline
+    \rowcolor{red!17}
+    \textbf{C} & \textbf{G} & \textbf{G} & \cellcolor{red!10}A \\  
+    \hline
+\end{thintabl} \\[0pt]
+\colorbox{gray!20}{\makebox[1cm][c]{\fontlibertsan{\textbf{0.75}}}}
+\begin{tabular}{|m{0.75cm}|m{0.75cm}|m{0.75cm}|m{0.75cm}|}
+    \hline
+    \cellcolor{red!50} & \cellcolor{red!50} & \cellcolor{red!50} & \\  
+    \hline
+\end{tabular}
+\end{wrapfigure}
+
+One major issue with GC measurement is its inability to capture the nucleotide arrangement within a sequence. 
+Two sequences can have identical GC content but different nucleotide order, leading to different structural 
+and functional properties (\fontnimbussnn{\textbf{Figure 1}}). For example \fontnimbussnn{\textbf{'GCGCTT'}} 
+will evidently behave different than \fontnimbussnn{\textbf{'GGAACC'}}, even though they have the 
+\fontnimbussnn{\textbf{same GC\%}} and the \fontnimbussnn{\textbf{same TM}} 
+(\fontnimbussnn{\textbf{Figure 1}}).
+
+GC ratio alone will fail to capture a complete picture of a sequence's biological function since 
+it can provide no insight into sequence motifs or complexity, meaning that it fails to differentiate 
+between truly complex sequences and those that are repetitive or structurally constrained. However one 
+thing it can supply is information regarding sequence length importance. We will notice two opposting 
+issues for each function: while sequence length does not influence *GC Percentage* computation, for 
+*Melting Temperature* it does. This should lead to considerably different experimental approaches 
+dependent on the kind of data available for our analysis. These approaches were dicussed in Section 2.5.
+
+Consequently and referent to sequence length, we observe that for sequences (or kmers) of **size *N*** 
+we will **always obtain at most *N*+1 different values** (considering the empty case of sequences that 
+lack G/C nucleotides), using either function. A practical representation of this and the redundancy of 
+values (considering the amount of kmers), can be observed with the following code cells:
+\vspace{0.2cm}
+
+```{r}
+#| label: gc-metrics-values
+
+#List of GC% values per kmer-set
+all_k3_gc <- func_per_windows(windows = all_k3,
+                              func = gc_percentage)
+all_k4_gc <- func_per_windows(windows = all_k4,
+                              func = gc_percentage)
+all_k5_gc <- func_per_windows(windows = all_k5,
+                              func = gc_percentage)
+#List of TM values per kmer-set
+all_k3_tm <- func_per_windows(windows = all_k3,
+                              func = tm_calc)
+all_k4_tm <- func_per_windows(windows = all_k4,
+                              func = tm_calc)
+all_k5_tm <- func_per_windows(windows = all_k5,
+                              func = tm_calc)
+all_k6_tm <- func_per_windows(windows = all_k6,
+                              func = tm_calc)
+```
+\vspace{0.2cm}
+```{r}
+#| label: gc-data-size-comparison
+#| layout: [[23,17,60],[23,17,60],[23,17,60]]
+
+uk3_gc <- uniq_values(all_k3_gc, round_digits = 2)
+uk4_gc <- uniq_values(all_k4_gc, round_digits = 2)
+uk5_gc <- uniq_values(all_k5_gc, round_digits = 2)
+	
+# kmer-set    | number of     | values #
+# size        | unique values | list   #
+length(all_k3); length(uk3_gc); uk3_gc
+length(all_k4); length(uk4_gc); uk4_gc
+length(all_k5); length(uk5_gc); uk5_gc
+```
+```{r}
+#| label: tm-data-size-comparison
+#| layout: [[20,80],[20,80],[20,80],[20,80],[20,80],[20,80],[20,80],[20,80]]
+
+uk3_tm <- unique(all_k3_tm)
+uk4_tm <- unique(all_k4_tm)
+uk5_tm <- unique(all_k5_tm)
+uk6_tm <- unique(all_k6_tm)
+
+length(uk3_tm); uk3_tm
+length(uk4_tm); uk4_tm
+length(uk5_tm); uk5_tm
+length(uk6_tm); uk6_tm
+```
+
+In summary, while GC measurement is a useful and simple measure for basic sequence characterization, its inability 
+to capture nucleotide arrangement and sequence complexity limits its utility.
+
+# Understanding:\newline Shannon Entropy Coefficient
+## Shannon Entropy Coefficient: Definition & Formula
+The *Shannon Entropy Coefficient* is a *measure of uncertainty* in a probability distribution. If we have 
+a discrete (countable) random variable *X* with *n* possible outcomes {$x_1, x_2, ..., x_n$}, its' Shannon 
+Coefficient would be calculated by means of multiplying each outcome's probability by its logaritm and then 
+sum the products; for a system with *n* possible outcomes and probabilities $p_1, p_2, ..., p_n$ this formula 
+would be depicted as:
+
+\small
+\begin{equation}
+H(X) = -\sum_{i=1}^{n} p_i \log_b(p_i)
+\end{equation}
+\normalsize
+
+**Interpretation:**
+
+* \fontlibertsnn{\underline{\textbf{Minimum Entropy:}}} When there's only one possible outcome (i.e. a group 
+consisting of a single element like {A,A,A,A}), the entropy value is *zero*. 
+
+* \fontlibertsnn{\underline{\textbf{Maximum Entropy:}}} When all outcomes are equally likely, the entropy is at 
+its maximum, this indicates the highest level of uncertainty. Its value is dependent on 
+the logaritm base and the number of possible outcomes: 
+
+	* In the case of base 2, for a system with *n* \fontlibertsan{\underline{equally probable}} outcomes, the 
+	maximum entropy is $\log_2(n)$. \fontlibertsan{For example:} \newline
+		* \fontlibertsnn{\textbf{2 Outcomes:}} $\log_2(2)=1$ \newline
+		i.e. {G,C} or {A,A,T,T} \newline
+        * \fontlibertsnn{\textbf{4 Outcomes:}} $\log_2(4)=2$ \newline
+		i.e. {A,T,G,C} or {A,A,T,T,G,G,C,C} \newline
+
+Since we do use $\log_2(x)$ for our *Shannon Entropy* calculation, and only the 4 canonical nucleotides are 
+considered for each sequences characterization, we might as well say that the Shannon Entropy Coefficient 
+values in our tables are distributed in a spectrum ranging from **zero** to **two** (at most).
+
+## Issues in Kmer Characterization
+
+While this metric provides insights into the complexity and diversity of nucleotide compositions, 
+through the distribution of nucleotide frequencies, it suffers from one of the same defects of GC 
+measurement: \fontnimbussan{it pays no attention to nucleotide positions}. 
+
+This becomes fairly important when we consider the influence that 'order' has in a biological context.
+For instance, even though \fontnimbussnn{\textbf{'ATG'}} and \fontnimbussnn{\textbf{'TAG'}} are composed 
+of the same nucleotides, they are a \fontnimbussnn{\textbf{start}} and \fontnimbussnn{\textbf{stop}} 
+codon, respectively. Other examples are conserved motifs or regions where the order of nucleotides 
+determines secondary structure like hairpins, loops, or binding sites. Furtherfore, given that in 
+regulatory sequences specific motifs might restrict certain nucleotides to particular positions 
+(thus, reducing their entropy), this function might be rather suited as a partial approach to 
+our kmer-characterization objective.
+
+However, I believe the biggest issue here is the lack of distinction between sequences with \fontnimbussan{
+equal diversity but different elements}. Take as an example this two sequences: \fontnimbussnn{\textbf{'AAAT'
+}} and \fontnimbussnn{\textbf{'CGCC'}}, both with identical entropy values, but clearly different biological 
+properties (\fontnimbussnn{\textbf{Figure 2}}).
+
+\begin{figure}[h]
+\caption{Entropic Redundancy}
+\label{fig:entropy-redundancy}
+\setlength{\tabcolsep}{0pt}          % Remove column padding
+\renewcommand{\arraystretch}{1.65}   % Adjust higher row height 
+\setlength{\arrayrulewidth}{1.5pt}   % Set thick frame lines
+\centering
+
+\colorbox{gray!20}{\makebox[4.25cm][c]{\fontlibertsan{\textbf{Shannon Entropy Coefficient}}}}
+\makebox[4.65cm][r]{\fontlibertsan{Example Sequences:}} \\[0.25cm]
+
+\makebox[0.85cm][r]{}
+\begin{thintabl}{C{0.79cm} C{0.79cm} C{0.79cm} C{0.79cm}}
+    \arrayrulecolor{white}
+    \cellcolor{green!20}T & \cellcolor{orange!20}A & \cellcolor{red!20}G & \cellcolor{cyan!20}C \\  
+    \hline
+    \cellcolor{orange!20}T & \cellcolor{red!20}C & \cellcolor{cyan!20}A & \cellcolor{green!20}G \\  
+    \hline
+    \cellcolor{red!20}C & \cellcolor{cyan!20}G & \cellcolor{green!20}A & \cellcolor{orange!20}T \\  
+    \hline
+\end{thintabl}
+\makebox[0.975cm][r]{}
+\begin{thintabl}{C{0.79cm} C{0.79cm} C{0.79cm} C{0.79cm}}
+    \arrayrulecolor{white}
+    \rowcolor{green!20}
+    A & A & \cellcolor{red!20}T & \cellcolor{cyan!20}C \\  
+    \hline
+    \rowcolor{green!20}
+    \cellcolor{red!20}A & C & C & \cellcolor{cyan!20}T \\  
+    \hline
+    \rowcolor{green!20}
+    \cellcolor{red!20}C & \cellcolor{cyan!20}G & G & G \\  
+    \hline
+\end{thintabl} \\[0pt]
+\colorbox{gray!20}{\makebox[1cm][c]{\fontlibertsan{\textbf{2.00}}}}
+\begin{tabular}{|m{0.75cm}|m{0.75cm}|m{0.75cm}|m{0.75cm}|}
+    \hline
+    \cellcolor{red!50} & \cellcolor{cyan!50} & \cellcolor{green!50} & \cellcolor{orange!50} \\  
+    \hline
+\end{tabular}
+\colorbox{gray!20}{\makebox[1cm][c]{\fontlibertsan{\textbf{1.50}}}}
+\begin{tabular}{|m{0.75cm}|m{0.75cm}|m{0.75cm}|m{0.75cm}|}
+    \hline
+    \cellcolor{red!50} & \cellcolor{cyan!50} & \cellcolor{green!50} & \cellcolor{green!50} \\  
+    \hline
+\end{tabular} \\[0.25cm]
+
+\makebox[0.85cm][r]{}
+\begin{thintabl}{C{0.79cm} C{0.79cm} C{0.79cm} C{0.79cm}}
+    \arrayrulecolor{white}
+    \cellcolor{red!20}A & \cellcolor{cyan!20}C & \cellcolor{red!20}A & \cellcolor{cyan!20}C \\  
+    \hline 
+    \cellcolor{red!20}T & \cellcolor{cyan!20}G & \cellcolor{cyan!20}G & \cellcolor{red!20}T \\  
+    \hline
+    \cellcolor{red!20}T & \cellcolor{red!20}T & \cellcolor{cyan!20}A & \cellcolor{cyan!20}A \\  
+    \hline
+\end{thintabl} 
+\makebox[0.975cm][r]{}
+\begin{thintabl}{C{0.79cm} C{0.79cm} C{0.79cm} C{0.79cm}}
+    \arrayrulecolor{white}
+    \rowcolor{cyan!20}
+    A & A & \cellcolor{red!20}T & A \\  
+    \hline
+    \rowcolor{cyan!20}
+    T & \cellcolor{red!20}G & T & T \\  
+    \hline
+    \rowcolor{cyan!20}
+    \cellcolor{red!20}C & G & G & G \\  
+    \hline
+\end{thintabl} \\[0pt]
+\colorbox{gray!20}{\makebox[1cm][c]{\fontlibertsan{\textbf{1.00}}}}
+\begin{tabular}{|m{0.75cm}|m{0.75cm}|m{0.75cm}|m{0.75cm}|}
+    \hline
+    \cellcolor{red!50} & \cellcolor{red!50} & \cellcolor{cyan!50} & \cellcolor{cyan!50} \\ 
+    \hline
+\end{tabular}
+\colorbox{gray!20}{\makebox[1cm][c]{\fontlibertsan{\textbf{0.81}}}}
+\begin{tabular}{|m{0.75cm}|m{0.75cm}|m{0.75cm}|m{0.75cm}|}
+    \hline
+    \cellcolor{red!50} & \cellcolor{cyan!50} & \cellcolor{cyan!50} & \cellcolor{cyan!50} \\  
+    \hline
+\end{tabular} \\[0.25cm]
+
+\raggedright
+\makebox[0.9cm][r]{}
+\begin{thintabl}{C{0.79cm} C{0.79cm} C{0.79cm} C{0.79cm}}
+    \arrayrulecolor{white}
+    \rowcolor{red!20}
+    A & A & A & A \\  
+    \hline
+    \rowcolor{red!20}
+    G & G & G & G \\  
+    \hline
+    \rowcolor{red!20}
+    T & T & T & T \\  
+    \hline
+\end{thintabl} \\[0pt]
+\colorbox{gray!20}{\makebox[1cm][c]{\fontlibertsan{\textbf{0.00}}}}
+\begin{tabular}{|m{0.75cm}|m{0.75cm}|m{0.75cm}|m{0.75cm}|}
+    \hline
+    \rowcolor{red!50}
+    & & & \\  
+    \hline
+\end{tabular}
+\end{figure}
+
+In order to know the number of possible values per size of 
+kmer-set, we'll have to use a little bit of *Number Theory*. 
+In\linebreak particular, *partitions*.
+
+\vspace{0.2cm}
+A \underline{partition} of a positive integer *n* is a multiset of positive integers 
+that sum to *n*. The total number of partitions of *n* is denoted by $p_n$. Thus, given
+that \newline\small 
+5 = 4 + 1 = 3 + 2 = 3 + 1 + 1 = 2 + 2 + 1 = 2 + 1 + 1 + 1 = 1 + 1 + 1 + 1 + 1 \newline
+\normalsize\textcolor{white}{--------}is a complete enumeration of the partitions of 5, 
+$p(5) = 7$.
+
+\vspace{0.2cm}
+There is no simple formula for $p_n$, however its not hard to find a generating function
+for them, one of the examples is in the R library *'partitions'* (which will be used 
+in the rest of the chapter). There, the function \fontnimbussan{P()} works as its 
+homonym and \fontnimbussan{parts()} computes the spread-out matrix of partitions.
+Theres also the homolog functions for restricted partitions \fontnimbussan{R()} 
+and \fontnimbussan{restrictedparts()}, which compute the number of partitions 
+conditioned upon an *m* maximum number of parts.
+\vspace{0.2cm}
+
+```{r}
+#| label: partitions-function
+#| layout-ncol: 2
+
+library(partitions)
+
+P(5);				R(4,5, include.zero=TRUE);
+addpadd(parts(5));	restrictedparts(5,4)
+```
+
+\vspace{0.2cm}
+Additionally we can code a function like the following: 
+\vspace{0.2cm}
+
+```{r}
+#| label: rawpart-function
+
+rawpart <- function(n,k){
+  if (missing(k)) k <- n
+  if (k == 0) return(0)
+  if (n == 0) return(1)
+  if (n < 0) return(0)
+  return(rawpart(n, k-1) + rawpart(n-k, k))
+}
+```
+
+```{r}
+#| label: partition-functions
+#| layout: [[25,25,25,25],[25,25,25,25],[1],[25,25,25,25],[25,25,25,25]]
+
+rawpart(3); rawpart(4); rawpart(5); rawpart(6);
+rawpart(7); rawpart(8); rawpart(9); rawpart(10);
+hspace();
+P(3);		P(4);		P(5);		P(6);
+P(7);		P(8);		P(9);		P(10);
+```
+
+There exist also multiple mathematical formulas for computation. However the oldest one
+is Euler's geometric series where the coefficient of $x^n$ is equal to $p_n$, and it can 
+be shown as: 
+
+\small
+\begin{equation}
+\begin{aligned}
+    & \eqmathbox[eqn8]{(1+x+x^2+x^3+\dots)(1+x^2+x^4+x^6+\dots)} \\
+    & \eqmathbox[eqn8]{(1+x^3+x^6+x^9+\dots)\dots(1+x^k+x^{2k}+x^{3k}+\dots)}
+    % \eqmathbox is used to center-align this part of the equation
+\end{aligned}
+\begin{aligned}
+    = \prod_{k=1}^{\infty}\sum_{i=0}^{\infty} x^{ik}
+\end{aligned}
+\end{equation}
+\normalsize
+\vspace{0.25cm}
+
+```{r}
+#| label: partitions-functions
+
+rparts <- restrictedparts
+Rz <- function(n_opts, n_slots) {
+  return(R(n_opts, n_slots, include.zero = TRUE))
+}
+rP <- function(n_opts, n_slots) {
+  return(ncol(rparts(n_slots, n_opts)))
+}
+```
+
+\vspace{0.33cm}
+
+```{r}
+#| label: shannon-coefs
+#| layout: [[15,15,70],[15,15,70],[15,15,70],[15,15,70]]
+
+all_k3_sh <- func_per_windows(windows = all_k3,
+                              func = shannon_entropy)
+all_k4_sh <- func_per_windows(windows = all_k4,
+                              func = shannon_entropy)
+all_k5_sh <- func_per_windows(windows = all_k5,
+                              func = shannon_entropy)
+all_k6_sh <- func_per_windows(windows = all_k6,
+                              func = shannon_entropy)
+
+uk3_sh <- uniq_values(all_k3_sh, round_digits = 2)
+uk4_sh <- uniq_values(all_k4_sh, round_digits = 2)
+uk5_sh <- uniq_values(all_k5_sh, round_digits = 2)
+uk6_sh <- uniq_values(all_k6_sh, round_digits = 2)
+
+length(uk3_sh); rP(4,3); uk3_sh
+length(uk4_sh); rP(4,4); uk4_sh
+length(uk5_sh); rP(4,5); uk5_sh
+length(uk6_sh); rP(4,6); outputwrap(uk6_sh, width = 30)
+```
+
+```{r}
+#| label: partitions
+#| layout: [[28,32,40]]
+
+rparts(4,4);     rparts(5,4);     rparts(6,4);
+```
+
+```{r}
+#| label: partitions-4
+#| layout-ncol: 2
+
+addpadd(rparts(4,4));	addpadd(rparts(5,4)); 
+addpadd(rparts(6,4));	addpadd(rparts(7,4));
+
+```
+
+```{r}
+#| label: partitions-3
+#| include: false
+#| layout: [[35,65],[35,65],[35,65]]
+
+Rz(4,5);      addpadd(rparts(5,4)); 
+Rz(4,6);      addpadd(rparts(6,4));
+Rz(4,7);      addpadd(rparts(7,4));
+
+```
+
+In summary, while Shannon entropy is a valuable tool for measuring sequence diversity and randomness, it has significant 
+limitations in biological sequence characterization. Its assumption of positional independence and inability to reflect 
+nucleotide order make it less suitable as a standalone metric for understanding the complexity and functionality of 
+nucleotide sequences. To gain deeper insights, Shannon entropy should be used in combination with other metrics that 
+account for sequence structure, motifs, and functional relevance.
+
+
+Blablalbalalblab
+
+
+
+

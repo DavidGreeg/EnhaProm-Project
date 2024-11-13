@@ -1,0 +1,17 @@
+Pending: Convert this into a qmd
+Pending: Add former issues
+
+	- Quarto developers doesn't seem interested in implementing code-wrapping for PDF format,
+	it seems like it's a way bigger issue regarding file rendering, and no current (07-10-2024)
+	seems to produce a satisfactory result.
+
+	- Font size for code chunks can either be modified by changing all monofont sizes from the 
+	YAML like 'monofontoptions:\n  - Scale=0.55', or locally for each chunk by putting before 
+	the cell (```{r}) '\AddToHookNext{env/Highlighting/begin}{\<fontsize>}'.
+
+	- Since quarto uses pandoc, and pandoc 'longtables' have issues with 'two column' format,
+	then when using \twocolumn, evary table created with 'kable' in R, will not display.
+	'kbl(df, longtable=FALSE)' must be used.
+
+	- Need to check out 'kable' documentation, seems fairly accessible, instructive and readable
+	https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_pdf.pdf
