@@ -989,7 +989,7 @@ for (k_n in k_Ns) {
   k_inds <- c(k_inds, tail(k_inds,2)[1] + k_n)
 }
 k_inds <- k_inds[-1]
-# print(k_inds)
+# print(rev(k_inds)[1])
 # print((ldf-6)/4)
 # print(ldf)
 ```
@@ -1026,14 +1026,14 @@ ggplot(kmer_set_sizes, aes(x = "", y = sizes,
 #| label: indexes
 
 pe_arr <- function(seq_data)
-  return(array(seq_data, dim = c((ldf-6)/4, 2),
-    dimnames = list(1:((ldf-6)/4), c("prom","enha"))))
+  return(array(seq_data, dim = c(rev(k_inds)[1], 2),
+    dimnames = list(1:rev(k_inds)[1], c("prom","enha"))))
 
 indxs <- list(
-  prod = pe_arr(c(seq(7,ldf-3,4), ldf + seq(7,ldf-3,4))),
-  barc = pe_arr(c(seq(8,ldf-2,4), ldf + seq(8,ldf-2,4))),
-  pals = pe_arr(c(seq(9,ldf-1,4), ldf + seq(9,ldf-1,4))),
-  revc = pe_arr(c(seq(10,ldf,4), ldf + seq(10,ldf,4))))
+  prod = pe_arr(c(seq(7,ldf-3,4), ldf+seq(7,ldf-3,4))),
+  barc = pe_arr(c(seq(8,ldf-2,4), ldf+seq(8,ldf-2,4))),
+  pals = pe_arr(c(seq(9,ldf-1,4), ldf+seq(9,ldf-1,4))),
+  revc = pe_arr(c(seq(10,ldf,4), ldf+seq(10,ldf,4))))
 ```
 
 Now, for the sake of text-space optimization, we'll make some plotting

@@ -1,6 +1,9 @@
 *XX01tiles_DEE1.fastq
+*.html
+*.tex
 *.tsv
 *.csv
 datasets/
 PDFs/
 notebooks/*cache
+notebooks/*files
