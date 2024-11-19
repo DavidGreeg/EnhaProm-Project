@@ -11,6 +11,9 @@ execute:
   cache: true
 ---
 
+
+
+
 \newpage
 \setlength\parindent{18pt}
 \setlength\columnsep{18pt}
@@ -53,10 +56,12 @@ display a header indicating the corresponding language.
 Python Code
 \end{pythonheader}
 \vspace{-1.75pt}
-```{python}
-#| label: outputwrap-py
-#| cache: false
 
+
+
+::: {.cell}
+
+```{.python .cell-code}
 import io, textwrap
 from contextlib import redirect_stdout
 
@@ -80,6 +85,10 @@ def outputwrap(output_func, width = 50,
     print(subst_output)
     print(func_df)
 ```
+:::
+
+
+
 
 Another instance of the output-wrapping function, but implemented in *R*, is in the 
 following code-cell. Although, unlike its' counterparts in *Python*, this function
@@ -90,10 +99,12 @@ was specifically designed to manage the overflowing output of some vectors.
 R Code
 \end{rheader}
 \vspace{-1.75pt}
-```{r}
-#| label: outputwrap-r
-#| cache: false
 
+
+
+::: {.cell}
+
+```{.r .cell-code}
 outputwrap <- function(func_out, width = 50) {
   form_out <- format(round(func_out, digits = 2),
                      nsmall = 2)
@@ -105,6 +116,10 @@ outputwrap <- function(func_out, width = 50) {
   cat(wrapped)
 }
 ```
+:::
+
+
+
 
 Since some outputs are printed next to each other 
 Subsequently, while employing Quarto's \impw{figrue layout features}, it was noticed how 
@@ -113,9 +128,12 @@ solutions were the following functions, which attach some padding to the input p
 and print an horizontal space ('\fn{addpadd}' and '\{hspace}' respectively).
 within Quarto's cell, the following 
 
-```{r}
-#| label: addpadd-r
 
+
+
+::: {.cell}
+
+```{.r .cell-code}
 addpadd <- function(func_out) {
   captout <- capture.output(func_out)
   captout[1] <- paste("\n", captout[1], sep="")
@@ -129,6 +147,10 @@ hspace <- function()
   knitr::asis_output("\\textcolor{white}
 	  {\\tiny\\texttt{hi}}\\normalsize")
 ```
+:::
+
+
+
 
 On the other hand, one inconvenient found in the "*sequence characterization*" step was the
 necessity to call all the \impw{libraries} required by '\fn{sequence\_characterizer}' inside 
@@ -138,14 +160,20 @@ is the following '\fn{required\_libs}' which suppresses the startup messages tha
 context, only clutters the output.
 
 \vspace{0.33cm}
-```{r}
-#| label: reqlibs-function
-#| cache: false
 
+
+
+::: {.cell}
+
+```{.r .cell-code}
 required_libs <- function(libs)
   for(lib in libs) suppressPackageStartupMessages(
                      library(lib, character.only = TRUE))
 ```
+:::
+
+
+
 
 Conversely, an inconvenience not related with Quarto was that for some reason the *LaTeX* 
 command '\impw{\backslash twocolumn}' has incompatibilities with the *longtable* format from 
@@ -159,10 +187,12 @@ set to 'false', so that it is reloaded each time the notebook is rendered. The f
 version of '\fn{teatable}' was somethin like the code below:
 
 \vspace{0.33cm}
-```{r}
-#| label: tabular-functions-facade-1
-#| eval: false
 
+
+
+::: {.cell}
+
+```{.r .cell-code}
 teetable <- function(tabl){
   kbl(
     as.data.frame(tabl), booktabs = T, longtable = F) %>%
@@ -170,8 +200,11 @@ teetable <- function(tabl){
                   latex_options = c("striped",
                     "scale_down", "hold_position"))
 }
-
 ```
+:::
+
+
+
 
 The name came from the fact that \impw{"kable"} might derive from \impw{"knitr\_table"} and I 
 thought that I might as well name my table function(s) after types of furniture. Ultimately it 
@@ -181,10 +214,12 @@ The code below is the final version which displays a colored '\fn{teatable}'. Th
 behind this was that I liked a lot the result obtained after coloring '\fn{coffeetable}'.
 
 \vspace{0.33cm}
-```{r}
-#| label: tabular-functions-facade-2
-#| eval: false
 
+
+
+::: {.cell}
+
+```{.r .cell-code}
 teatable <- function(tabl, colsize, cat=FALSE,
                      decay=TRUE, pale = TRUE) {
   greens <- c("#a3cfa3", "#b3e6b3", "green!20")
@@ -223,6 +258,10 @@ teatable <- function(tabl, colsize, cat=FALSE,
   if (!cat) {asis_output(ktabl)} else {cat(ktabl)}
 }
 ```
+:::
+
+
+
 
 The definition of '\fn{coffeetable}' is significantly larger than (and practically 
 does the same as) '\fn{teatable}' plus some functions like: row height modification, 
@@ -243,10 +282,12 @@ googling it for a bit, it turned out to be apparently caused by a conflict betwe
 up with a solution, which I copyied as '\fn{get\_legend\_bypass}'.
 
 \vspace{0.33cm}
-```{r}
-#| label: get-legend-function
-#| eval: false
 
+
+
+::: {.cell}
+
+```{.r .cell-code}
 get_legend_bypass <- function(plot) { 
   legends <- get_plot_component(plot, "guide-box",
                                 return_all = TRUE)
@@ -257,6 +298,10 @@ get_legend_bypass <- function(plot) {
   } else { return(legends[[1]]) }
 }
 ```
+:::
+
+
+
 
 # Introduction
 In this analysis, we explore methods to process, characterize, visualize and classify a preliminary set of activating cis-regulatory
@@ -280,10 +325,12 @@ to mention the importance of internet connectivity as a determining factor of th
 Python Code
 \end{pythonheader}
 \vspace{-1.75pt}
-```{python}
-#| label: genomic-benchmarks-libraries
-#| cache: false
 
+
+
+::: {.cell}
+
+```{.python .cell-code}
 # To list available datasets
 from genomic_benchmarks.data_check import \
 	list_datasets
@@ -299,134 +346,249 @@ from genomic_benchmarks.loc2seq import \
 # To position ourselves in the correct directory
 import os
 ```
+:::
+
+
+
 
 When displaying the available datasets, we can highlight the presence of four datasets containing \impw{human} 
 regulatory elements: '\impw{\textit{non-TATA} promoters}', '\impw{enhancers \textit{Ensembl}}', '\impw{enhancers 
 \textit{Cohn}}' and '\impw{\textit{Ensembl} regulatory}':
 
 \vspace{0.5cm}
-```{python}
-#| label: data-skimming-false
-#| eval: false
+
+
+
+::: {.cell}
+
+```{.python .cell-code}
 list_datasets()
 ```
-```{python}
-#| label: data-skimming 
-#| echo: false
-outputwrap1(list_datasets(), set_width = 65)
-# Equivalent to: list_datasets()
+:::
+
+::: {.cell}
+::: {.cell-output .cell-output-stdout}
+
+```
+['human_nontata_promoters', 'drosophila_enhancers_stark',
+'human_enhancers_cohn', 'dummy_mouse_enhancers_ensembl',
+'human_ocr_ensembl', 'human_ensembl_regulatory',
+'demo_human_or_worm', 'human_enhancers_ensembl',
+'demo_coding_vs_intergenomic_seqs']
 ```
 
-\vspace{0.5cm}
-```{python}
-#| label: dataset1-exploration-facade
-#| eval: false
 
+:::
+:::
+
+
+
+
+\vspace{0.5cm}
+
+
+
+::: {.cell}
+
+```{.python .cell-code}
 info_gb("human_nontata_promoters", version=0)
 ```
-```{python}
-#| label: dataset1-exploration
-#| echo: false
+:::
 
-# Equal to: 
-# info_gb("human_nontata_promoters", version=0)
-outputwrap(info_gb, 
-		   args=("human_nontata_promoters",),
-		   kwargs={"version": 0}, width=50) 
+::: {.cell}
+::: {.cell-output .cell-output-stdout}
+
+```
+Dataset `human_nontata_promoters` has 2 classes:
+negative, positive.
+
+ All lengths of genomic
+intervals equals 251.
+
+ Totally 36131 sequences
+have been found, 27097 for training and 9034 for
+testing.
+          train  test
+negative  12355  4119
+positive  14742  4915
 ```
 
-\vspace{0.5cm}
-```{python}
-#| label: dataset2-exploration-facade
-#| eval: false
 
+:::
+:::
+
+
+
+
+\vspace{0.5cm}
+
+
+
+::: {.cell}
+
+```{.python .cell-code}
 info_gb("human_ensembl_regulatory", version=0)
 ```
-```{python}
-#| label: dataset2-exploration
-#| echo: false
+:::
 
-# Equal to: 
-# info_gb("human_ensembl_regulatory", version=0)
-outputwrap(info_gb, 
-		   args=("human_ensembl_regulatory",),
-		   kwargs={"version": 0}, width=50)
+::: {.cell}
+::: {.cell-output .cell-output-stdout}
+
+```
+Dataset `human_ensembl_regulatory` has 3 classes:
+enhancer, ocr, promoter.
+
+ The length of genomic
+intervals ranges from 71 to 802, with average
+429.91753643694585 and median 401.0.
+
+ Totally
+289061 sequences have been found, 231348 for
+training and 57713 for testing.
+          train   test
+enhancer  85512  21378
+ocr       69902  17476
+promoter  75934  18859
 ```
 
-\vspace{0.5cm}
-```{python}
-#| label: dataset3-exploration-facade
-#| eval: false
 
+:::
+:::
+
+
+
+
+\vspace{0.5cm}
+
+
+
+::: {.cell}
+
+```{.python .cell-code}
 info_gb("human_enhancers_cohn", version=0)
 ```
-```{python}
-#| label: dataset3-exploration
-#| echo: false
+:::
 
-# Equal to: 
-# info_gb("human_enhancers_cohn", version=0)
-outputwrap(info_gb, 
-		   args=("human_enhancers_cohn",),
-		   kwargs={"version": 0}, width=50) 
+::: {.cell}
+::: {.cell-output .cell-output-stdout}
+
 ```
+Dataset `human_enhancers_cohn` has 2 classes:
+negative, positive.
+
+ All lengths of genomic
+intervals equals 500.
+
+ Totally 27791 sequences
+have been found, 20843 for training and 6948 for
+testing.
+          train  test
+negative  10422  3474
+positive  10421  3474
+```
+
+
+:::
+:::
+
+
+
 
 \vspace{0.5cm}
-```{python}
-#| label: dataset4-exploration-facade
-#| eval: false
 
+
+
+::: {.cell}
+
+```{.python .cell-code}
 info_gb("human_enhancers_ensembl", version=0)
 ```
-```{python}
-#| label: dataset4-exploration
-#| echo: false
+:::
 
-# Equal to: 
-# info_gb("human_enhancers_ensembl", version=0)
-outputwrap(info_gb, args=("human_enhancers_ensembl",),
-			kwargs={"version": 0}, width=50)
+::: {.cell}
+::: {.cell-output .cell-output-stdout}
+
 ```
+Dataset `human_enhancers_ensembl` has 2 classes:
+negative, positive.
+
+ The length of genomic
+intervals ranges from 2 to 573, with average
+268.8641324705183 and median 269.0.
+
+ Totally
+154842 sequences have been found, 123872 for
+training and 30970 for testing.
+          train   test
+negative  61936  15485
+positive  61936  15485
+```
+
+
+:::
+:::
+
+
+
 
 'OCR Ensembl':
 \vspace{0.5cm}
-```{python}
-#| label: dataset5-exploration-facade
-#| eval: false
 
+
+
+::: {.cell}
+
+```{.python .cell-code}
 info_gb("human_ocr_ensembl", version=0)
 ```
+:::
 
-```{python}
-#| label: dataset5-exploration
-#| echo: false
+::: {.cell}
+::: {.cell-output .cell-output-stdout}
 
-# Equal to: 
-# info_gb("human_enhancers_ensembl", version=0)
-outputwrap(info_gb, args=("human_ocr_ensembl",),
-			kwargs={"version": 0}, width=50)
+```
+Dataset `human_ocr_ensembl` has 2 classes:
+negative, positive.
+
+ The length of genomic
+intervals ranges from 71 to 593, with average
+326.3452470873675 and median 315.0.
+
+ Totally
+174756 sequences have been found, 139804 for
+training and 34952 for testing.
+          train   test
+negative  69902  17476
+positive  69902  17476
 ```
 
-\vspace{0.5cm}
-```{python}
-#| label: data-download-facade
-#| eval: false
 
+:::
+:::
+
+
+
+
+\vspace{0.5cm}
+
+
+
+::: {.cell}
+
+```{.python .cell-code}
 os.chdir("/path/to/Project/datasets/GenomicBenchmarks")
 
 download_dataset("human_nontata_promoters", version=0) 
 download_dataset("human_enhancers_cohn", version=0) 
 ```
+:::
 
-```{python}
-#| label: data-download
-#| echo: false
-#| eval: false
+::: {.cell}
 
-os.chdir("/home/davidfm/Projects/UBMI-IFC/EnhaProm/datasets/GenomicBenchmarks")
-download_dataset("human_nontata_promoters", version=0) 
-download_dataset("human_enhancers_cohn", version=0) 
-```
+:::
+
+
+
 
 ## Formatting data
 The downloaded data consisted of multiple '*.txt*' files organized into two directories, and since at least the 
@@ -438,10 +600,12 @@ and appended them together with *AWK*.
 Bash Code
 \end{bashheader}
 \vspace{-1.75pt}
-```{bash}
-#| label: data-to-fasta-facade
-#| eval: false
 
+
+
+::: {.cell}
+
+```{.bash .cell-code}
 cd /path/to/Project/datasets/GenomicBenchmarks/
 
 awk 'BEGIN{counter=0}
@@ -456,20 +620,14 @@ awk 'BEGIN{counter=0}
      human_enhancers_cohn/train/positive/*.txt \
      > enhancers_train_positive.fasta
 ```
+:::
 
-```{bash}
-#| label: data-to-fasta
-#| eval: false
-#| echo: false
+::: {.cell}
 
-cd /home/davidfm/Projects/UBMI-IFC/EnhaProm/datasets/GenomicBenchmarks/
-awk 'BEGIN{counter=0}{print ">promoter_"counter"|train|positive";
-     print $0; counter+=1}' human_nontata_promoters/train/positive/*.txt \
-     > promoters_train_positive.fasta
-awk 'BEGIN{counter=0}{print ">enhancer_"counter"|train|positive"; 
-     print $0; counter+=1}' human_enhancers_cohn/train/positive/*.txt \
-     > enhancers_train_positive.fasta
-```
+:::
+
+
+
 
 # Data Characterization
 ## Libraries used
@@ -481,42 +639,14 @@ in the analysis are outlined below:
 R Code
 \end{rheader}
 \vspace{-1.75pt}
-```{r}
-#| label: requirements
-#| include: false
-#| cache: false
 
-# For genome-functions.R
-library(stringr)
-library(stringi)
-library(primes)
-# For parallel computing
-library(doParallel)
-library(foreach)
-# For biological functions: 
-#   - Local/Global alignments 
-#   - DNA Shape computing
-library(Biostrings)
-library(DNAshapeR)
-# For plotting
-library(paletteer)
-library(cowplot)
-library(ggplot2)
-library(dplyr)
-library(plyr)
-library(see) # for 'geom_violinhalf'
-# For pretty tables
-library(knitr)
-library(kableExtra)
-# For my own functions
-source("/home/davidfm/Projects/UBMI-IFC/EnhaProm/scripts/genome-functions.R")
-source("/home/davidfm/Projects/UBMI-IFC/EnhaProm/scripts/custom-functions.R")
-```
 
-```{r}
-#| label: requirements-facade
-#| eval: false
 
+
+
+::: {.cell}
+
+```{.r .cell-code}
 # For useful tools like 'filter'
 library(dplyr)
 library(plyr)
@@ -542,6 +672,10 @@ library(kableExtra)
 source("/path/to/Project/scripts/genome-functions.R")
 source("/path/to/Project/scripts/custom-functions.R")
 ```
+:::
+
+
+
 
 
 ## Characterizing sequences
@@ -558,22 +692,16 @@ sequences that has to be noted:
 * All features per sequence must be numerical and two-dimensional since we want
 it to be fed eventually to a simple classifier (like a Support Vector Machine).
 
-```{r}
-#| label: csv-scanning
-#| eval: false
-#| echo: false
 
-# Scanning sequences
-prom_fasta <- "datasets/GenomicBenchmarks/promoters_train_positive.fasta"
-enha_fasta <- "datasets/GenomicBenchmarks/enhancers_train_positive.fasta"
-prom_seqs <- scan(prom_fasta, character(), quote = "")[seq(2, 29484, 2)]
-enha_seqs <- scan(enha_fasta, character(), quote = "")[seq(2, 20842, 2)]
-```
 
-```{r}
-#| label: csv-scanning-facade
-#| eval: false
 
+::: {.cell}
+
+:::
+
+::: {.cell}
+
+```{.r .cell-code}
 proj_path <- "path/to/Project/datasets/GenomicBenchmarks"
 prom_fastaname <- "promoters_train_positive.fasta"
 enha_fastaname <- "enhancers_train_positive.fasta"
@@ -587,50 +715,26 @@ prom_seqs <- scan(prom_path,
 enha_seqs <- scan(enha_path, 
                   character(), quote="")[seq(2,20842,2)]
 ```
+:::
+
+
+
 
 Given some previous tests done to 'sequences_characterizer()' I came to the
 conclusion that parallel computing might provide a higher and more complex
 set of data in a feasible time span.
 
 \vspace{0.5cm}
-```{r}
-#| label: csv-construction
-#| eval: false
-#| echo: false
 
-# Prepairing clusters for parallel computing
-corescluster <- makeCluster(6)
-registerDoParallel(corescluster)
-# Characterizing sequences and exporting to CSV
-list_seqs <- list(promoters = prom_seqs, enhancers = enha_seqs)
-reg_elems <- c("promoters", "enhancers")
-for (reg_elem in reg_elems) {
-  foreach(i = 1:6) %dopar% {
-    library(stringr) # for some reason we have to specify for
-    library(stringi) # all the libraries that the sequence
-    library(primes)  # characterizer needs. NOTE: Try to put them all inside a function
-    i_start <- ((i - 1) * 273) + 1
-    i_final <- i * 273
-    if (i > 1) {     # Conditional so that only the first CSV has headers
-      write.table(sequences_characterizer(list_seqs[[reg_elem]][i_start:i_final],
-                                          k_max = 6, optim = TRUE),
-                  paste("datasets/GB-Testing/test", reg_elem, "-minitraining_",
-                        i, ".csv", sep = ""), sep = ",",
-                  row.names = FALSE, col.names = FALSE)
-    } else {
-	  write.csv(sequences_characterizer(list_seqs[[reg_elem]][i_start:i_final],
-                                        k_max = 6, optim = TRUE),
-                paste("datasets/GB-Testing/", reg_elem, "-minitraining_",
-                      i, ".csv", sep = ""), row.names = FALSE)
-    }
-  }
-}
-```
 
-```{r}
-#| label: csv-construction-facade
-#| eval: false
 
+::: {.cell}
+
+:::
+
+::: {.cell}
+
+```{.r .cell-code}
 # Prepairing clusters for parallel computing
 corescluster <- makeCluster(6)
 registerDoParallel(corescluster)
@@ -669,6 +773,10 @@ for (reg_elem in reg_elems) {
           row.names = FALSE)
 }}}
 ```
+:::
+
+
+
 
 ## Concatenating CSV's
 It was decided to produce many files instead of appending over the same CSV table in order to 
@@ -680,27 +788,25 @@ cis-regulatory element, here we only join each set together in a single CSV.
 Bash Code
 \end{bashheader}
 \vspace{-1.75pt}
-```{bash}
-#| label: csv-concatenation
-#| eval: false
-#| echo: false
 
-# Only added this cell in case I forget the original file names
-cat datasets/GB-Testing/testpromoters-minitraining_*.csv \
-    > datasets/GB-Testing/test-1638-promoters-6mers.csv
-cat datasets/GB-Testing/testenhancers-minitraining_*.csv \
-    > datasets/GB-Testing/test-1638-enhancers-6mers.csv
-```
 
-```{bash}
-#| label: csv-concatenation-facade
-#| eval: false
 
+::: {.cell}
+
+:::
+
+::: {.cell}
+
+```{.bash .cell-code}
 cat datasets/GB-Testing/testpromoters-training_*.csv \
     > datasets/GB-Testing/test-1638-promoters-6mers.csv
 cat datasets/GB-Testing/testenhancers-training_*.csv \
     > datasets/GB-Testing/test-1638-enhancers-6mers.csv
 ```
+:::
+
+
+
 
 ## Data description
 
@@ -832,22 +938,16 @@ We could have concatenated both tables together, however I prefer to keep them i
 R Code
 \end{rheader}
 \vspace{-1.75pt}
-```{r}
-#| label: data-load
-#| echo: false
 
-setwd("/home/davidfm/Projects/UBMI-IFC/EnhaProm")
-proms <- read.csv("datasets/GB-Testing/test-1638-promoters-6mers.csv", 
-                  check.names = F)
-enhas <- read.csv("datasets/GB-Testing/test-1638-enhancers-6mers.csv", 
-                  check.names = F)
-CREs <- c("Promoter","Enhancer")
-```
 
-```{r}
-#| label: data-load-facade
-#| eval: false
 
+::: {.cell}
+
+:::
+
+::: {.cell}
+
+```{.r .cell-code}
 setwd("/path/to/Project/")
 testdir_path <- "datasets/GB-Testing/"
 prom_csvpath <- "test-1638-promoters-6mers.csv" 
@@ -861,19 +961,75 @@ enhas <- read.csv(paste0(testdir_path,
                          check.names = F)
 CREs <- c("Promoter","Enhancer")
 ```
+:::
+
+
+
 \vspace{0.2cm}
 
 First we get an overviwew of the dimensions of our data:
 NOTE: Replace this with some kind of table
 \vspace{0.2cm}
-```{r}
-#| label: data-dimensions
-#| layout-ncol: 2
+
+
+
+::: {.cell layout-ncol="2"}
+
+```{.r .cell-code}
 deparse(substitute(proms))
+```
+
+::: {.cell-output .cell-output-stdout}
+
+```
+[1] "proms"
+```
+
+
+:::
+
+```{.r .cell-code}
 deparse(substitute(enhas))
+```
+
+::: {.cell-output .cell-output-stdout}
+
+```
+[1] "enhas"
+```
+
+
+:::
+
+```{.r .cell-code}
 dim(proms)
+```
+
+::: {.cell-output .cell-output-stdout}
+
+```
+[1]  1638 21830
+```
+
+
+:::
+
+```{.r .cell-code}
 dim(enhas)
 ```
+
+::: {.cell-output .cell-output-stdout}
+
+```
+[1]  1638 21830
+```
+
+
+:::
+:::
+
+
+
 \vspace{0.2cm}
 
 It's noticeable the fact that we have way more columns than rows in this test table.
@@ -883,54 +1039,143 @@ plus the first 12 *kmer-wise* variables, which align with the data related to th
 3 kmers (\fontnimbussnn{\textbf{'AA', 'AC'} \& \textbf{'AG'}}):
 
 \vspace{0.2cm}
-```{r}
-#| label: head-prom-facade
-#| eval: false
 
+
+
+::: {.cell}
+
+```{.r .cell-code}
 teatable(proms[1:3,1:18])
 ```
+:::
 
-```{r}
-#| label: head-prom
-#| echo: false
-#| cache: false
+::: {.cell}
+::: {.cell-output-display}
+\begin{table}[!h]
+\footnotesize
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{tabular}[t]{>{\centering\arraybackslash}p{5.75em}>{\centering\arraybackslash}p{5.75em}>{\centering\arraybackslash}p{5.75em}>{\centering\arraybackslash}p{5.75em}>{\centering\arraybackslash}p{5.75em}>{\centering\arraybackslash}p{5.75em}}
+\specialrule{1pt}{0pt}{1pt}
+\cellcolor[HTML]{ccccb3}{A} & \cellcolor[HTML]{ccccb3}{T} & \cellcolor[HTML]{ccccb3}{C} & \cellcolor[HTML]{ccccb3}{G} & \cellcolor[HTML]{ccccb3}{temp} & \cellcolor[HTML]{ccccb3}{shan}\\
+\specialrule{0.6pt}{0.8pt}{0.6pt}
+\cellcolor[HTML]{e0e0cc}{0.1673307} & \cellcolor[HTML]{e0e0cc}{0.2231076} & \cellcolor[HTML]{e0e0cc}{0.3306773} & \cellcolor[HTML]{e0e0cc}{0.2788845} & \cellcolor[HTML]{e0e0cc}{87.21315} & \cellcolor[HTML]{e0e0cc}{1.956136}\\
+\cellcolor[HTML]{f4f4e2}{0.2629482} & \cellcolor[HTML]{f4f4e2}{0.2788845} & \cellcolor[HTML]{f4f4e2}{0.2549801} & \cellcolor[HTML]{f4f4e2}{0.2031873} & \cellcolor[HTML]{f4f4e2}{81.00598} & \cellcolor[HTML]{f4f4e2}{1.990374}\\
+\cellcolor[HTML]{e0e0cc}{0.3625498} & \cellcolor[HTML]{e0e0cc}{0.2031873} & \cellcolor[HTML]{e0e0cc}{0.2470120} & \cellcolor[HTML]{e0e0cc}{0.1872510} & \cellcolor[HTML]{e0e0cc}{80.02590} & \cellcolor[HTML]{e0e0cc}{1.948719}\\
+\specialrule{1pt}{0.6pt}{0pt}
+\end{tabular}}
+\end{table}
+:::
 
-# Each time teatable is used, its' cell must be reloaded
-# teatable(proms[1:3,1:6], colsize = "6em")
-#   # kableExtra::add_header_above(header=c("Test Promoters"=6))
-# teatable(proms[1:3,7:12], colsize = "6em")
-# teatable(proms[1:3,13:18], colsize = "6em")
-teatable(proms[1:3,1:6], colsize = "5.75em")
-teatable(proms[1:3,7:12], colsize = "5.75em")
-teatable(proms[1:3,13:18], colsize = "5.75em")
-```
+::: {.cell-output-display}
+\begin{table}[!h]
+\footnotesize
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{tabular}[t]{>{\centering\arraybackslash}p{5.75em}>{\centering\arraybackslash}p{5.75em}>{\centering\arraybackslash}p{5.75em}>{\centering\arraybackslash}p{5.75em}>{\centering\arraybackslash}p{5.75em}>{\centering\arraybackslash}p{5.75em}}
+\specialrule{1pt}{0pt}{1pt}
+\cellcolor[HTML]{ccccb3}{k2.1\_prod} & \cellcolor[HTML]{ccccb3}{k2.1\_barc} & \cellcolor[HTML]{ccccb3}{k2.1\_pals} & \cellcolor[HTML]{ccccb3}{k2.1\_revc} & \cellcolor[HTML]{ccccb3}{k2.2\_prod} & \cellcolor[HTML]{ccccb3}{k2.2\_barc}\\
+\specialrule{0.6pt}{0.8pt}{0.6pt}
+\cellcolor[HTML]{e0e0cc}{9} & \cellcolor[HTML]{e0e0cc}{1.959765} & \cellcolor[HTML]{e0e0cc}{2.177403e+09} & \cellcolor[HTML]{e0e0cc}{1.374020e+12} & \cellcolor[HTML]{e0e0cc}{17.11198} & \cellcolor[HTML]{e0e0cc}{1.531862}\\
+\cellcolor[HTML]{f4f4e2}{17} & \cellcolor[HTML]{f4f4e2}{2.633165} & \cellcolor[HTML]{f4f4e2}{1.138401e+17} & \cellcolor[HTML]{f4f4e2}{2.971115e+17} & \cellcolor[HTML]{f4f4e2}{26.44579} & \cellcolor[HTML]{f4f4e2}{2.624612}\\
+\cellcolor[HTML]{e0e0cc}{38} & \cellcolor[HTML]{e0e0cc}{5.347025} & \cellcolor[HTML]{e0e0cc}{3.981015e+36} & \cellcolor[HTML]{e0e0cc}{8.100763e+29} & \cellcolor[HTML]{e0e0cc}{24.89016} & \cellcolor[HTML]{e0e0cc}{1.855662}\\
+\specialrule{1pt}{0.6pt}{0pt}
+\end{tabular}}
+\end{table}
+:::
+
+::: {.cell-output-display}
+\begin{table}[!h]
+\footnotesize
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{tabular}[t]{>{\centering\arraybackslash}p{5.75em}>{\centering\arraybackslash}p{5.75em}>{\centering\arraybackslash}p{5.75em}>{\centering\arraybackslash}p{5.75em}>{\centering\arraybackslash}p{5.75em}>{\centering\arraybackslash}p{5.75em}}
+\specialrule{1pt}{0pt}{1pt}
+\cellcolor[HTML]{ccccb3}{k2.2\_pals} & \cellcolor[HTML]{ccccb3}{k2.2\_revc} & \cellcolor[HTML]{ccccb3}{k2.3\_prod} & \cellcolor[HTML]{ccccb3}{k2.3\_barc} & \cellcolor[HTML]{ccccb3}{k2.3\_pals} & \cellcolor[HTML]{ccccb3}{k2.3\_revc}\\
+\specialrule{0.6pt}{0.8pt}{0.6pt}
+\cellcolor[HTML]{e0e0cc}{3.845422e+15} & \cellcolor[HTML]{e0e0cc}{3.525451e+11} & \cellcolor[HTML]{e0e0cc}{26.44579} & \cellcolor[HTML]{e0e0cc}{2.445328} & \cellcolor[HTML]{e0e0cc}{4.788062e+13} & \cellcolor[HTML]{e0e0cc}{1.305836e+26}\\
+\cellcolor[HTML]{f4f4e2}{2.607331e+20} & \cellcolor[HTML]{f4f4e2}{6.308689e+14} & \cellcolor[HTML]{f4f4e2}{24.89016} & \cellcolor[HTML]{f4f4e2}{2.513656} & \cellcolor[HTML]{f4f4e2}{1.320117e+14} & \cellcolor[HTML]{f4f4e2}{6.435389e+19}\\
+\cellcolor[HTML]{e0e0cc}{1.156904e+25} & \cellcolor[HTML]{e0e0cc}{3.573059e+12} & \cellcolor[HTML]{e0e0cc}{34.22397} & \cellcolor[HTML]{e0e0cc}{3.431445} & \cellcolor[HTML]{e0e0cc}{6.011592e+17} & \cellcolor[HTML]{e0e0cc}{7.178542e+17}\\
+\specialrule{1pt}{0.6pt}{0pt}
+\end{tabular}}
+\end{table}
+:::
+:::
+
+
+
 \vspace{0.2cm}
 
 We'll get a similar panorama when looking at the first three enhancers' rows
 (although it seems like *'barcode'* values appear to be significantly larger):
 
 \vspace{0.2cm}
-```{r}
-#| label: head-enha-facade
-#| eval: false
 
+
+
+::: {.cell}
+
+```{.r .cell-code}
 teatable(enhas[1:3,1:18])
 ```
-```{r}
-#| label: head-enha
-#| echo: false
-#| cache: false
+:::
 
-teatable(enhas[1:3,1:6], colsize = "6em") #|>
-  # kableExtra::add_header_above(header=c("Test Enhancers"=6))
-teatable(enhas[1:3,7:12], colsize = "6em")
-teatable(enhas[1:3,13:18], colsize = "6em")
-```
+::: {.cell}
+::: {.cell-output-display}
+\begin{table}[!h]
+\footnotesize
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{tabular}[t]{>{\centering\arraybackslash}p{6em}>{\centering\arraybackslash}p{6em}>{\centering\arraybackslash}p{6em}>{\centering\arraybackslash}p{6em}>{\centering\arraybackslash}p{6em}>{\centering\arraybackslash}p{6em}}
+\specialrule{1pt}{0pt}{1pt}
+\cellcolor[HTML]{ccccb3}{A} & \cellcolor[HTML]{ccccb3}{T} & \cellcolor[HTML]{ccccb3}{C} & \cellcolor[HTML]{ccccb3}{G} & \cellcolor[HTML]{ccccb3}{temp} & \cellcolor[HTML]{ccccb3}{shan}\\
+\specialrule{0.6pt}{0.8pt}{0.6pt}
+\cellcolor[HTML]{e0e0cc}{0.240} & \cellcolor[HTML]{e0e0cc}{0.236} & \cellcolor[HTML]{e0e0cc}{0.234} & \cellcolor[HTML]{e0e0cc}{0.290} & \cellcolor[HTML]{e0e0cc}{85.0392} & \cellcolor[HTML]{e0e0cc}{1.993988}\\
+\cellcolor[HTML]{f4f4e2}{0.204} & \cellcolor[HTML]{f4f4e2}{0.286} & \cellcolor[HTML]{f4f4e2}{0.210} & \cellcolor[HTML]{f4f4e2}{0.300} & \cellcolor[HTML]{f4f4e2}{84.4652} & \cellcolor[HTML]{f4f4e2}{1.978249}\\
+\cellcolor[HTML]{e0e0cc}{0.250} & \cellcolor[HTML]{e0e0cc}{0.280} & \cellcolor[HTML]{e0e0cc}{0.258} & \cellcolor[HTML]{e0e0cc}{0.212} & \cellcolor[HTML]{e0e0cc}{82.8252} & \cellcolor[HTML]{e0e0cc}{1.992923}\\
+\specialrule{1pt}{0.6pt}{0pt}
+\end{tabular}}
+\end{table}
+:::
 
-```{r}
-#| label: data-summary
-#| cache: false
+::: {.cell-output-display}
+\begin{table}[!h]
+\footnotesize
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{tabular}[t]{>{\centering\arraybackslash}p{6em}>{\centering\arraybackslash}p{6em}>{\centering\arraybackslash}p{6em}>{\centering\arraybackslash}p{6em}>{\centering\arraybackslash}p{6em}>{\centering\arraybackslash}p{6em}}
+\specialrule{1pt}{0pt}{1pt}
+\cellcolor[HTML]{ccccb3}{k2.1\_prod} & \cellcolor[HTML]{ccccb3}{k2.1\_barc} & \cellcolor[HTML]{ccccb3}{k2.1\_pals} & \cellcolor[HTML]{ccccb3}{k2.1\_revc} & \cellcolor[HTML]{ccccb3}{k2.2\_prod} & \cellcolor[HTML]{ccccb3}{k2.2\_barc}\\
+\specialrule{0.6pt}{0.8pt}{0.6pt}
+\cellcolor[HTML]{e0e0cc}{36} & \cellcolor[HTML]{e0e0cc}{10.432345} & \cellcolor[HTML]{e0e0cc}{1.885437e+37} & \cellcolor[HTML]{e0e0cc}{8.632413e+30} & \cellcolor[HTML]{e0e0cc}{24.89016} & \cellcolor[HTML]{e0e0cc}{6.027803}\\
+\cellcolor[HTML]{f4f4e2}{20} & \cellcolor[HTML]{f4f4e2}{6.153015} & \cellcolor[HTML]{f4f4e2}{5.673403e+20} & \cellcolor[HTML]{f4f4e2}{1.061673e+53} & \cellcolor[HTML]{f4f4e2}{23.33452} & \cellcolor[HTML]{f4f4e2}{4.984254}\\
+\cellcolor[HTML]{e0e0cc}{31} & \cellcolor[HTML]{e0e0cc}{9.936447} & \cellcolor[HTML]{e0e0cc}{1.640775e+32} & \cellcolor[HTML]{e0e0cc}{5.563175e+39} & \cellcolor[HTML]{e0e0cc}{46.66905} & \cellcolor[HTML]{e0e0cc}{9.301359}\\
+\specialrule{1pt}{0.6pt}{0pt}
+\end{tabular}}
+\end{table}
+:::
 
+::: {.cell-output-display}
+\begin{table}[!h]
+\footnotesize
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{tabular}[t]{>{\centering\arraybackslash}p{6em}>{\centering\arraybackslash}p{6em}>{\centering\arraybackslash}p{6em}>{\centering\arraybackslash}p{6em}>{\centering\arraybackslash}p{6em}>{\centering\arraybackslash}p{6em}}
+\specialrule{1pt}{0pt}{1pt}
+\cellcolor[HTML]{ccccb3}{k2.2\_pals} & \cellcolor[HTML]{ccccb3}{k2.2\_revc} & \cellcolor[HTML]{ccccb3}{k2.3\_prod} & \cellcolor[HTML]{ccccb3}{k2.3\_barc} & \cellcolor[HTML]{ccccb3}{k2.3\_pals} & \cellcolor[HTML]{ccccb3}{k2.3\_revc}\\
+\specialrule{0.6pt}{0.8pt}{0.6pt}
+\cellcolor[HTML]{e0e0cc}{1.579134e+29} & \cellcolor[HTML]{e0e0cc}{1.707234e+31} & \cellcolor[HTML]{e0e0cc}{76.22611} & \cellcolor[HTML]{e0e0cc}{13.43518} & \cellcolor[HTML]{e0e0cc}{3.557032e+41} & \cellcolor[HTML]{e0e0cc}{5.830130e+44}\\
+\cellcolor[HTML]{f4f4e2}{4.485619e+32} & \cellcolor[HTML]{f4f4e2}{1.810188e+35} & \cellcolor[HTML]{f4f4e2}{73.11484} & \cellcolor[HTML]{f4f4e2}{13.29662} & \cellcolor[HTML]{f4f4e2}{3.273426e+39} & \cellcolor[HTML]{f4f4e2}{3.755909e+39}\\
+\cellcolor[HTML]{e0e0cc}{9.951038e+37} & \cellcolor[HTML]{e0e0cc}{3.612544e+25} & \cellcolor[HTML]{e0e0cc}{60.66976} & \cellcolor[HTML]{e0e0cc}{12.53356} & \cellcolor[HTML]{e0e0cc}{4.255600e+33} & \cellcolor[HTML]{e0e0cc}{3.010280e+57}\\
+\specialrule{1pt}{0.6pt}{0pt}
+\end{tabular}}
+\end{table}
+:::
+:::
+
+::: {.cell}
+
+```{.r .cell-code}
 mean_prom <- colMeans(proms)
 mean_enha <- colMeans(enhas)
 sd_prom <- apply(proms, 2, sd)
@@ -942,19 +1187,84 @@ cre_summary <- data.frame(Type = factor(names_CREs),
                           Means = c(mean_prom,mean_enha),
                           StDevs = c(sd_prom,sd_enha))
 ```
+:::
 
-```{r}
-#| label: summary-head
-#| cache: false
+::: {.cell}
 
+```{.r .cell-code}
 ldf <- length(proms)
 coffeetable(cre_summary[c(1:10,(ldf+1):(ldf+10)),])
 ```
 
+::: {.cell-output-display}
+\begin{table}[!h]
+\centering
+\footnotesize
+\renewcommand{\arraystretch}{1.3}
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{tabular}[t]{lllrr}
+\specialrule{1pt}{0pt}{0.5pt}
+\rowcolor{brown!42}
+  & Type & Field & Means & StDevs\\
+\specialrule{0.6pt}{1pt}{0pt}
+\rowcolor{brown!25}
+1 & \cellcolor{brown!10} & A & 1.911256e-01 & 7.145510e-02\\[-0.12pt]
+\rowcolor{brown!10}
+2 & \cellcolor{brown!10} & T & 1.995826e-01 & 7.599340e-02\\[-0.12pt]
+\rowcolor{brown!25}
+3 & \cellcolor{brown!10} & C & 2.962655e-01 & 8.067840e-02\\[-0.12pt]
+\rowcolor{brown!10}
+4 & \cellcolor{brown!10} & G & 3.130263e-01 & 8.524230e-02\\[-0.12pt]
+\rowcolor{brown!25}
+5 & \cellcolor{brown!10} & temp & 8.720208e+01 & 5.379461e+00\\[-0.12pt]
+\rowcolor{brown!10}
+6 & \cellcolor{brown!10} & shan & 1.891724e+00 & 9.437000e-02\\[-0.12pt]
+\rowcolor{brown!25}
+7 & \cellcolor{brown!10} & k2.1\_prod & 1.196276e+01 & 8.995306e+00\\[-0.12pt]
+\rowcolor{brown!10}
+8 & \cellcolor{brown!10} & k2.1\_barc & 1.500971e+00 & 1.229003e+00\\[-0.12pt]
+\rowcolor{brown!25}
+9 & \cellcolor{brown!10} & k2.1\_pals & 2.634405e+51 & 1.065029e+53\\[-0.12pt]
+\rowcolor{brown!10}
+10 & \multirow{-10}{*}{\raggedright\arraybackslash\cellcolor{brown!10} Promoter} & k2.1\_revc & 9.789346e+62 & 3.960331e+64\\[-0.12pt]
+\rowcolor{brown!25}
+21831 & \cellcolor{brown!25} & A & 2.653712e-01 & 5.853000e-02\\[-0.12pt]
+\rowcolor{brown!10}
+21832 & \cellcolor{brown!25} & T & 2.678205e-01 & 5.815610e-02\\[-0.12pt]
+\rowcolor{brown!25}
+21833 & \cellcolor{brown!25} & C & 2.351111e-01 & 5.648440e-02\\[-0.12pt]
+\rowcolor{brown!10}
+21834 & \cellcolor{brown!25} & G & 2.316972e-01 & 5.435370e-02\\[-0.12pt]
+\rowcolor{brown!25}
+21835 & \cellcolor{brown!25} & temp & 8.269434e+01 & 3.785299e+00\\[-0.12pt]
+\rowcolor{brown!10}
+21836 & \cellcolor{brown!25} & shan & 1.959202e+00 & 3.892580e-02\\[-0.12pt]
+\rowcolor{brown!25}
+21837 & \cellcolor{brown!25} & k2.1\_prod & 4.093346e+01 & 1.835697e+01\\[-0.12pt]
+\rowcolor{brown!10}
+21838 & \cellcolor{brown!25} & k2.1\_barc & 1.208127e+01 & 5.751107e+00\\[-0.12pt]
+\rowcolor{brown!25}
+21839 & \cellcolor{brown!25} & k2.1\_pals & 2.567318e+112 & 1.038419e+114\\[-0.12pt]
+\rowcolor{brown!10}
+21840 & \multirow{-10}{*}{\raggedright\arraybackslash\cellcolor{brown!25} Enhancer} & k2.1\_revc & 3.321646e+121 & 1.344343e+123\\[-0.12pt]
+\bottomrule
+\end{tabular}}
+\renewcommand{\arraystretch}{1}
+
+\end{table}
+:::
+:::
+
+
+
+
 This text should be later deleted
-```{r}
-#| layout-nrow: 3
-#| code-overflow: wrap
+
+
+
+::: {.cell layout-nrow="3"}
+
+```{.r .cell-code .code-overflow-wrap}
 # Get only 'prod' columns of each kmer
 
 k_Ns <- c(n_ki(2), n_ki(3), n_ki(4), n_ki(5), n_ki(6)) 
@@ -968,13 +1278,11 @@ k_inds <- k_inds[-1]
 # print((ldf-6)/4)
 # print(ldf)
 ```
+:::
 
-```{r}
-#| label: kmer-set-sizes
-#| crop: true
-#| fig-height: 7
-#| fig-align: center
+::: {.cell layout-align="center" crop='true'}
 
+```{.r .cell-code}
 kmer_set_sizes <- data.frame(sizes = k_Ns,
   k_sets = c("2","3","4","5","6"))
 
@@ -994,12 +1302,16 @@ ggplot(kmer_set_sizes, aes(x = "", y = sizes,
         legend.title = element_text(size = 13.5),
         axis.text.y = element_text(family = "mono"),
         plot.title = element_text(size = 16, hjust = 0.5))
-  
 ```
 
-```{r}
-#| label: indexes
+::: {.cell-output-display}
+![](gb-test-pdf_files/figure-pdf/kmer-set-sizes-1.png){fig-align='center' fig-pos='H'}
+:::
+:::
 
+::: {.cell}
+
+```{.r .cell-code}
 pe_arr <- function(seq_data)
   return(array(seq_data, dim = c(rev(k_inds)[1], 2),
     dimnames = list(1:rev(k_inds)[1], c("prom","enha"))))
@@ -1010,14 +1322,21 @@ indxs <- list(
   pals = pe_arr(c(seq(9,ldf-1,4), ldf+seq(9,ldf-1,4))),
   revc = pe_arr(c(seq(10,ldf,4), ldf+seq(10,ldf,4))))
 ```
+:::
+
+
+
 
 Now, for the sake of text-space optimization, we'll make some plotting
 functions (principally pyramid, bar and violin plots), in order to 
 visualize our data. 
 
-```{r}
-#| label: chunk-shortening-functions
 
+
+
+::: {.cell}
+
+```{.r .cell-code}
 # To plot pyramid-plots
 pyrplot_ <- function(cre_data, kmer_labels, title, 
                     x_label, y_label, y_breaks) {
@@ -1102,57 +1421,39 @@ hvioplot_ <- function(data, y_var, y_label = "",
           axis.title = element_text(size = 13))
 }
 ```
+:::
 
-```{r}
-#| label: visual-table
-#| echo: false
-#| eval: false
-# This is just a neat table I liked
-# ...don't really know why
-cols_names <- colnames(subset_cre_prod)
-pcol_names <- paste0(cols_names, ".P")
-ecol_names <- paste0(cols_names, ".E")
-pcol_names[2] <- cols_names[2]
-newc_names <- c(pcol_names, ecol_names)
-cols_order <- c(2,1,3,4,5,7,8)
-visual_table <- head(cbind(
-  filter(subset_cre_prod, Type == "Promoter"),
-  filter(subset_cre_prod, Type == "Enhancer")
-              )[, cols_order], 10)
-colnames(visual_table) <- newc_names[cols_order]
-coffeetable(visual_table, row.names = FALSE)
-```
+::: {.cell}
 
-```{r}
-#| label: figure-nucl
-#| row: screen
-#| fig-height: 7
-#| crop: true
-#| fig-align: center
+:::
 
+::: {.cell layout-align="center" row='screen' crop='true'}
+
+```{.r .cell-code}
 pyrplot_(cre_summary[c(1:4, ldf + (1:4)), ], 
       x_label = "Nucleotides", y_breaks = seq(-1,1,0.2), 
       title = "Percentage Means per Nucleotide")
 ```
 
-```{r}
-#| label: subset-temp-shan
+::: {.cell-output-display}
+![](gb-test-pdf_files/figure-pdf/figure-nucl-1.png){fig-align='center' fig-pos='H'}
+:::
+:::
 
+::: {.cell}
+
+```{.r .cell-code}
 data_e <- cbind(type = rep("Enhancer",
                 length(enhas$temp)), enhas[,5:6])
 data_p <- cbind(type = rep("Promoter",
                 length(proms$temp)), proms[,5:6])
 subset_tm_sh <- rbind(data_e, data_p)
-
 ```
+:::
 
-```{r}
-#| label: subset-temp-shan-3
-#| row: screen
-#| crop: true
-#| fig-height: 7
-#| fig-align: center
+::: {.cell layout-align="center" row='screen' crop='true'}
 
+```{.r .cell-code}
 # Saving Melting Temperature Violin Plot 
 tm_violin <- hvioplot_(data = subset_tm_sh, 
                        y_var = "temp", 
@@ -1183,13 +1484,14 @@ plot_grid(grid_violin, legend_violin,
           ncol = 1, rel_heights = c(12,1))
 ```
 
-```{r}
-#| label: figure-shan-temp
-#| row: screen
-#| crop: true
-#| fig-height: 7
-#| fig-align: center
+::: {.cell-output-display}
+![](gb-test-pdf_files/figure-pdf/subset-temp-shan-3-1.png){fig-align='center' fig-pos='H'}
+:::
+:::
 
+::: {.cell layout-align="center" row='screen' crop='true'}
+
+```{.r .cell-code}
 # Saving Melting Temperature Bar-Plot
 temp_plot <- barplot_(filter(cre_summary, Field=="temp"), 
                       y_breaks = seq(0, 100, 10), 
@@ -1208,22 +1510,33 @@ plot_grid(temp_plot, shan_plot,
     labels = c("Melting Temperature", "Shannon Entropy")) 
 ```
 
+::: {.cell-output-display}
+![](gb-test-pdf_files/figure-pdf/figure-shan-temp-1.png){fig-align='center' fig-pos='H'}
+:::
+:::
 
-```{r}
-#| label: figure-prods
-#| fig-height: 8
-#| row: screen
-#| fig-align: center
+::: {.cell layout-align="center" row='screen'}
 
+```{.r .cell-code}
 kmer_names <- combi_kmers(k=3)[1:48]
 
 pyrplot_(cre_summary[indxs$prod[17:64,],], kmer_names,
          x_label = "Kmers", y_breaks = seq(-30,30,10), 
          title = "KSG-Product Means per Kmer")
+```
 
+::: {.cell-output-display}
+![](gb-test-pdf_files/figure-pdf/figure-prods-1.png){fig-align='center' fig-pos='H'}
+:::
+
+```{.r .cell-code}
 pyrplot_(cre_summary[indxs$barc[17:64,],], kmer_names,
          x_label = "Kmers", y_breaks = seq(-10,10,1), 
          title = "Barcode Profile Means per Kmer")
 ```
 
+::: {.cell-output-display}
+![](gb-test-pdf_files/figure-pdf/figure-prods-2.png){fig-align='center' fig-pos='H'}
+:::
+:::
 

@@ -100,6 +100,9 @@ format:
           boxrule=0.1mm, arc=4mm,
           left=1.5mm, right=1.5mm, top=0.5mm, bottom=0.5mm,
           halign=right, sharp corners=south}
+      - \newtcolorbox{notebox}[2][]{
+          colback=red!5!white, colframe=red!75!black,
+          fonttitle=\bfseries, fontupper=\small, title={#2},#1}
       - \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
       - \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
       - \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
@@ -117,6 +120,79 @@ execute:
 \setlength\columnsep{18pt}
 \newpage
 \twocolumn
+# \texttt{Appendix: Custom Functions} {.unnumbered}
+
+The following functions were made in order to provide a better
+presentation to the data displayed in this notebook:
+
+\vspace{0.25cm}
+\begin{notebox}[center, width=0.93\columnwidth]{Note:}
+Each time the programming language changes, the code-cell will 
+display a header indicating the corresponding language.
+\end{notebox}
+\vspace{0.25cm}
+
+\begin{rheader}
+R Code
+\end{rheader}
+\vspace{-1.75pt}
+```{r}
+#| label: frontend-functions-1
+
+wrap_output <- function(func_out, width = 50) {
+  output <- capture.output(func_out)
+  wrapped_output <- lapply(output, strwrap,
+                           width = width)
+  cat(wrapped_output, sep = "\n")
+}
+
+outputwrap <- function(func_out, width = 50) {
+  form_out <- format(round(func_out, digits = 2),
+                     nsmall = 2)
+  wrapped <- strwrap(gsub(',', '', toString(form_out)),
+                     width = width)
+  wrapped[1] <- paste("\n\n[1]", wrapped[1])
+  len_w <- length(wrapped)
+  wrapped[2:len_w] <- paste("\n   ", wrapped[2:len_w])
+  cat(wrapped)
+}
+```
+
+```{r}
+#| label: frontend-functions-2
+
+addpadd <- function(func_out) {
+  captout <- capture.output(func_out)
+  captout[1] <- paste("\n", captout[1], sep="")
+  captout[2:length(captout)] <- paste("\n",
+            captout[2:length(captout)], sep="")
+  captout <- append(captout, "\n\t")
+  cat(captout)
+}
+```
+
+```{r}
+#| label: frontend-functions-3
+
+hspace <- function()
+  knitr::asis_output("\\textcolor{white}
+	  {\\tiny\\texttt{hi}}\\normalsize")
+```
+
+```{r}
+#| label: frontend-functions-4
+
+uniq_values <- function(vect, round_digits = 4){
+  return(round(as.numeric(names(table(vect))),
+               digits = round_digits))}
+
+uniq_not <- function(vect, round_digits=4){
+  return(round(unique(sort(vect)),
+               digits=round_digits))}
+# ^For some reason returned duplicated values when 
+#  processing floating values from "gc-percentage"
+```
+
 # Data Recollection
 ## Data Sources and Sequence Lengths
 ### Promoter Elements: Core, Proximal and Distal
@@ -138,54 +214,6 @@ library(knitr)
 source('../scripts/genome-functions.R')
 ```
 
-```{r}
-#| label: frontend-functions
-#| echo: false
-
-# Function to wrap output text
-wrap_output <- function(func_out, width = 50) {
-  output <- capture.output(func_out)
-  wrapped_output <- lapply(output, strwrap,
-                           width = width)
-  cat(wrapped_output, sep = "\n")
-}
-outputwrap <- function(func_out, width = 50) {
-  wrapped <- strwrap(gsub(',', '', toString(
-                 format(
-                   round(func_out,
-                         digits=2),
-                        nsmall=2))),
-                     width=width)
-  wrapped[1] <- paste("\n\n[1]", wrapped[1])
-  wrapped[2:length(wrapped)] <- paste("\n   ", wrapped[2:length(wrapped)])
-  cat(wrapped)
-}
-addpadd <- function(func_out) {
-  captout <- capture.output(func_out)
-  captout[1] <- paste("\n", captout[1], sep="")
-  captout[2:length(captout)] <- paste("\n", captout[2:length(captout)], sep="")
-  captout <- append(captout, "\n\t")
-  cat(captout)
-}
-hspace <- function()
-  knitr::asis_output("\\textcolor{white}{\\tiny\\texttt{hi}}\\normalsize")
-```
-
-\begin{rheader}
-R Code
-\end{rheader}
-```{r}
-#| label: some-functions
-
-uniq_values <- function(vect, round_digits = 4){
-  return(round(as.numeric(
-                 names(table(vect))
-         ), digits = round_digits))}
-uniq_not <- function(vect, round_digits=4){
-  return(round(unique(sort(vect)), digits=round_digits))}
-# ^For some reason returned duplicated values when 
-#  processing floating values from "gc-percentage"
-```
 
 ## Whole-Sequence Characterization
 ## Kmer Characterization

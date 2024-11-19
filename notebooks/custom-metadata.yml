@@ -1,0 +1,97 @@
+format: 
+  pdf: 
+    documentclass: article
+    include-in-header:
+      - text: |
+         \newcommand{\fontmydefault}{\fontspec{Liberation Serif}}
+         \newcommand{\fontlibertsan}[1]{{\fontspec{Liberation Sans} #1}}
+         \newcommand{\fontlibertser}[1]{{\fontspec{Liberation Serif} #1}}
+         \newcommand{\fontlibertsnn}[1]{{\fontspec{Liberation Sans Narrow} #1}}
+         \newcommand{\fontnimbussan}[1]{{\fontspec{Nimbus Sans} #1}}
+         \newcommand{\fontnimbussnn}[1]{{\fontspec{Nimbus Sans Narrow} #1}}
+         \newcommand{\fontdejavusan}[1]{{\fontspec{DejaVu Sans} #1}}
+         \newcommand{\fontdejavuser}[1]{{\fontspec{DejaVu Serif} #1}}
+         \newcommand{\myfontchart}[1]{{\fontfamily{bch}\selectfont #1}}
+         \newcommand{\fn}[1]{\textcolor{DarkSlateGray}{\texttt{#1}}}
+         \newcommand{\impw}[1]{{\textcolor{MidnightBlue}{\fontspec{Nimbus Sans} #1}}}
+         \newcommand{\hlight}[1]{{\textcolor{Sienna4}{\fontspec{DejaVu Sans} #1}}}
+         \setlength{\defaultaddspace}{0pt} %This prevents tables in kable to display interpaces every 5 rows
+    include-before-body:	
+      - text: |
+         \begin{titlepage}
+         \begin{flushleft}
+           { UBMI-IFC, UNAM } \\
+           { Coyoacan, CDMX }
+         \end{flushleft}
+         \vspace*{3cm}
+         \begin{center}
+           { \Large Sequece Characterization Test } \\[1cm]
+           { \large Using Genomic-Benchmarks Data }
+         \end{center}
+         \vfill
+         \begin{flushright}
+         \begin{tabular}{l@{\hspace*{\tabcolsep}}l}
+           Author: & Fuentes David \\
+           Tutors: & \\
+           & - PhD. Poot Augusto \\
+           & - MSc. Pedraza Carlos \\
+         \end{tabular}
+         \end{flushright}
+         \end{titlepage}
+    toc: true
+    number-sections: true
+    colorlinks: true
+    urlcolor: DodgerBlue4
+    citecolor: RosyBrown4
+    papersize: letter
+    fig-format: png
+    fig-width: 7
+    fig-height: 5
+    keep-tex: true
+    cell-language: true
+    header-includes:
+      - \usepackage{wrapfig}
+      - \usepackage{lipsum}
+      - \usepackage{array}
+      - \usepackage{float}
+      - \usepackage{booktabs}
+      - \usepackage{arydshln}
+      - \usepackage{multirow}
+      - \usepackage{xcolor}
+      - \usepackage{tcolorbox}
+      - \usepackage{geometry}
+      - \geometry{
+          left=0.4in,
+          right=0.4in,
+          top=0.5in,
+          bottom=0.5in}
+      - \definecolor{pythoncol}{rgb}{0.188,0.412,0.596}
+      - \definecolor{rcol}{rgb}{0.121,0.466,0.705}
+      - \definecolor{bashcol}{rgb}{0.207,0.262,0.392}
+      - \newtcolorbox{pythonheader}{
+          colback=pythoncol!70, colframe=pythoncol,
+          fontupper=\footnotesize\bfseries\color{white},
+          boxrule=0.1mm, arc=4mm,
+          left=1.5mm, right=1.5mm, top=0.5mm, bottom=0.5mm,
+          halign=right, sharp corners=south}
+      - \newtcolorbox{rheader}{
+          colback=rcol!70, colframe=rcol,
+          fontupper=\footnotesize\bfseries\color{white},
+          boxrule=0.1mm, arc=4mm,
+          left=1.5mm, right=1.5mm, top=0.5mm, bottom=0.5mm,
+          halign=right, sharp corners=south}
+      - \newtcolorbox{bashheader}{
+          colback=bashcol!70, colframe=bashcol,
+          fontupper=\footnotesize\bfseries\color{white},
+          boxrule=0.1mm, arc=4mm,
+          left=1.5mm, right=1.5mm, top=0.5mm, bottom=0.5mm,
+          halign=right, sharp corners=south}
+      - \newtcolorbox{notebox}[2][]{
+          colback=red!5!white, colframe=red!75!black,
+          fonttitle=\bfseries, fontupper=\small, title={#2},#1}
+      - \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+      - \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+      - \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+      - \newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+      - \usepackage{pagecolor}
+      - \definecolor{lightbeige}{RGB}{243,246,255} 

@@ -7,6 +7,97 @@ execute:
   cache: true
 ---
 
+## Custom Functions (Column Test)
+:::: {.columns}
+
+::: {.column width="35%"}
+
+-----------------------------------------
+
+Quarto output wrap sometimes is deficient
+The next python cells' output overflows without them
+
+For some reason we have to specify inside 'foreach' the required libraries that 
+the sequence characterizer uses even though they are already required inside 
+'genome-functions.R'
+
+For some reason the latex command '\\twocolumn' has incompatibilities with the *longtable* 
+format from 'knitr' (their default type of table), so 'teatable()' is a function to work
+around that limitation. However for some reason each cell that uses it requires to have 
+'cache: false' set, so it can be reloaded each time the notebook is rendered.
+
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="60%"}
+
+\begin{notebox}[center, width=0.95\columnwidth]{Note:}
+Each time the programming language changes, the code-cell will 
+display a header indicating the corresponding language.
+
+\end{notebox}
+\begin{pythonheader}
+Python Code
+\end{pythonheader}
+\vspace{-1.75pt}
+```{python}
+#| label: frontend-functions-py
+# echo: false
+
+import io
+import textwrap
+from contextlib import redirect_stdout
+
+# Commentz
+def outputwrap1(output_func, set_width=50):
+	output = str(output_func)
+	wrap_output = textwrap.fill(output, width=set_width)
+	print(wrap_output)
+
+def outputwrap(func, args=(), kwargs=None, width=50):
+    if kwargs is None:
+        kwargs = {}
+    output_stream = io.StringIO()
+    with redirect_stdout(output_stream):
+        func_df = func(*args, **kwargs)
+    full_output = output_stream.getvalue()
+    wrapped_output = textwrap.fill(full_output, width=width)
+    subst_output = wrapped_output.replace(". ", ".\n\n")
+    print(subst_output)
+    print(func_df)
+```
+
+\begin{rheader}
+R Code
+\end{rheader}
+\vspace{-1.75pt}
+```{r}
+#| label: frontend-functions-r
+#| cache: false
+
+
+required_libs <- function(libs)
+  for(lib in libs) suppressPackageStartupMessages(library(lib, character.only = TRUE))
+```
+
+
+```{r}
+required_libs(c("knitr", "kableExtra", "stringi", "dplyr")) # teatable requires those libs
+
+teetable <- function(tabl){
+  kbl(as.data.frame(tabl), booktabs = T, longtable = F, linesep = "") %>%
+    kable_styling(position = "center",
+                  latex_options = c("striped", "scale_down", "hold_position")) #%>% 
+}
+
+```
+:::
+
+::::
+
+
 ## Downloading data
 ::: {.cell .python} 
 :::
