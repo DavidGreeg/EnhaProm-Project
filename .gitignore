@@ -3,6 +3,7 @@
 *.tex
 *.tsv
 *.csv
+*pycache*
 datasets/
 PDFs/
 notebooks/*cache
