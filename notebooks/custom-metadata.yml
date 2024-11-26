@@ -16,28 +16,6 @@ format:
          \newcommand{\impw}[1]{{\textcolor{MidnightBlue}{\fontspec{Nimbus Sans} #1}}}
          \newcommand{\hlight}[1]{{\textcolor{Sienna4}{\fontspec{DejaVu Sans} #1}}}
          \setlength{\defaultaddspace}{0pt} %This prevents tables in kable to display interpaces every 5 rows
-    include-before-body:	
-      - text: |
-         \begin{titlepage}
-         \begin{flushleft}
-           { UBMI-IFC, UNAM } \\
-           { Coyoacan, CDMX }
-         \end{flushleft}
-         \vspace*{3cm}
-         \begin{center}
-           { \Large Sequece Characterization Test } \\[1cm]
-           { \large Using Genomic-Benchmarks Data }
-         \end{center}
-         \vfill
-         \begin{flushright}
-         \begin{tabular}{l@{\hspace*{\tabcolsep}}l}
-           Author: & Fuentes David \\
-           Tutors: & \\
-           & - PhD. Poot Augusto \\
-           & - MSc. Pedraza Carlos \\
-         \end{tabular}
-         \end{flushright}
-         \end{titlepage}
     toc: true
     number-sections: true
     colorlinks: true

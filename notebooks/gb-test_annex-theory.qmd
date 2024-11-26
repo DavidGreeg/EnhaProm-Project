@@ -120,78 +120,7 @@ execute:
 \setlength\columnsep{18pt}
 \newpage
 \twocolumn
-# \texttt{Appendix: Custom Functions} {.unnumbered}
 
-The following functions were made in order to provide a better
-presentation to the data displayed in this notebook:
-
-\vspace{0.25cm}
-\begin{notebox}[center, width=0.93\columnwidth]{Note:}
-Each time the programming language changes, the code-cell will 
-display a header indicating the corresponding language.
-\end{notebox}
-\vspace{0.25cm}
-
-\begin{rheader}
-R Code
-\end{rheader}
-\vspace{-1.75pt}
-```{r}
-#| label: frontend-functions-1
-
-wrap_output <- function(func_out, width = 50) {
-  output <- capture.output(func_out)
-  wrapped_output <- lapply(output, strwrap,
-                           width = width)
-  cat(wrapped_output, sep = "\n")
-}
-
-outputwrap <- function(func_out, width = 50) {
-  form_out <- format(round(func_out, digits = 2),
-                     nsmall = 2)
-  wrapped <- strwrap(gsub(',', '', toString(form_out)),
-                     width = width)
-  wrapped[1] <- paste("\n\n[1]", wrapped[1])
-  len_w <- length(wrapped)
-  wrapped[2:len_w] <- paste("\n   ", wrapped[2:len_w])
-  cat(wrapped)
-}
-```
-
-```{r}
-#| label: frontend-functions-2
-
-addpadd <- function(func_out) {
-  captout <- capture.output(func_out)
-  captout[1] <- paste("\n", captout[1], sep="")
-  captout[2:length(captout)] <- paste("\n",
-            captout[2:length(captout)], sep="")
-  captout <- append(captout, "\n\t")
-  cat(captout)
-}
-```
-
-```{r}
-#| label: frontend-functions-3
-
-hspace <- function()
-  knitr::asis_output("\\textcolor{white}
-	  {\\tiny\\texttt{hi}}\\normalsize")
-```
-
-```{r}
-#| label: frontend-functions-4
-
-uniq_values <- function(vect, round_digits = 4){
-  return(round(as.numeric(names(table(vect))),
-               digits = round_digits))}
-
-uniq_not <- function(vect, round_digits=4){
-  return(round(unique(sort(vect)),
-               digits=round_digits))}
-# ^For some reason returned duplicated values when 
-#  processing floating values from "gc-percentage"
-```
 
 # Data Recollection
 ## Data Sources and Sequence Lengths
@@ -209,11 +138,25 @@ or structural constraints, that influence nucleotide placement.
 #| label: libraries
 #| echo: false
 
-library(partitions)
-library(knitr)
-source('../scripts/genome-functions.R')
+setwd("/home/davidfm/Projects/UBMI-IFC/EnhaProm")
+source('scripts/genome-functions.R')
+source('scripts/custom-functions.R')
+required_libs(c("partitions", "knitr"))
 ```
 
+\begin{rheader}
+R Code
+\end{rheader}
+\vspace{-1.75pt}
+```{r}
+#| label: libraries-facade
+#| eval: false
+
+setwd("/path/to/Project/")
+source('scripts/genome-functions.R')
+source('scripts/custom-functions.R')
+required_libs(c("partitions", "knitr"))
+```
 
 ## Whole-Sequence Characterization
 ## Kmer Characterization

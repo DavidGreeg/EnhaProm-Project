@@ -5,6 +5,7 @@ library(dplyr)
 
 library(ggplot2)
 library(cowplot)
+library(see)
 
 #______________________________________________________________________________#
 #==================================LIBRARIE====================================#
@@ -221,3 +222,138 @@ get_legend_bypass <- function(plot) {
     return(legends[[1]])
   }
 }
+
+#______________________________________________________________________________#
+#==================================PLOTTING====================================#
+Type <- factor()	# This variables are just 'decoys' so my object-linter
+Means <- integer()	# doesn't fire a lot of warnings for the following
+StDevs <- integer() # plotting functions
+
+# To plot pyramid-plots
+pyrplot_ <- function(cre_data, kmer_labels, title,
+                     x_label, y_label, y_breaks) {
+  CREs <- c("Enhancer", "Promoter")
+  field_order <- filter(cre_data, Type == CREs[1])$Field
+  fact_field_order <- factor(cre_data$Field, field_order)
+
+  if (missing(kmer_labels)) kmer_labels <- field_order
+
+  ggplot(cre_data) +
+    geom_bar(aes(x = fact_field_order,
+                 y = ifelse(Type == CREs[1], -Means, Means),
+                 fill = paste(Type, "Means")),
+             stat = "identity", position = "identity",
+             alpha = 0.6, width = 0.7) +
+    geom_errorbar(aes(x = fact_field_order,
+                      ymin = ifelse(Type == CREs[1],
+                                    -Means + StDevs, Means - StDevs),
+                      ymax = ifelse(Type == CREs[1],
+                                    -Means - StDevs, Means + StDevs)),
+                  width = 0.5, alpha = 0.6,
+                  colour = "black") +
+    coord_flip() +
+    scale_x_discrete(labels = kmer_labels) +
+    scale_y_continuous(breaks = y_breaks,
+                       labels = abs(y_breaks)) +
+    scale_fill_manual(values = c("turquoise", "coral"),
+                      labels = CREs) +
+    labs(y = "Means", x = x_label,
+         title = title, fill = "CRE Type") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          axis.title = element_text(size = 15),
+          text = element_text(size = rel(4.25)),
+          legend.text = element_text(size = 13),
+          legend.title = element_text(size = 13.5),
+          axis.text.y = element_text(family = "mono"),
+          plot.title = element_text(size = 16, hjust = 0.5))
+}
+
+barplot_ <- function(cre_data, y_breaks, y_axis_title = "",
+                     fill_legend_title = "") {
+  ggplot(cre_data) +
+    geom_bar(aes(x = factor(Type),
+                 y = Means, fill = Type),
+             stat = "identity", position = "identity",
+             alpha = 0.6) +
+    geom_errorbar(aes(x = factor(Type),
+                      ymin = Means - StDevs,
+                      ymax = Means + StDevs),
+                  alpha = 0.6, width = 0.5,
+                  colour = "black") +
+    labs(y = y_axis_title, x = "",
+         fill = fill_legend_title) +
+    scale_y_continuous(breaks = y_breaks,
+                       labels = y_breaks) +
+    scale_fill_manual(values = c("turquoise", "coral")) +
+    theme_minimal() +
+    theme(legend.position = "none",
+          text = element_text(size = rel(4.5)),
+          axis.title = element_text(size = 16))
+}
+
+hvioplot_ <- function(data, y_var, y_label = "",
+                      fill_legend_title = "") {
+  #: x_breaks <- seq(-0.12,0.12,0.06)
+  ggplot(data, aes(x = 0, y = !!sym(y_var), fill = Type)) +
+    geom_violinhalf(flip = 1, adjust = 0.25,
+                    trim = FALSE, scale = "count",
+                    position = position_dodge(width = 0),
+                    linewidth = 0.1, alpha = 0.6) +
+    theme_minimal() +
+    #: scale_x_continuous(breaks = x_breaks ,
+    #:                    labels = abs(x_breaks )) +
+    scale_fill_manual(values = c("turquoise", "coral")) +
+    labs(x = "", y = y_label, fill = fill_legend_title) +
+    theme(legend.position = "none",
+          text = element_text(size = rel(4.5)),
+          axis.title = element_text(size = 13))
+}
+
+#______________________________________________________________________________#
+#===============================OUTPUT-WRAPPING================================#
+wrap_output <- function(func_out, width = 50) {
+  output <- capture.output(func_out)
+  wrapped_output <- lapply(output, strwrap,
+                           width = width)
+  cat(wrapped_output, sep = "\n")
+}
+
+outputwrap <- function(func_out, width = 50) {
+  form_out <- format(round(func_out, digits = 2),
+                     nsmall = 2)
+  wrapped <- strwrap(gsub(",", "", toString(form_out)),
+                     width = width)
+  wrapped[1] <- paste("\n\n[1]", wrapped[1])
+  len_w <- length(wrapped)
+  wrapped[2:len_w] <- paste("\n   ", wrapped[2:len_w])
+  cat(wrapped)
+}
+
+#______________________________________________________________________________#
+#=================================TEXT-PADDING=================================#
+addpadd <- function(func_out) {
+  captout <- capture.output(func_out)
+  captout[1] <- paste("\n", captout[1], sep = "")
+  captout[2:length(captout)] <- paste("\n", captout[2:length(captout)], sep ="")
+  captout <- append(captout, "\n\t")
+  cat(captout)
+}
+
+hspace <- function()
+    asis_output("\\textcolor{white}{\\tiny\\texttt{hi}}\\normalsize")
+
+#______________________________________________________________________________#
+#================================UNIQUE-VALUES=================================#
+uniq_values <- function(vect, round_digits = 4) {
+  return(round(as.numeric(names(table(vect))), digits = round_digits))
+}
+
+uniq_not <- function(vect, round_digits = 4) {
+  return(round(unique(sort(vect)), digits = round_digits))
+}
+# ^For some reason returned duplicated values when
+#  processing floating values from "gc-percentage"
+
+
+
