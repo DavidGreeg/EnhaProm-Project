@@ -116,7 +116,8 @@ R Code
 #| label: outputwrap-r
 #| cache: false
 
-outputwrap <- function(func_out, width = 50) {
+#(!) Needs to be updated, has changes in source file
+vectwrap <- function(func_out, width = 50) {
   form_out <- format(round(func_out, digits = 2),
                      nsmall = 2)
   wrapped <- strwrap(gsub(',', '', toString(form_out)),
@@ -172,7 +173,7 @@ required_libs <- function(libs)
                      library(lib, character.only = TRUE))
 ```
 
-# \texttt{Table Re-Formatting} {.unnumbered}
+# \texttt{Table Customization} {.unnumbered}
 Conversely, an inconvenience not related with Quarto was that for some reason the *LaTeX* 
 command '\impw{\backslash twocolumn}' has incompatibilities with the *longtable* format from 
 '\fn{knitr}' (their default type of table). This seemed to be a well documented issue
@@ -285,7 +286,7 @@ get_legend_bypass <- function(plot) {
 }
 ```
 
-# \texttt{Plotting Condensing} {.unnumbered}
+# \texttt{Plotting: Pyramid, Bar, Half-Violin} {.unnumbered}
 Now, for the sake of text-space optimization, we'll make some plotting
 functions (principally pyramid, bar and violin plots), in order to 
 visualize our data. 
@@ -379,4 +380,79 @@ hvioplot_ <- function(data, y_var, y_label = "",
 }
 ```
 
+# \texttt{Principal Components Analysis} {.unnumbered}
+\vspace{0.33cm}
+```{r}
+#| label: pca-function
+#| cache: false
+simple_pca <- function(data, type, n_comp = 10) {
+  # Validate inputs
+  if (!is.matrix(data) && !is.data.frame(data)) {
+    stop("'data' must be a matrix or data frame.")
+  }
+  if (length(type) != nrow(data)) {
+    stop("'type' must have the same length
+         as the number of rows in 'data'.")
+  }
+  
+  # Scale the data
+  scaled_data <- scale(data)
+  
+  # Perform PCA 
+  pca_result <- irlba(scaled_data, nv = n_comp)
+  
+  # Scree Plot
+  sing_vals <- pca_result$d
+  var_expl<- (sing_vals^2) / sum(sing_vals^2) * 100
+
+  scree_df <- data.frame(Component = seq_along(var_expl),
+                         Variance = var_expl)
+
+  scree_plot <- ggplot(scree_df, aes(x = Component,
+                                     y = Variance)) +
+    geom_line(color = "cadetblue", linewidth = 0.5) +
+    geom_point(color = "dodgerblue4", size = 2) +
+    labs(title = "Scree Plot",
+         x = "Principal Component",
+         y = "% Explained Variance") +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(size = 16, hjust = 0.5),
+      axis.title = element_text(size = 13),
+      axis.text = element_text(size = 11))
+
+  # Extract scores
+  scores <- pca_result$u %*% diag(pca_result$d)
+  
+  # Prepare data for ggplot
+  pca_df <- data.frame(PC1 = scores[, 1],
+                       PC2 = scores[, 2],
+                       Type = type)
+  
+  # PCA Plot
+  pca_plot <- ggplot(pca_df, aes(x = PC1, y = PC2,
+                                 color = Type)) +
+    geom_point(alpha = 0.6, size = 2) +
+    labs(title = "PCA: First Two Components",
+         x = "PC1", y = "PC2") +
+    scale_color_manual(values = c("turquoise", "coral")) +
+    theme_minimal() +
+    theme(
+      legend.position = "bottom",
+      axis.title = element_text(size = 15),
+      text = element_text(size = rel(4.25)),
+      legend.text = element_text(size = 13),
+      legend.title = element_text(size = 13.5),
+      axis.text.y = element_text(family = "mono"),
+      plot.title = element_text(size = 16, hjust = 0.5))
+  
+  # Return PCA results
+  return(list(
+    pca_result = pca_result,
+    scores = scores,
+    var_expl = var_expl,
+    scree_plot = scree_plot,
+    pca_plot = pca_plot))
+}
+```
 

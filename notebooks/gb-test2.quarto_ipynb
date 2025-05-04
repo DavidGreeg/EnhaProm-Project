@@ -1,0 +1,225 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "format: \n",
+        "  pdf: \n",
+        "    documentclass: article\n",
+        "    include-before-body:\t\n",
+        "      - text: |\n",
+        "         \\begin{titlepage}\n",
+        "         \\begin{flushleft}\n",
+        "           { UBMI-IFC, UNAM } \\\\\n",
+        "           { Coyoacan, CDMX }\n",
+        "         \\end{flushleft}\n",
+        "         \\vspace*{3cm}\n",
+        "         \\begin{center}\n",
+        "           { \\Large Sequece Characterization Test 2} \\\\[1cm]\n",
+        "           { \\large Using Genomic-Benchmarks Data }\n",
+        "         \\end{center}\n",
+        "         \\vfill\n",
+        "         \\begin{flushright}\n",
+        "         \\begin{tabular}{l@{\\hspace*{\\tabcolsep}}l}\n",
+        "           Author: & Fuentes David \\\\\n",
+        "           Tutors: & \\\\\n",
+        "           & - PhD. Poot Augusto \\\\\n",
+        "           & - MSc. Pedraza Carlos \\\\\n",
+        "         \\end{tabular}\n",
+        "         \\end{flushright}\n",
+        "         \\end{titlepage}\n",
+        "metadata-files: \n",
+        "  - custom-metadata.yml\n",
+        "mainfont: Liberation Sans\n",
+        "mainfontoptions:\n",
+        "  - Scale=0.8\n",
+        "monofont: JetBrainsMono Nerd Font\n",
+        "monofontoptions:\n",
+        "  - Scale=0.7\n",
+        "---\n",
+        "\n",
+        "\n",
+        "\n",
+        "\\newpage\n",
+        "\\setlength\\parindent{18pt}\n",
+        "\\setlength\\columnsep{18pt}\n",
+        "\\twocolumn\n",
+        "\n",
+        "# Data Preparation\n",
+        "## Downloading data\n",
+        "\n",
+        "\\vspace{0.33cm}\n",
+        "\\begin{pythonheader}\n",
+        "Python Code\n",
+        "\\end{pythonheader}\n",
+        "\\vspace{-1.75pt}"
+      ],
+      "id": "62280a86"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| label: genomic-benchmarks-libraries\n",
+        "\n",
+        "# To inspect each dataset to select two\n",
+        "from genomic_benchmarks.data_check import info as \\\n",
+        "\tinfo_gb\n",
+        "\n",
+        "# To download each dataset\n",
+        "from genomic_benchmarks.loc2seq import \\\n",
+        "\tdownload_dataset"
+      ],
+      "id": "genomic-benchmarks-libraries",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| label: custom-modules\n",
+        "#| echo: false\n",
+        "\n",
+        "# To load the 'custom-functions' module\n",
+        "os.chdir(\"/home/davidfm/Projects/EnhaProm/scripts\")\n",
+        "from custom_functions import *"
+      ],
+      "id": "custom-modules",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| label: custom-modules-facade\n",
+        "#| eval: false\n",
+        "\n",
+        "# To load the 'custom-functions' module\n",
+        "os.chdir(\"/path/to/Project/scripts\")\n",
+        "from custom_functions import *"
+      ],
+      "id": "custom-modules-facade",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "\\vspace{0.25cm}"
+      ],
+      "id": "622223a5"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| label: dataset2-exploration-facade\n",
+        "#| eval: false\n",
+        "\n",
+        "info_gb(\"human_ensembl_regulatory\", version=0)"
+      ],
+      "id": "dataset2-exploration-facade",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| label: dataset2-exploration\n",
+        "#| echo: false\n",
+        "\n",
+        "# Equal to: \n",
+        "# info_gb(\"human_ensembl_regulatory\", version=0)\n",
+        "outputwrap(info_gb, \n",
+        "\t\t   args=(\"human_ensembl_regulatory\",),\n",
+        "\t\t   kwargs={\"version\": 0}, width=50)"
+      ],
+      "id": "dataset2-exploration",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "\\vspace{0.25cm}"
+      ],
+      "id": "9146c958"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| label: data-download-facade\n",
+        "#| eval: false\n",
+        "\n",
+        "download_dataset(\"human_ensembl_regulatory\", version=0) "
+      ],
+      "id": "data-download-facade",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "```{bash}\n",
+        "#| eval: false\n",
+        "#| echo: false\n",
+        "\n",
+        "# Move sequences to our project directory\n",
+        "mv /home/davidfm/.genomic_benchmarks/human_ensembl_regulatory /home/davidfm/Projects/EnhaProm/datasets/GenomicBenchmarks/\n",
+        "\n",
+        "# Concatenate sequences in '.txt' files into a single FASTA (this is a temporary solution since the FASTA has \"ugly\" headers (counter doesn't work))\n",
+        "# 'find' + 'xargs' approach used since awk couldn't handle >80K files at once\n",
+        "find GenomicBenchmarks/human_ensembl_regulatory/train/enhancer/ -type f -name '*.txt' | xargs -I {} awk 'BEGIN{counter=0}{print \">enhancer_\"counter\"|training\"; print $0; counter+=1}' {} > GB-Test/enhancers_training.fasta\n",
+        "find GenomicBenchmarks/human_ensembl_regulatory/train/promoter/ -type f -name '*.txt' | xargs -I {} awk 'BEGIN{counter=0}{print \">promoter_\"counter\"|training\"; print $0; counter+=1}' {} > GB-Test/promoters_training.fasta\n",
+        "find GenomicBenchmarks/human_ensembl_regulatory/train/ocr/ -type f -name '*.txt' | xargs -I {} awk 'BEGIN{counter=0}{print \">OCR_\"counter\"|training\"; print $0; counter+=1}' {} > GB-Test/OCRs_training.fasta\n",
+        "```\n",
+        "\n",
+        "```{bash}\n",
+        "#| eval: false\n",
+        "#| echo: false\n",
+        "\n",
+        "# Move sequences to our project directory\n",
+        "mv ~/.genomic_benchmarks/human_ensembl_regulatory \\\n",
+        "   /path/to/Project/datasets/GenomicBenchmarks/\n",
+        "\n",
+        "# Concatenate sequences in '.txt' files into single FASTAs\n",
+        "find GenomicBenchmarks/human_ensembl_regulatory/train/enhancer/ \\\n",
+        "     -type f -name '*.txt' | xargs -I {} \\\n",
+        "     awk 'BEGIN{counter=0}\n",
+        "          {print \">enhancer_\"counter\"|training\"; \n",
+        "          print $0; counter+=1}' {} > GB-Test/enhancers_training.fasta\n",
+        "find GenomicBenchmarks/human_ensembl_regulatory/train/promoter/ \\\n",
+        "     -type f -name '*.txt' | xargs -I {} \\\n",
+        "     awk 'BEGIN{counter=0}\n",
+        "          {print \">promoter_\"counter\"|training\"; \n",
+        "          print $0; counter+=1}' {} > GB-Test/promoters_training.fasta\n",
+        "find GenomicBenchmarks/human_ensembl_regulatory/train/ocr/ \\\n",
+        "     -type f -name '*.txt' | xargs -I {} \\\n",
+        "     awk 'BEGIN{counter=0}\n",
+        "          {print \">ocr_\"counter\"|training\"; \n",
+        "          print $0; counter+=1}' {} > GB-Test/OCRs_training.fasta\n",
+        "```"
+      ],
+      "id": "570ac414"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "/home/davidfm/mambaforge/envs/enha-prom-project/share/jupyter/kernels/python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

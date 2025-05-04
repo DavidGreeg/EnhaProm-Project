@@ -44,7 +44,7 @@ format:
          \begin{center}
            { \Large Sequece Characterization Test } \\[1cm]
            { \large Using Genomic-Benchmarks Data } \\[1.5cm]
-           { \fontlibertsan{\textbf{THEORY \& CODE ANNEX}} }
+           { \fontlibertsan{\textbf{THEORY ANNEX}} }
          \end{center}
          \vfill
          \begin{flushright}
@@ -439,7 +439,7 @@ properties (\fontnimbussnn{\textbf{Figure 2}}).
     \cellcolor{red!20}A & C & C & \cellcolor{cyan!20}T \\  
     \hline
     \rowcolor{green!20}
-    \cellcolor{red!20}C & \cellcolor{cyan!20}G & G & G \\  
+    \cellcolor{red!20}C & \cellcolor{cyan!20}A & G & G \\  
     \hline
 \end{thintabl} \\[0pt]
 \colorbox{gray!20}{\makebox[1cm][c]{\fontlibertsan{\textbf{2.00}}}}
@@ -623,6 +623,7 @@ uk4_sh <- uniq_values(all_k4_sh, round_digits = 2)
 uk5_sh <- uniq_values(all_k5_sh, round_digits = 2)
 uk6_sh <- uniq_values(all_k6_sh, round_digits = 2)
 
+#Comment
 length(uk3_sh); rP(4,3); uk3_sh
 length(uk4_sh); rP(4,4); uk4_sh
 length(uk5_sh); rP(4,5); uk5_sh

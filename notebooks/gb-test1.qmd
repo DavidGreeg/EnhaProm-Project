@@ -11,7 +11,7 @@ format:
          \end{flushleft}
          \vspace*{3cm}
          \begin{center}
-           { \Large Sequece Characterization Test } \\[1cm]
+           { \Large Sequece Characterization Test 1} \\[1cm]
            { \large Using Genomic-Benchmarks Data }
          \end{center}
          \vfill
@@ -203,7 +203,6 @@ outputwrap(info_gb, args=("human_enhancers_ensembl",),
 			kwargs={"version": 0}, width=50)
 ```
 
-'OCR Ensembl':
 \vspace{0.5cm}
 ```{python}
 #| label: dataset5-exploration-facade
@@ -242,10 +241,10 @@ download_dataset("human_enhancers_cohn", version=0)
 ```
 
 ## Formatting data
-The downloaded data consisted of multiple '*.txt*' files organized into two directories, and since at least the 
-'*getShape()*' function from the '*DNAshapeR*' package required FASTA files to work, it felt right to integrate 
-all sequences of each cis-regulatory element in a single FASTA file. For this, I gave them all a simple header 
-and appended them together with *AWK*.
+The downloaded data consisted of multiple '\impw{.txt}' files organized into two directories, and since at least 
+the '\fn{getShape}' function from the '\fn{DNAshapeR}' package required \impw{FASTA} files to work, it felt right 
+to integrate all sequences of each cis-regulatory element in a single FASTA file. For this, I gave them all a simple 
+header and appended them together with *\impw{AWK}*.
 
 \begin{bashheader}
 Bash Code
@@ -286,9 +285,9 @@ awk 'BEGIN{counter=0}{print ">enhancer_"counter"|train|positive";
 
 # Data Characterization
 ## Libraries used
-The following procedures require several R libraries, alongside custom functions 
-developed for sequence characterization. The libraries and their respective roles 
-in the analysis are outlined below:
+The following procedures require several \impw{R libraries}, alongside custom 
+functions developed for sequence characterization. The libraries and their 
+respective roles in the analysis are outlined below:
 
 \begin{rheader}
 R Code
@@ -321,6 +320,10 @@ library(see) # for 'geom_violinhalf'
 # For pretty tables
 library(knitr)
 library(kableExtra)
+# For statistic analysis
+library(stats)
+library(irlba) # for memory-efficient PCA
+# library(nortest)
 # For my own functions
 source("/home/davidfm/Projects/UBMI-IFC/EnhaProm/scripts/genome-functions.R")
 source("/home/davidfm/Projects/UBMI-IFC/EnhaProm/scripts/custom-functions.R")
@@ -333,6 +336,10 @@ source("/home/davidfm/Projects/UBMI-IFC/EnhaProm/scripts/custom-functions.R")
 # For useful tools like 'filter'
 library(dplyr)
 library(plyr)
+# For statistic analysis
+library(stats)
+library(irlba)      # Memory-efficient PCA
+# library(nortest)    # Lillifors normality test
 # For genome-functions.R
 library(stringr)
 library(stringi)
@@ -358,8 +365,8 @@ source("/path/to/Project/scripts/custom-functions.R")
 
 
 ## Characterizing sequences
-Here, we characterize a subset from each of our datasets: 1638 sequences per 
-regulatory element; 3276 in total. However, there's a circumstance about the 
+Here, we characterize a subset from each of our datasets: \impw{1638 sequences} per 
+regulatory element; \impw{3276 in total}. However, there's a circumstance about the 
 sequences that has to be noted:
 
 * Both datasets have considerably different elements lengthwise:
@@ -401,9 +408,9 @@ enha_seqs <- scan(enha_path,
                   character(), quote="")[seq(2,20842,2)]
 ```
 
-Given some previous tests done to 'sequences_characterizer()' I came to the
-conclusion that parallel computing might provide a higher and more complex
-set of data in a feasible time span.
+Given some previous tests done to '\fn{sequences\_characterizer}' I came to 
+the conclusion that parallel computing might provide a higher and more 
+complex set of data in a feasible time span.
 
 \vspace{0.5cm}
 ```{r}
@@ -518,7 +525,7 @@ cat datasets/GB-Testing/testenhancers-training_*.csv \
 ## Data description
 
 \begin{table}[h]
-\caption{Overview of each column generated so far by '\textit{sequences-characterizer()}'}
+\caption{Overview of each column generated so far by '\fn{sequences\_characterizer}'}
 \small
 \centering
 % Using the new column types L, C, and R for custom width and orientation
@@ -560,9 +567,9 @@ kN.M\_revc & \parbox[c][1.7cm]{2.5cm}{\centering Reverse Complement Profile} & \
 \end{table}
 
 Prior to our primary analysis, it feels reasonable to explain the columns per sequence produced by our
-tabulator '*sequences_characterizer()*'. From here we'll first describe the ones computed sequence-wise, 
+tabulator '\fn{sequences\_characterizer}'. From here we'll first describe the ones computed sequence-wise, 
 the ones computed kmer-wise, then the ones computed over each kmer distribution, and finally the ones 
-corresponding to DNA-Shape; this feature comes at last considering '*getShape()*' function makes its' own 
+corresponding to DNA-Shape; this feature comes at last considering '\fn{getShape}' function makes its' own 
 dataframe. The ones in **black** are already integrated in the table, the ones in \color{red} **red** 
 \color{black} are yet to be adjoined:
 
@@ -603,7 +610,7 @@ value dependent on their sequence structure. This under the assumption that .
 	all have the *same GC Percentage* (0.5). Additionally, it is a little tricky to *keep the product from becoming 
 	zero* when the sequence is either devoid of C/G nucleotides (e.g. \fontnimbussnn{\textbf{gc\_percentage('ATTA')
 	=0}}), or lacks nucleotide diversity (e.g. \fontnimbussnn{\textbf{shannon\_entropy('GGGG')=0}}). 
-	\newline\small\fontlibertser{Refer to 'Theory \& Code Annex', Sections 2 \& 3, for more details.}\normalsize
+	\newline\small\fontlibertser{Refer to 'Theory Annex', Sections 2 \& 3, for more details.}\normalsize
 
     * **kN.M_barc** - \textit{\underline{Barc}ode Profile}: Its obtained by generating a vector with size equal to
 	the kmer amount (which is equivalent to \fontnimbussnn{\textbf{'sequence length'} - \textbf{'kmer length'} + 1})
@@ -772,11 +779,17 @@ This text should be later deleted
 
 k_Ns <- c(n_ki(2), n_ki(3), n_ki(4), n_ki(5), n_ki(6)) 
 k_inds <- c(0)
+k_stt <- c(0)
+k_fin <- c(0)
 for (k_n in k_Ns) {
   k_inds <- c(k_inds, tail(k_inds,1) + 1)
   k_inds <- c(k_inds, tail(k_inds,2)[1] + k_n)
+  k_stt <- c(k_stt, tail(k_fin,1) + 1)
+  k_fin <- c(k_fin, tail(k_fin,1) + k_n)
 }
 k_inds <- k_inds[-1]
+k_indz <- array(c(k_stt[-1], k_fin[-1]), dim = c(5, 2), 
+                dimnames = list(1:5, c("start","final")))
 # print(rev(k_inds)[1])
 # print((ldf-6)/4)
 # print(ldf)
@@ -949,6 +962,100 @@ pyrplot_(cre_summary[indxs$barc[17:64,],], kmer_names,
          x_label = "Kmers", y_breaks = seq(-10,10,1), 
          title = "Barcode Profile Means per Kmer")
 ```
+
+With this last pyramid plot, I noticed one crucial bias all my 
+profiler functions had (*\impw{Barcode}*, *\impw{Palindrome}* and
+*\impw{Reverse Complement}*), sequence length. This would make them
+somewhat useless for the purpose of this actual test, nevertheless
+they would still be of use for the following analysis.
+
+## Principal Components Analysis
+Since **\fontnimbussnn{\undrl{P}rincipal \undrl{C}omponents \undrl{A}nal
+ysis}** (\impw{PCA}) should be one of the elementary tests when approaching 
+a high-dimensional dataset given its' simplicity, straightforward understanding 
+and computational speed, it was the next method applied to our data.
+
+Yet, there was a catch for this: I wanted to test whether the KSG-Product
+would be sufficient to characterize this data, and if so, at least how many 
+kmers would be needed to achieve that.
+
+The PCA procedure is described (for readability purposes) through the 
+following function: '\fn{pca\_plot}'. Note that instead of using '\fn{
+prcomp}' from '\fn{stats}', the alternative '\fn{irlba}' was chosen 
+due to its' optimization (via truncated singular value decomposition)
+for very large, sparse and high-dimensional datasets; the concrete 
+method being the **\fontnimbussnn{\undrl{i}mplicitly \undrl{r}estarted 
+\undrl{L}anczos \undrl{b}idiagonalization \undrl{a}lgorithm}**
+(\impw{IRLBA}).
+
+\vspace{0.33cm}
+```{r}
+#| label: pca-fulldata
+#| row: screen
+#| fig-align: center
+#| layout-ncol: 1
+
+# 'Type' tags for the resulting elements
+CRE_type <- c(rep("Enhancer", dim(enhas)[1]),
+              rep("Promoter", dim(proms)[1]))
+
+pe_data <- rbind(enhas, proms)
+fulldata_pca <- simple_pca(pe_data, CRE_type)
+fulldata_pca$scree_plot; hspace()
+fulldata_pca$pca_plot
+```
+
+Here we observe the data separate through the first 2 principal 
+components, however this is something expected since most variables 
+(namely *Tm* and all *kmer profilers*) in our table are biased towards 
+sequence length.
+
+In consequence, for the following approach we will exclude those 
+variables and use only the ones we know to be independent of 
+sequence length.
+
+\vspace{0.33cm}
+```{r}
+#| label: pca-seqlen-indep
+#| row: screen
+#| fig-align: center
+#| layout-ncol: 1
+
+# Selection of sequence-length independent  columns
+seqlen_indep <- c(1:4,6, indxs$prod[,1])
+
+# Data scaling
+pe_data<- rbind(enhas[,seqlen_indep],
+                proms[,seqlen_indep])
+
+seqlen_indep_pca <- simple_pca(pe_data, CRE_type)
+seqlen_indep_pca$scree_plot; hspace()
+seqlen_indep_pca$pca_plot
+```
+
+Suprisingly, the data does show a clear separation between groups
+a further step would be to try with the \impw{k-means} algorithm, 
+however I believe it's fair to try and reduce the number of kmers
+analized so that we may further reduce the number of computations.
+
+\vspace{0.33cm}
+```{r}
+#| label: pca-less-kmers
+#| row: screen
+#| fig-align: center
+
+indz <- c(k_indz[1,"start"]:k_indz[4,"final"])
+less_kmers <- indxs$prod[indz, 1]
+seqlen_indep <- c(1:4,6, less_kmers)
+
+pe_data <- rbind(enhas[,seqlen_indep],
+                 proms[,seqlen_indep])
+
+lessk_pca <- simple_pca(pe_data, CRE_type)
+lessk_pca$scree_plot
+lessk_pca$pca_plot
+```
+
 
 
 

@@ -1,0 +1,34 @@
+---
+title: Reporte 8vo Semestre
+format: pdf
+---
+
+## Introducción
+Durante este semestre trabajé sobre la misma línea de investigación del semestre pasado:
+caracterización de elementos cis-regulatorios activadores por medio de algoritmos de baja
+exigencia computacional. Para esto los resultados se pueden clasificar en: 
+
+  * Se refinaron funciones creadas el semestre pasado 
+  * Se llevó a cabo el primer test preliminar con secuencias 'de prueba' de ambos tipos de
+  secuencia (provenientes del paquete *Genomic Benchmarks* en Python).
+  * Se evaluaron sesgos tanto en las funciones como en los sets de datos ocupados después 
+  de realizar las primeras visualizaciones.
+  * Adicionalmente se crearon herramientas de visualización para un formato de cuadernos 
+  de código con el que se trabajó (Quarto).
+
+Cabe resaltar que todo el proyecto (aún el código descartado, enviado a 'trash-code.R' se 
+encuentra disponible en mi GitHub, dentro de su respectivo repositorio (*EnhaProm-Project*)).
+
+## Funciones
+Para el proceso de caracterización se trabajó principalmente sobre el archivo 'genome-functions.R'
+el cual posée alrededor de 1K líneas de código usadas para la generación de cada variable en las 
+tablas (sin contar líneas vacías usadas para una mayor legibilidad).
+
+```{r}
+#| include: false
+print("hi")
+```
+
+```{bash}
+awk 'NF > 0 {count++} END {print count}' ../scripts/genome-functions.R
+```

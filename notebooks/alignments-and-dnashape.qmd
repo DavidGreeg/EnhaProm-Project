@@ -1,18 +1,184 @@
 ---
 title: Tests for local alignments and DNA shape
-format: html
+format: pdf
 ---
 
-## Pair-wise alignments
+# Uploadings
+## Load libraries
 ```{r}
+#| output: false
+
 #library(Biostrings)
-#Biostrings::pairwiseAligment()
+library(ggplot2)
+library(DNAshapeR)
+projpath <- "/home/davidfm/Projects/UBMI-IFC/EnhaProm/"
 ```
 
-## DNA shape metrics
+## Load functions and libraries
+```{r}
+#| label: label-1
+#| output: false
+
+setwd(projpath)
+source("scripts/genome-functions.R")
+```
+
+# DNA shape metrics
 ```{r}
 #shape_promoters <- getShape("datasets/testing/promoters_train_positive.fasta", shapeType= c("Stretch", "Tilt", "Buckle", "Shear"))
-#getShape("datasets/testing/promoters_train_positive.fasta", shapeType= c("Stretch", "Tilt", "Buckle", "Shear"))
+#getShape("datasets/testing/promoters_train_positive.fasta", 
+#         shapeType= c("Stretch", "Tilt", "Buckle", "Shear"))
 #getShape("datasets/testing/promoters_train_positive.fasta")
 #getShape("datasets/testing/promoters_train_positive.fasta", parse=FALSE)
+# setwd(paste0(projpath, "liltests/"))
+setwd(projpath)
+shape_seqs <- getShape("datasets/GB-Testing/10seqs.fasta")
+
+# Change matrix rows into list of vectors
+ss_mgw <- t(shape_seqs$MGW)
+small_ <- t(shape_seqs$MGW[c(3,5,8),200:300])
+#         ^If not transposed, this becomes a mess
+# ss_mgw[c(1:10,(nrow(ss_mgw)-10):nrow(ss_mgw)),1:3]
+split_factor1 <- rep(1:ncol(ss_mgw), each = nrow(ss_mgw))
+split_factor2 <- rep(1:ncol(small_), each = nrow(small_))
+
+ss_mgw_list <- split(ss_mgw, split_factor1)
+ss_mgw_list <- lapply(ss_mgw_list, na.omit)
+small__list <- split(small_, split_factor2)
+# ^There are no NAs in this list since no 'border' columns are considerated
+any(is.na(small_))
 ```
+
+```{r}
+# Plot list of vectors
+linesplot <- function(vector_list) {
+# Create a data frame to hold the data
+  df <- do.call(rbind, lapply(vector_list,
+                              function(x) data.frame(x = seq_along(x), y = x)))
+  df$vector <- rep(names(vector_list), sapply(vector_list, length))
+
+  # Create the plot
+  ggplot(df, aes(x = x, y = y, color = vector)) +
+    geom_line() +
+    labs(x = "Index", y = "Value") +
+	theme_minimal()
+}
+
+# Sample data: a list of vectors
+vector_list <- list(
+  vector1 = c(1, 3, 2, 4, 6, 12, 9),
+  vector2 = c(2, 1, 6, 5, 12),
+  vector3 = c(10, 8, 6.2, 6.5, 7, 7.7)
+)
+
+linesplot(vector_list)
+linesplot(ss_mgw_list)
+linesplot(small__list)
+```
+
+# Regressions
+```{r}
+## Shape data as dataframe per sequence
+seqshape_df <- function(seqshape) {
+  # Normalization
+  #: norm_val <- max(c(max(seqshape), abs(min(seqshape))))
+  #: norm_seqshape <- seqshape / norm_val
+  norm_seqshape <- 2 * (seqshape - min(seqshape)) / (max(seqshape) - min(seqshape)) - 1
+
+  # Positions in 'relative' values
+  rel_positions <- seq_along(seqshape) / 100
+
+  return(data.frame(mgw_values = norm_seqshape,
+                    positions = rel_positions))
+}
+```
+```{r}
+# Example shape data
+sshape3 <- shape_seqs$MGW[3,200:300]
+sshape5 <- shape_seqs$MGW[5,200:300]
+sshape8 <- shape_seqs$MGW[8,200:300]
+
+trunc_fourier(seqshape_df(sshape3), "mgw_values", "positions",
+              n_peaks=7, aem_option=1, bottomtop=TRUE,
+              silent=TRUE, check_again=TRUE, only_coefficients=FALSE)
+trunc_fourier(seqshape_df(sshape5), "mgw_values", "positions",
+              n_peaks=7, aem_option=1, bottomtop=TRUE,
+              silent=TRUE, check_again=TRUE, only_coefficients=FALSE)
+trunc_fourier(seqshape_df(sshape8), "mgw_values", "positions",
+              n_peaks=7, aem_option=1, bottomtop=TRUE,
+              silent=TRUE, check_again=TRUE, only_coefficients=FALSE)
+```
+
+```{r}
+#| label: label-2
+testseq1 <- paste0("TTCTCCTGCCTTAGCCTCCCAAGTCACTGGGATTACAGGTGCCCACCACCATACCAGGCTAA",
+                  "TTTTTGTATTTTTAGTGGAGATGCGGTTTCACCATGTTGGCCGGGCCAGTCTCGAACTCCTGACGTC",
+                  "AAGTGATCTTCCCGCCTCGACTCCTGATATCAAGTGATCTTCCCGCCTCGGCCTCCCAGAGTGCTGA",
+                  "GATTACAGACGTGAACCCATGCCTGGCCAGGAATTTTGTTTTTTAGGAAGGCTTTCTACTAATGGAA",
+                  "TTCCTGGCCTTGAGAGGATGTTACTTTAGAAGGAAAGGATTTTTTTGTTATTAAAAGGTAAGATTCC",
+                  "TGGATTCTTATTGGACTGTTGTCTCTGTTATGAGTAATCCATCTTTAGTCATTCACCACTAGGGTTG",
+                  "TATTTAATTAAGTCTGAGTTATTTTATGGTGATTTTGTTTTGTTTTGTTTTGTTTTTACCGAATTTT",
+                  "GTTCTCATTGCCGTGGCTTGAGGGCAATGACGTGAT") # Pasted so the output don't overflows
+testseq2 <- "CAAGCTTGTGCAGTGTTGCTGTTCTATCTCGGCTCACTGCAAGCTGTTCACGCCATGTTCTGTT"
+#sort(sapply(ls()[grep("seq", ls())], function(x) object.size(get(x))))
+```
+
+## Get-Interspaces
+(This was practically already done)
+This functions measures all the spaces in between a given 'kmer', the produced
+data can either be represented 'as-is' or in terms of position relative to 
+sequence length.
+
+```{r}
+#| label: label-3
+setwd(projpath)
+source("scripts/trash-code.R")
+source("scripts/interpolation-functions.R")
+get_interspaces(testseq1, k = 3, kmer = "CTC", print = TRUE)
+get_interspaces(testseq1, k = 3, kmer = "CTC", relative = TRUE, print = TRUE)
+```
+
+## Kmer-Interspaces
+(This function was already done and moved to 'trash-code' since it wasn't of use
+at the moment. Its' only modification was moving interspaces' computation to an individual 
+function an adding the 'acc_peaks' ("accentuate peaks") and 'rel' ("relative") paramters).
+This function used the previous one and adjusts the data to many trigonometric linear models
+from which it chooses the 'best' one.
+```{r}
+kmer_interspace_polynome(testseq1, kmer="CTG", aem_option=5, acc_peaks=TRUE)
+kmer_interspace_polynome(testseq1, kmer="CTG", aem_option=7, acc_peaks=TRUE)
+kmer_interspace_polynome(testseq1, kmer="CTC", aem_option=7, acc_peaks=TRUE)
+kmer_interspace_polynome(testseq1, kmer="CTC", aem_option=8, acc_peaks=TRUE)
+```
+
+At a certain point I wanted to visualize the process of model selection so I added the parameter 'silent'
+(Since the output is really long, we won't evaluate the following cell)
+```{r}
+#| eval: false
+kmer_interspace_polynome(testseq1, kmer="CTC", aem_option=7, acc_peaks=TRUE, silent=FALSE)
+kmer_interspace_polynome(testseq1, kmer="CTC", aem_option=8, acc_peaks=TRUE, silent=FALSE)
+```
+
+To visualize this in a plot I added the paramter 'aem_graph' ('AEM' standing for 'Adjust-Error Metric')
+```{r}
+kmer_interspace_polynome(testseq1, kmer="CTC", silent=TRUE, aem_option=5, acc_peaks=TRUE, aem_graph=TRUE)
+kmer_interspace_polynome(testseq1, kmer="CTC", silent=TRUE, aem_option=7, acc_peaks=TRUE, aem_graph=TRUE)
+kmer_interspace_polynome(testseq1, kmer="CTC", silent=TRUE, aem_option=8, acc_peaks=TRUE, aem_graph=TRUE)
+```
+
+In case I wanted to watch a spacific trigonometric case, I added the 'fixed' parameter:
+```{r}
+kmer_interspace_polynome(testseq2, kmer="GTT", silent=TRUE, fixed=TRUE, case=2, subcase=10)
+kmer_interspace_polynome(testseq2, kmer="GTT", silent=TRUE, fixed=TRUE, case=2, subcase=8)
+```
+
+I also got the curiosity to apply Kernel Density Estimation to the data, so I added the parameters
+'kdesmooth' and 'bw' (for "bandwidth"):
+```{r}
+kmer_interspace_polynome(testseq1, kmer="CTC", silent=TRUE, kdesmooth=TRUE, bw = 0.2)
+kmer_interspace_polynome(testseq1, kmer="CTC", silent=TRUE, kdesmooth=TRUE, bw = 0.1)
+kmer_interspace_polynome(testseq1, kmer="CTC", silent=TRUE, kdesmooth=TRUE, bw = 0.05)
+#kmer_interspace_polynome(windows=testseq1, kmer="CTC", silent=TRUE, aem_option=7, rel = FALSE)
+```
+
+

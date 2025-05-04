@@ -8,3 +8,5 @@ datasets/
 PDFs/
 notebooks/*cache
 notebooks/*files
+liltests/
+trash-code/

@@ -13,8 +13,9 @@ format:
          \newcommand{\fontdejavuser}[1]{{\fontspec{DejaVu Serif} #1}}
          \newcommand{\myfontchart}[1]{{\fontfamily{bch}\selectfont #1}}
          \newcommand{\fn}[1]{\textcolor{DarkSlateGray}{\texttt{#1}}}
-         \newcommand{\impw}[1]{{\textcolor{MidnightBlue}{\fontspec{Nimbus Sans} #1}}}
+         \newcommand{\impw}[1]{{\textcolor{brown!45!black}{\fontspec{Nimbus Sans} #1}}}
          \newcommand{\hlight}[1]{{\textcolor{Sienna4}{\fontspec{DejaVu Sans} #1}}}
+         \newcommand{\undrl}[1]{{\underline{#1}}}
          \setlength{\defaultaddspace}{0pt} %This prevents tables in kable to display interpaces every 5 rows
     toc: true
     number-sections: true
@@ -46,6 +47,7 @@ format:
       - \definecolor{pythoncol}{rgb}{0.188,0.412,0.596}
       - \definecolor{rcol}{rgb}{0.121,0.466,0.705}
       - \definecolor{bashcol}{rgb}{0.207,0.262,0.392}
+      - \definecolor{awkcol}{rgb}{0.650,0.188,0.120}
       - \newtcolorbox{pythonheader}{
           colback=pythoncol!70, colframe=pythoncol,
           fontupper=\footnotesize\bfseries\color{white},
@@ -60,6 +62,12 @@ format:
           halign=right, sharp corners=south}
       - \newtcolorbox{bashheader}{
           colback=bashcol!70, colframe=bashcol,
+          fontupper=\footnotesize\bfseries\color{white},
+          boxrule=0.1mm, arc=4mm,
+          left=1.5mm, right=1.5mm, top=0.5mm, bottom=0.5mm,
+          halign=right, sharp corners=south}
+      - \newtcolorbox{awkheader}{
+          colback=awkcol!70, colframe=awkcol,
           fontupper=\footnotesize\bfseries\color{white},
           boxrule=0.1mm, arc=4mm,
           left=1.5mm, right=1.5mm, top=0.5mm, bottom=0.5mm,

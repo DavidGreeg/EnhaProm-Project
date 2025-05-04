@@ -1,0 +1,20 @@
+├── Features per whole sequence:
+│   ├──=> nb_perc: Nucleotide Percentages
+│   ├──=> nb_temp: Melting Temperature
+│   ├──=> nb_shan: Shannon entropy coefficient of Nucleotides
+│   └── Global Self-Alignment
+│       ├── Sequence Reverse Self-Alignment
+│       │   ├──=> r_id: reverse alignment identity
+│       │   └──=> r_sc: reverse alignment score
+│       └── Sequence Reverse Complement Self-Alignment
+│           ├──=> rc_id: reverse complement alignment identity
+│           └──=> rc_sc: reverse complement alignment score
+├── Features per kmer set:
+│   └── Kmer Diversity
+│       ├──=> kx_shan: Shannon entropy coefficient of Kmers
+│       ├──=> kx_adiv: Absolute kmer diversity
+│       └──=> kx_rdiv: Relative kmer diversity
+└── Feature per each kmer:
+    ├──=> ki_prod: Count percentage product
+    ├──=> ki_bcds: Barcode profile - Division of Exponent Sum
+    └──=> ki_bclp: Barcode profile - Log of Primes Product
